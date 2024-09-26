@@ -1,8 +1,12 @@
 import {
+  ApertureIcon,
   CalendarDaysIcon,
   CheckCircle2Icon,
   CheckIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsUpDownIcon,
   CircleHelpIcon,
   CircleIcon,
   CircleMinusIcon,
@@ -10,13 +14,14 @@ import {
   Clock1Icon,
   EllipsisIcon,
   Home,
+  ImageIcon,
   LoaderIcon,
   Package,
   Settings2,
   ShoppingCart,
   SlashIcon,
   Trash2Icon,
-  type LucideIcon
+  type LucideIcon,
 } from "lucide-react";
 
 export type IconType = LucideIcon;
@@ -39,4 +44,9 @@ export const Icons = {
   circle: CircleIcon,
   clock: Clock1Icon,
   checkCircle: CheckCircle2Icon,
+  chevronsUpDown: ChevronsUpDownIcon,
+  logo: ApertureIcon,
+  image: ImageIcon,
+  chevronLeft: ChevronLeftIcon,
+  chevronRight: ChevronRightIcon,
 };
