@@ -13,15 +13,18 @@ import {
   CirclePlusIcon,
   Clock1Icon,
   EllipsisIcon,
+  EllipsisVertical,
   Home,
   ImageIcon,
   LoaderIcon,
+  MoveUpRight,
   Package,
   Settings2,
   ShoppingCart,
   SlashIcon,
   Trash2Icon,
-  type LucideIcon,
+  XIcon,
+  type LucideIcon
 } from "lucide-react";
 
 export type IconType = LucideIcon;
@@ -49,4 +52,7 @@ export const Icons = {
   image: ImageIcon,
   chevronLeft: ChevronLeftIcon,
   chevronRight: ChevronRightIcon,
+  verticalEllipsis: EllipsisVertical,
+  moveUpRight: MoveUpRight,
+  x: XIcon,
 };

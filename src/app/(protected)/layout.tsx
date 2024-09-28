@@ -6,9 +6,9 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="flex min-h-screen w-full">
+    <main className="flex min-h-screen w-screen">
       <Navbar />
-      <section className="px-8 py-12">{children}</section>
+      <section className="px-8 py-12 w-full">{children}</section>
     </main>
   );
 }

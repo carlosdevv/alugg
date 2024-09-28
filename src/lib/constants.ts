@@ -1,5 +1,7 @@
-
 export const appRoutes = {
   home: "/",
-  inventory: "/inventory",
+  inventory: {
+    root: "/inventory",
+    createItem: "/inventory/create-item",
+  },
 };

@@ -28,7 +28,7 @@ export default function Navbar() {
               Inicio
             </NavLink>
             <NavLink
-              href={appRoutes.inventory}
+              href={appRoutes.inventory.root}
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary data-[current=true]:bg-muted"
             >
               <Icons.package className="h-4 w-4" />

@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
+import Link from "next/link";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -68,6 +69,12 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-60"
         />
+        <Button className="ml-auto" size="sm" asChild>
+          <Link href="/inventory/create-item">
+            <Icons.circlePlus className="size-4 mr-2" />
+            Criar Item
+          </Link>
+        </Button>
       </div>
       <div className="rounded-md border mb-2">
         <Table>

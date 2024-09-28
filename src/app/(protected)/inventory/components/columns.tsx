@@ -1,9 +1,35 @@
 "use client";
 
 import { Icons } from "@/components/icons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  FloatingPanelBody,
+  FloatingPanelCloseButton,
+  FloatingPanelContent,
+  FloatingPanelFooter,
+  FloatingPanelRoot,
+  FloatingPanelTrigger,
+} from "@/components/ui/floating-panel";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 export type StockItems = {
   id: string;
@@ -17,32 +43,11 @@ export type StockItems = {
   description?: string;
   amount: number;
   imageUrl?: string;
+  itemInRenovation: boolean;
+  itemInactive: boolean;
 };
 
 export const columns: ColumnDef<StockItems>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="mr-4"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "imageUrl",
     header: "Imagem",
@@ -52,16 +57,36 @@ export const columns: ColumnDef<StockItems>[] = [
         <>
           {imageUrl ? (
             <div className="w-full flex">
-              <Avatar className="size-16">
-                <AvatarImage src={imageUrl} />
-                <AvatarFallback>
-                  <Icons.image className="size-6 text-muted-foreground" />
-                </AvatarFallback>
-              </Avatar>
+              <FloatingPanelRoot>
+                <FloatingPanelTrigger title="Imagem do Item" asChild>
+                  <Image
+                    alt="Product image"
+                    className="aspect-square rounded-md object-cover"
+                    height="64"
+                    width="64"
+                    src={imageUrl}
+                  />
+                </FloatingPanelTrigger>
+                <FloatingPanelContent className="w-80">
+                  <FloatingPanelBody>
+                    <motion.img
+                      src={imageUrl}
+                      alt="image"
+                      className="w-full h-auto rounded-md"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </FloatingPanelBody>
+                  <FloatingPanelFooter>
+                    <FloatingPanelCloseButton />
+                  </FloatingPanelFooter>
+                </FloatingPanelContent>
+              </FloatingPanelRoot>
             </div>
           ) : (
             <div className="w-full flex">
-              <div className="flex items-center justify-center bg-muted size-16 rounded-full">
+              <div className="flex items-center justify-center size-16 bg-muted aspect-square rounded-md object-cover">
                 <Icons.image className="size-6 text-muted-foreground" />
               </div>
             </div>
@@ -71,20 +96,42 @@ export const columns: ColumnDef<StockItems>[] = [
     },
   },
   {
-    accessorKey: "name",
-    header: "Nome",
+    accessorKey: "code",
+    header: "Código",
+    cell: ({ row }) => {
+      const code: string = row.getValue("code") || "-";
+      return <div className="font-medium">{code}</div>;
+    },
   },
   {
     accessorKey: "category",
     header: "Categoria",
+    cell: ({ row }) => {
+      return (
+        <div className="truncate max-w-60 font-medium">
+          {row.getValue("category")}
+        </div>
+      );
+    },
   },
   {
-    accessorKey: "code",
-    header: "Código",
+    accessorKey: "name",
+    header: "Nome",
+    cell: ({ row }) => {
+      return (
+        <div className="truncate max-w-60 font-medium">
+          {row.getValue("name")}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "amount",
+    header: "Quantidade",
   },
   {
     accessorKey: "objectPrice",
-    header: "Preço de objeto",
+    header: "Preço do Objeto",
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("objectPrice"));
       const formatted = new Intl.NumberFormat("pt-BR", {
@@ -92,12 +139,12 @@ export const columns: ColumnDef<StockItems>[] = [
         currency: "BRL",
       }).format(amount);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div className="font-medium">{formatted}</div>;
     },
   },
   {
     accessorKey: "rentPrice",
-    header: "Preço de aluguel",
+    header: "Preço de Aluguel",
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("rentPrice"));
       const formatted = new Intl.NumberFormat("pt-BR", {
@@ -105,26 +152,100 @@ export const columns: ColumnDef<StockItems>[] = [
         currency: "BRL",
       }).format(amount);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div className="font-medium">{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: "itemInactive",
+    header: "Item Ativo",
+    cell: ({ row }) => {
+      const itemInactive: string =
+        row.getValue("itemInactive") === true ? "Não" : "Sim";
+      return (
+        <Badge
+          className={cn(
+            itemInactive === "Sim"
+              ? "bg-emerald-400 hover:bg-emerald-500"
+              : "bg-rose-500 hover:bg-rose-600",
+            "font-medium"
+          )}
+        >
+          {itemInactive}
+        </Badge>
+      );
     },
   },
   {
     accessorKey: "size",
     header: "Tamanho",
+    cell: ({ row }) => {
+      const size: string = row.getValue("size") || "-";
+      return <div className="font-medium">{size}</div>;
+    },
   },
   {
     accessorKey: "color",
     header: "Cor",
+    cell: ({ row }) => {
+      const color: string = row.getValue("color") || "-";
+      return <div className="font-medium">{color}</div>;
+    },
   },
   {
     accessorKey: "description",
     header: "Descrição",
+    cell: ({ row }) => {
+      const description: string = row.getValue("description") || "-";
+      return (
+        <>
+          {description === "-" ? (
+            <div>-</div>
+          ) : (
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <Button variant="link" className="p-0">
+                  Ver descrição
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <div className="flex flex-col space-y-2">
+                  <h1 className="font-medium">Descrição</h1>
+                  {description}
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          )}
+        </>
+      );
+    },
   },
-  {
-    accessorKey: "amount",
-    header: "Quantidade",
-  },
+
   {
     header: "Opções",
+    cell: () => {
+      return (
+        <div className="flex items-center justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Icons.verticalEllipsis className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Opções</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem className="cursor-pointer">
+                  Ver Detalhes
+                  <DropdownMenuShortcut>
+                    <Icons.moveUpRight className="size-4" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      );
+    },
   },
 ];

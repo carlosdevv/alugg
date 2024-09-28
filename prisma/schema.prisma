@@ -27,7 +27,6 @@ model User {
   name               String?
   email              String         @unique
   passwordHash       String?        @map("password_hash")
-  avatarUrl          String?        @map("avatar_url")
   createdAt          DateTime       @default(now()) @map("created_at")
   updatedAt          DateTime       @updatedAt @map("updated_at")
   tokens             Token[]
@@ -113,7 +112,7 @@ model StockItem {
   color             String?
   description       String?
   amount            Int
-  itemInRenovatioon Boolean    @default(false) @map("item_in_renovation")
+  itemInRenovation Boolean    @default(false) @map("item_in_renovation")
   itemInactive      Boolean    @default(false) @map("item_inactive")
   imageUrl          String?    @map("image_url")
   owner             User       @relation(fields: [ownerId], references: [id])
