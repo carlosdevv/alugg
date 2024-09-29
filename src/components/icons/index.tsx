@@ -19,12 +19,13 @@ import {
   LoaderIcon,
   MoveUpRight,
   Package,
+  PenLineIcon,
   Settings2,
   ShoppingCart,
   SlashIcon,
   Trash2Icon,
   XIcon,
-  type LucideIcon
+  type LucideIcon,
 } from "lucide-react";
 
 export type IconType = LucideIcon;
@@ -55,4 +56,5 @@ export const Icons = {
   verticalEllipsis: EllipsisVertical,
   moveUpRight: MoveUpRight,
   x: XIcon,
+  update: PenLineIcon,
 };

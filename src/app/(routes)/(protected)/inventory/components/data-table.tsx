@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import Link from "next/link";
+import { appRoutes } from "@/lib/constants";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -60,7 +61,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex flex-wrap gap-y-4 justify-between items-center py-4">
         <Input
           placeholder="🔎  Filtrar por Nome"
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -69,8 +70,8 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-60"
         />
-        <Button className="ml-auto" size="sm" asChild>
-          <Link href="/inventory/create-item">
+        <Button size="sm" asChild>
+          <Link href={appRoutes.inventory.create}>
             <Icons.circlePlus className="size-4 mr-2" />
             Criar Item
           </Link>

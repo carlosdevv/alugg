@@ -1,3 +1,4 @@
+import { Icons } from "@/components/icons";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -5,8 +6,11 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { appRoutes } from "@/lib/constants";
+import Link from "next/link";
+import CreateItemForm from "./components/create-item-form";
 
 export default function CreateItemPage() {
   return (
@@ -20,15 +24,23 @@ export default function CreateItemPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={appRoutes.inventory.createItem}>
+            <BreadcrumbLink href={appRoutes.inventory.create}>
               Criar Item
             </BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h1 className="font-semibold text-2xl mt-4">Criar Item</h1>
-      <Separator className="my-2" />
+      <div className="flex items-center space-x-4 mt-4">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={appRoutes.inventory.root}>
+            <Icons.chevronLeft className="size-4" />
+          </Link>
+        </Button>
+        <h1 className="font-semibold text-2xl">Criar Item</h1>
+      </div>
+      <Separator className="mt-2 mb-6" />
+      <CreateItemForm />
     </div>
   );
 }

@@ -2,6 +2,7 @@ export const appRoutes = {
   home: "/",
   inventory: {
     root: "/inventory",
-    createItem: "/inventory/create-item",
+    create: "/inventory/create",
+    update: "/inventory/update",
   },
 };

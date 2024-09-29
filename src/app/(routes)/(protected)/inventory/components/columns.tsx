@@ -30,8 +30,9 @@ import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { RowActions } from "./row-actions";
 
-export type StockItems = {
+export type InventoryItemColumn = {
   id: string;
   name: string;
   category: string;
@@ -47,7 +48,7 @@ export type StockItems = {
   itemInactive: boolean;
 };
 
-export const columns: ColumnDef<StockItems>[] = [
+export const columns: ColumnDef<InventoryItemColumn>[] = [
   {
     accessorKey: "imageUrl",
     header: "Imagem",
@@ -222,29 +223,9 @@ export const columns: ColumnDef<StockItems>[] = [
 
   {
     header: "Opções",
-    cell: () => {
+    cell: ({row}) => {
       return (
-        <div className="flex items-center justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Icons.verticalEllipsis className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Opções</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem className="cursor-pointer">
-                  Ver Detalhes
-                  <DropdownMenuShortcut>
-                    <Icons.moveUpRight className="size-4" />
-                  </DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <RowActions row={row} />
       );
     },
   },

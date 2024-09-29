@@ -34,7 +34,6 @@ model User {
   member_on          Member[]
   owns_organizations Organization[]
   Inventory          Inventory?
-  StockItem          StockItem[]
 
   @@map("users")
 }
@@ -103,26 +102,24 @@ model Inventory {
 }
 
 model StockItem {
-  id                BigInt     @id
-  name              String
-  code              String?
-  objectPrice       Float      @map("object_price")
-  rentPrice         Float      @map("rent_price")
-  size              String?
-  color             String?
-  description       String?
-  amount            Int
+  id               BigInt     @id
+  name             String
+  code             String?
+  objectPrice      Float      @map("object_price")
+  rentPrice        Float      @map("rent_price")
+  size             String?
+  color            String?
+  description      String?
+  amount           Int
   itemInRenovation Boolean    @default(false) @map("item_in_renovation")
-  itemInactive      Boolean    @default(false) @map("item_inactive")
-  imageUrl          String?    @map("image_url")
-  owner             User       @relation(fields: [ownerId], references: [id])
-  ownerId           String     @map("owner_id")
-  category          Category   @relation(fields: [categoryId], references: [id])
-  categoryId        String
-  Inventory         Inventory? @relation(fields: [inventoryId], references: [id])
-  inventoryId       String?
-  createdAt         DateTime   @default(now()) @map("created_at")
-  updatedAt         DateTime   @updatedAt @map("updated_at")
+  itemInactive     Boolean    @default(false) @map("item_inactive")
+  imageUrl         String?    @map("image_url")
+  category         Category   @relation(fields: [categoryId], references: [id])
+  categoryId       String
+  Inventory        Inventory? @relation(fields: [inventoryId], references: [id])
+  inventoryId      String?
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
 
   @@map("stock_items")
 }
