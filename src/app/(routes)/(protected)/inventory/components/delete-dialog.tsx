@@ -1,6 +1,4 @@
-import { Icons } from "@/components/icons";
 import {
-  AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
@@ -8,17 +6,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  DropdownMenuItem,
-  DropdownMenuShortcut,
-} from "@/components/ui/dropdown-menu";
 
 export function DeleteDialog() {
   return (
     <>
-      
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Tem Certeza?</AlertDialogTitle>

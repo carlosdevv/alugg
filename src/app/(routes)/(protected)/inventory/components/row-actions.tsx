@@ -1,4 +1,5 @@
 import { Icons } from "@/components/icons";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +16,6 @@ import Link from "next/link";
 import slugify from "slugify";
 import type { InventoryItemColumn } from "./columns";
 import { DeleteDialog } from "./delete-dialog";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;

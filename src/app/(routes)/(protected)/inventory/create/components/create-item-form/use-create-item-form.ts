@@ -6,7 +6,10 @@ const createItemFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
   category: z.string({ required_error: "Selecione ao menos uma categoria" }),
   amount: z.coerce
-    .number({ required_error: "Quantidade é obrigatória" })
+    .number({
+      required_error: "Quantidade é obrigatória",
+      invalid_type_error: "Quantidade deve ser um número",
+    })
     .positive({ message: "Quantidade deve ser maior que 0" }),
   objectPrice: z
     .number({ required_error: "Valor do Objeto é obrigatório" })

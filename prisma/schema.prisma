@@ -24,9 +24,9 @@ enum TokenType {
 
 model User {
   id                 String         @id @default(uuid())
-  name               String?
+  name               String
   email              String         @unique
-  passwordHash       String?        @map("password_hash")
+  passwordHash       String         @map("password_hash")
   createdAt          DateTime       @default(now()) @map("created_at")
   updatedAt          DateTime       @updatedAt @map("updated_at")
   tokens             Token[]
@@ -42,7 +42,6 @@ model Organization {
   id        String   @id @default(uuid())
   name      String
   slug      String   @unique
-  avatarUrl String?  @map("avatar_url")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   owner     User     @relation(fields: [ownerId], references: [id])
@@ -91,17 +90,18 @@ model Token {
 }
 
 model Inventory {
-  id        String      @id @default(cuid())
-  items     StockItem[]
-  owner     User        @relation(fields: [ownerId], references: [id])
-  ownerId   String      @unique @map("owner_id")
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
+  id         String          @id @default(cuid())
+  items      InventoryItem[]
+  categories Category[]
+  owner      User            @relation(fields: [ownerId], references: [id])
+  ownerId    String          @unique @map("owner_id")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
 
   @@map("inventories")
 }
 
-model StockItem {
+model InventoryItem {
   id               BigInt     @id
   name             String
   code             String?
@@ -121,15 +121,17 @@ model StockItem {
   createdAt        DateTime   @default(now()) @map("created_at")
   updatedAt        DateTime   @updatedAt @map("updated_at")
 
-  @@map("stock_items")
+  @@map("inventory_items")
 }
 
 model Category {
-  id        String      @id @default(cuid())
-  name      String
-  items     StockItem[]
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
+  id          String          @id @default(cuid())
+  name        String
+  items       InventoryItem[]
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  Inventory   Inventory?      @relation(fields: [inventoryId], references: [id])
+  inventoryId String?
 
   @@map("categories")
 }

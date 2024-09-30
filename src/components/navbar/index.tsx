@@ -1,11 +1,17 @@
+"use client";
+
 import Link from "next/link";
 
 import { Icons } from "@/components/icons";
 import { ProjectSwitcher } from "@/components/project-switcher";
 import { appRoutes } from "@/lib/constants";
+import { useClerk } from "@clerk/nextjs";
 import { NavLink } from "../nav-link";
+import { Button } from "../ui/button";
 
 export default function Navbar() {
+  const { signOut } = useClerk();
+
   return (
     <div className="hidden border-r bg-muted/40 md:block">
       <div className="flex h-full max-h-screen flex-col gap-2">
@@ -36,6 +42,14 @@ export default function Navbar() {
             </NavLink>
           </nav>
         </div>
+        <Button
+          onClick={() => signOut({ redirectUrl: appRoutes.signIn })}
+          variant="ghost"
+          className="mt-auto m-3 mb-4"
+        >
+          <Icons.signOut className="size-4 mr-2" />
+          Sair
+        </Button>
       </div>
     </div>
   );

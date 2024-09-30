@@ -27,6 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { appRoutes } from "@/lib/constants";
+import Link from "next/link";
 import useCreateItemForm from "./use-create-item-form";
 
 export default function CreateItemForm() {
@@ -64,24 +66,33 @@ export default function CreateItemForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Categoria *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione uma categoria" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="m@example.com">
-                            m@example.com
-                          </SelectItem>
-                          <SelectItem value="m@google.com">
-                            m@google.com
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center space-x-4">
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione uma categoria" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="m@example.com">
+                              m@example.com
+                            </SelectItem>
+                            <SelectItem value="m@google.com">
+                              m@google.com
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        <Button size="sm" type="button" asChild>
+                          <Link href={appRoutes.inventory.createCategory}>
+                            <Icons.circlePlus className="size-4 mr-2" />
+                            Adicionar
+                          </Link>
+                        </Button>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
