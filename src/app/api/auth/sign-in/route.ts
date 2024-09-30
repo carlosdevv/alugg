@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const isPasswordValid = compare(password, hasUser.passwordHash);
+    const isPasswordValid = compare(password, hasUser?.passwordHash);
 
     if (!isPasswordValid) {
       return new NextResponse("Credenciais inválidas.", {
