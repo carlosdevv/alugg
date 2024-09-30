@@ -12,12 +12,81 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useSignUpForm from "./use-sign-up-form";
 
 export default function SignUpForm() {
-  const { form, onSubmit, showPassword, setShowPassword, isPending } =
-    useSignUpForm();
+  const {
+    form,
+    onSubmit,
+    showPassword,
+    setShowPassword,
+    isPending,
+    verifyCodeScreen,
+    setVerifyCodeScreen,
+    code,
+    setCode,
+    verifyCode,
+    isSendingEmail,
+  } = useSignUpForm();
+
+  if (verifyCodeScreen) {
+    return (
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-y-4">
+          <div className="flex flex-col space-y-4 justify-center items-center">
+            <Label>Código de verificação</Label>
+            <InputOTP
+              maxLength={6}
+              value={code}
+              onChange={(value) => setCode(value)}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+              </InputOTPGroup>
+              <InputOTPSeparator />
+              <InputOTPGroup>
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+
+          <Button
+            variant="ghost"
+            type="button"
+            className="w-min mx-auto text-muted-foreground"
+            disabled={isPending}
+            onClick={() => setVerifyCodeScreen(false)}
+          >
+            Reenviar código
+          </Button>
+          <Button
+            type="button"
+            className="w-full mt-4"
+            disabled={isPending}
+            onClick={verifyCode}
+          >
+            {isPending ? (
+              <Icons.loader className="size-4 animate-spin" />
+            ) : (
+              "Cadastrar"
+            )}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -98,8 +167,10 @@ export default function SignUpForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">
-            {isPending && <Icons.loader className="mr-2 size-4 animate-spin" />}
+          <Button type="submit" disabled={isSendingEmail}>
+            {isSendingEmail && (
+              <Icons.loader className="mr-2 size-4 animate-spin" />
+            )}
             Cadastrar
           </Button>
         </form>

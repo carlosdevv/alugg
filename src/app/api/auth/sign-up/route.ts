@@ -1,4 +1,3 @@
-import { appRoutes } from "@/lib/constants";
 import prisma from "@/lib/prismadb";
 import { clerkClient } from "@clerk/nextjs/server";
 import { hash } from "bcryptjs";
@@ -7,15 +6,25 @@ import { z } from "zod";
 
 const signUpSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(6),
   name: z.string(),
+  code: z.string(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { email, password, name } = signUpSchema.parse(body);
+    const parsed = signUpSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: "Dados inválidos." },
+        { status: 400 }
+      );
+    }
+
+    const { email, password, name, code } = parsed.data;
 
     const hasUser = await prisma.user.findFirst({
       where: {
@@ -24,37 +33,80 @@ export async function POST(req: NextRequest) {
     });
 
     if (hasUser) {
-      return new NextResponse("Já existe um usuário com o esse e-mail.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Já existe um usuário com o esse e-mail." },
+        { status: 400 }
+      );
+    }
+
+    const token = await prisma.token.findFirst({
+      where: {
+        type: "EMAIL_VALIDATION",
+        email,
+        code,
+      },
+    });
+
+    if (!token) {
+      return NextResponse.json(
+        { message: "Código de verificação inválido." },
+        { status: 400 }
+      );
+    }
+
+    const EXPIRED_TIME_MS = 15 * 1000 * 60;
+    const tokenExpired =
+      Date.now() - new Date(token.createdAt).getTime() >= EXPIRED_TIME_MS;
+
+    if (tokenExpired) {
+      return NextResponse.json(
+        { message: "Código de verificação expirado." },
+        { status: 400 }
+      );
     }
 
     const passwordHash = await hash(password, 6);
 
-    const clerkUser = await clerkClient.users.createUser({
+    const clerkUser = await clerkClient().users.createUser({
       emailAddress: [email],
       firstName: name,
-      password: passwordHash,
+      password: password,
+      skipPasswordChecks: true,
     });
 
     if (!clerkUser) {
-      return new NextResponse("CLK - Erro ao criar usuário.", { status: 500 });
+      return NextResponse.json(
+        { message: "CLK - Erro ao criar usuário." },
+        { status: 500 }
+      );
     }
 
-    await prisma.user.create({
-      data: {
-        id: clerkUser.id,
-        email,
-        passwordHash,
-        name,
-      },
-    });
+    Promise.all([
+      await prisma.token.deleteMany({
+        where: {
+          type: "EMAIL_VALIDATION",
+          email,
+        },
+      }),
+      await prisma.user.create({
+        data: {
+          id: clerkUser.id,
+          email,
+          passwordHash,
+          name,
+        },
+      }),
+    ]);
 
-    return NextResponse.redirect(appRoutes.signIn);
+    return NextResponse.json(
+      { message: "Usuário criado com sucesso." },
+      { status: 201 }
+    );
   } catch (error) {
     console.log("ERR:", error);
-    return new NextResponse("Ocorreu um erro, tente novamente mais tarde.", {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Ocorreu um erro, tente novamente mais tarde." },
+      { status: 500 }
+    );
   }
 }

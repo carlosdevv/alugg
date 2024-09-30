@@ -20,6 +20,7 @@ enum Role {
 
 enum TokenType {
   PASSWORD_RECOVER
+  EMAIL_VALIDATION
 }
 
 model User {
@@ -29,7 +30,6 @@ model User {
   passwordHash       String         @map("password_hash")
   createdAt          DateTime       @default(now()) @map("created_at")
   updatedAt          DateTime       @updatedAt @map("updated_at")
-  tokens             Token[]
   invites            Invite[]
   member_on          Member[]
   owns_organizations Organization[]
@@ -82,9 +82,9 @@ model Invite {
 model Token {
   id        String    @id @default(uuid())
   type      TokenType
+  code      String?
   createdAt DateTime  @default(now()) @map("created_at")
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String    @map("user_id")
+  email     String?
 
   @@map("tokens")
 }
