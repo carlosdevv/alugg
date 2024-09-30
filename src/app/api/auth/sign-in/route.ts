@@ -22,19 +22,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (!hasUser) {
-      return new NextResponse("Credenciais inválidas.", {
-        status: 400,
-      });
-    }
-
     if (!email || !password) {
       return new NextResponse("Credenciais inválidas.", {
         status: 400,
       });
     }
 
-    const isPasswordValid = compare(password, hasUser?.passwordHash);
+    if (!hasUser) {
+      return new NextResponse("Credenciais inválidas.", {
+        status: 400,
+      });
+    }
+
+    const isPasswordValid = compare(password, hasUser.passwordHash as string);
 
     if (!isPasswordValid) {
       return new NextResponse("Credenciais inválidas.", {
