@@ -44,7 +44,7 @@ export default function useSignInForm() {
 
         if (signInAttempt.status === "complete") {
           await setActive({ session: signInAttempt.createdSessionId });
-          router.push(appRoutes.home);
+          router.push(appRoutes.onboarding);
         } else {
           toast.error(
             "CLK - Ocorreu um erro ao realizar o login, tente novamente mais tarde."

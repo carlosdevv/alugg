@@ -10,10 +10,6 @@ export type SignUpServiceBody = {
   code: string;
 };
 
-export type ErrorResponse = {
-  message: string;
-};
-
 export type ValidateEmailServiceBody = {
   email: string;
   name: string;

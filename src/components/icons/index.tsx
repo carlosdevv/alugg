@@ -24,6 +24,7 @@ import {
   Package,
   PenLineIcon,
   Settings2,
+  ShieldAlertIcon,
   ShoppingCart,
   SlashIcon,
   Trash2Icon,
@@ -63,4 +64,5 @@ export const Icons = {
   signOut: LogOutIcon,
   eye: EyeIcon,
   eyeOff: EyeOffIcon,
+  alert: ShieldAlertIcon,
 };

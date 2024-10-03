@@ -4,8 +4,8 @@ import type { HTTPError } from "ky";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { signInService, signUpService, validateEmailService } from ".";
+import type { ErrorResponse } from "../types";
 import type {
-  ErrorResponse,
   SignInServiceBody,
   SignUpServiceBody,
   ValidateEmailServiceBody,

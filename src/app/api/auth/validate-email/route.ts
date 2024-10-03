@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     const verificationCode = Math.floor(
-      11111 + Math.random() * 900000
+      100000 + Math.random() * 900000
     ).toString();
 
     const token = await prisma.token.create({
