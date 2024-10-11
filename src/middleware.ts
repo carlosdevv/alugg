@@ -10,17 +10,6 @@ const isPublicRoute = createRouteMatcher([
 
 export default clerkMiddleware((auth, request) => {
   const { userId } = auth();
-  const { pathname } = request.nextUrl;
-  const response = NextResponse.next();
-
-  if (pathname.includes("/org")) {
-    const [, , slug] = pathname.split("/");
-
-    response.cookies.set("org", slug);
-  } else {
-    console.log("djakdajkda");
-    response.cookies.delete("org");
-  }
 
   if (isPublicRoute(request) && userId) {
     const redirectUrl = request.nextUrl.clone();
@@ -31,17 +20,6 @@ export default clerkMiddleware((auth, request) => {
   if (!isPublicRoute(request)) {
     auth().protect();
   }
-
-  
-
-  // const org = request.cookies.get("org");
-  // if (org && org.value !== "" && ["/", appRoutes.home].includes(pathname)) {
-  //   const redirectUrl = request.nextUrl.clone();
-  //   redirectUrl.pathname = `/org/${org.value}`;
-  //   return NextResponse.redirect(redirectUrl);
-  // }
-
-  return response;
 });
 
 export const config = {

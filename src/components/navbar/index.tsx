@@ -1,49 +1,91 @@
-import Link from "next/link";
-
 import { Icons } from "@/components/icons";
-import { NavLink } from "@/components/nav-link";
 import { OrganizationSwitcher } from "@/components/organization-switcher";
-import { appRoutes } from "@/lib/constants";
-import { getCookie } from "cookies-next";
-import SignOutButton from "./sign-out-button";
+import { ClientOnly } from "@/components/ui/client-only";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
+import { useMemo } from "react";
+import { Area } from "./area";
+import { ITEMS } from "./items";
+import { NavItem } from "./nav-item";
+import UserDropdown from "./user-dropdown";
 
-export default function Navbar() {
-  const currentOrg = getCookie("org");
-  
+const AREAS = ["settings", "default"] as const;
+
+export function Navbar() {
+  const { slug } = useParams() as { slug?: string };
+  const pathname = usePathname();
+
+  const currentArea = useMemo(() => {
+    return pathname.startsWith(`/${slug}/settings`) ? "settings" : "default";
+  }, [slug, pathname]);
+
   return (
-    <div className="hidden border-r bg-muted/40 md:block">
-      <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-          <Link
-            href={appRoutes.home}
-            className="flex items-center gap-2 font-semibold"
-          >
-            <Icons.logo className="size-5" color="#0e0f10" />
-            <OrganizationSwitcher currentOrg={currentOrg} />
-          </Link>
+    <ClientOnly className="scrollbar-hide relative flex h-full w-full flex-col overflow-y-auto overflow-x-hidden">
+      <nav className="relative p-3 text-gray-500">
+        <div className="relative flex items-start justify-between gap-1 pb-3">
+          {AREAS.map((area) => (
+            <Link
+              key={area}
+              href={slug ? `/${slug}` : "/"}
+              className={cn(
+                "rounded-md px-1 outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-black/50",
+                area === currentArea
+                  ? "relative opacity-100"
+                  : "pointer-events-none absolute opacity-0",
+                area === "default" && "mb-1"
+              )}
+              aria-hidden={area !== currentArea ? true : undefined}
+            >
+              {area === "default" ? (
+                <Icons.logo className="size-7" />
+              ) : (
+                <div className="py group -my-1 -ml-1 flex items-center gap-2 py-2 pr-1 text-sm font-medium text-neutral-900">
+                  <Icons.chevronLeft className="size-4 text-neutral-500 transition-transform duration-100 group-hover:-translate-x-0.5" />
+                  Configurações
+                </div>
+              )}
+            </Link>
+          ))}
+          <div className="hidden items-center gap-3 md:flex">
+            <UserDropdown />
+          </div>
         </div>
-        <div className="flex-1">
-          {currentOrg && (
-            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <NavLink
-                href={appRoutes.home}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary data-[current=true]:bg-muted"
-              >
-                <Icons.home className="h-4 w-4" />
-                Inicio
-              </NavLink>
-              <NavLink
-                href={appRoutes.inventory.root}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary data-[current=true]:bg-muted"
-              >
-                <Icons.package className="h-4 w-4" />
-                Estoque
-              </NavLink>
-            </nav>
-          )}
+        <div className="relative w-full">
+          {AREAS.map((area) => (
+            <Area
+              key={area}
+              visible={area === currentArea}
+              direction={area === "default" ? "left" : "right"}
+            >
+              {area === "default" && (
+                <>
+                  <div className="h-px w-full border border-white border-dashed mb-2" />
+                  <OrganizationSwitcher />
+                </>
+              )}
+
+              <div className="flex flex-col gap-4 pt-4">
+                {ITEMS[area].map(({ name, items }, idx) => (
+                  <div key={idx} className="flex flex-col gap-0.5">
+                    {name && (
+                      <div className="mb-2 pl-1 text-sm text-neutral-500">
+                        {name}
+                      </div>
+                    )}
+                    {items({ slug: slug || "" }).map((item) => (
+                      <NavItem key={item.name} item={item} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </Area>
+          ))}
         </div>
-        <SignOutButton />
+      </nav>
+      <div className="relative mt-6 flex grow flex-col justify-end">
+        UserSurveyButton Usage
       </div>
-    </div>
+    </ClientOnly>
   );
 }

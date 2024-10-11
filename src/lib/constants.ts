@@ -3,7 +3,6 @@ export const appRoutes = {
   signUp: "/auth/sign-up",
   forgotPassword: "/auth/forgot-password",
   onboarding: "/",
-  home: "/org",
   createOrganization: "/create-organization",
   inventory: {
     root: "inventory",

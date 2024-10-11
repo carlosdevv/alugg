@@ -2,6 +2,8 @@ import { api } from "../api-client";
 import type {
   CreateOrganizationServiceBody,
   CreateOrganizationServiceResponse,
+  GetMembershipProps,
+  GetMembershipResponse,
   GetOrganizationsApiProps,
   GetOrganizationsResponse,
 } from "./types";
@@ -26,4 +28,14 @@ export async function createOrganizationService({
       },
     })
     .json<CreateOrganizationServiceResponse>();
+}
+
+export async function getMembershipService({
+  org,
+}: GetMembershipProps): Promise<GetMembershipResponse> {
+  const result = await api
+    .get(`organization/${org}/membership`)
+    .json<GetMembershipResponse>();
+
+  return result;
 }

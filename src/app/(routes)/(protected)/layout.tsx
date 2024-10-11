@@ -1,4 +1,4 @@
-import Navbar from "@/components/navbar";
+import { MainNav } from "@/components/main-nav";
 
 export default function ProtectedLayout({
   children,
@@ -10,11 +10,10 @@ export default function ProtectedLayout({
   return (
     <>
       <main className="flex h-screen w-screen overflow-hidden">
-        <Navbar />
-        <section className="px-8 py-12 w-full overflow-y-auto overflow-x-hidden">
+        <MainNav>
           {children}
           {sheet}
-        </section>
+        </MainNav>
       </main>
     </>
   );

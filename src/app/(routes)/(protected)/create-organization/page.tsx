@@ -1,3 +1,5 @@
+"use client";
+
 import { CreateOrganizationForm } from "@/components/create-organization-form";
 import {
   Breadcrumb,
@@ -8,14 +10,18 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { appRoutes } from "@/lib/constants";
+import { usePathname } from "next/navigation";
 
 export default function CreateOrganization() {
+  const pathname = usePathname();
+  const slug = pathname.split("/")[1];
+
   return (
     <>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href={appRoutes.home}>Inicio</BreadcrumbLink>
+            <BreadcrumbLink href={slug}>Inicio</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

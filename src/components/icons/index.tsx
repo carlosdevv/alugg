@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ApertureIcon,
   CalendarDaysIcon,
@@ -12,6 +14,7 @@ import {
   CircleMinusIcon,
   CirclePlusIcon,
   Clock1Icon,
+  CogIcon,
   EllipsisIcon,
   EllipsisVertical,
   EyeIcon,
@@ -23,6 +26,7 @@ import {
   MoveUpRight,
   Package,
   PenLineIcon,
+  ReceiptTextIcon,
   Settings2,
   ShieldAlertIcon,
   ShoppingCart,
@@ -32,7 +36,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type IconType = LucideIcon;
+import { ComponentType, SVGProps } from "react";
+
+export type IconType = LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
 
 export const Icons = {
   package: Package,
@@ -65,4 +71,6 @@ export const Icons = {
   eye: EyeIcon,
   eyeOff: EyeOffIcon,
   alert: ShieldAlertIcon,
+  cog: CogIcon,
+  receipt: ReceiptTextIcon,
 };

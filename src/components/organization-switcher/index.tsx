@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 
 import { Icons } from "@/components/icons";
@@ -8,53 +6,99 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetOrganizationsService } from "@/http/organizations/use-organizations-service";
 import { appRoutes } from "@/lib/constants";
-import useOrganizationSwitcher from "./use-organization-switcher";
+import { useAuth } from "@clerk/nextjs";
+import { Role } from "@prisma/client";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-type OrganizationSwitcherProps = {
-  currentOrg?: string;
-};
+export function OrganizationSwitcher() {
+  const { data: organizations } = useGetOrganizationsService();
+  const { userId } = useAuth();
 
-export function OrganizationSwitcher({
-  currentOrg,
-}: OrganizationSwitcherProps) {
-  const { currentOrganization, organizations } = useOrganizationSwitcher({
-    currentOrg,
-  });
+  const { slug: currentSlug } = useParams() as {
+    slug?: string;
+  };
+
+  // Prevent slug from changing to empty to avoid UI switching during nav animation
+  const [slug, setSlug] = useState(currentSlug);
+  useEffect(() => {
+    if (currentSlug) setSlug(currentSlug);
+  }, [currentSlug]);
+
+  const currentOrganization = useMemo(() => {
+    const selectedOrganization = organizations?.find(
+      (organization) => organization.slug === slug
+    );
+
+    if (slug && organizations && selectedOrganization) {
+      return {
+        ...selectedOrganization,
+      };
+    }
+
+    return null;
+  }, [organizations, slug]);
+
+  const isOwner = useMemo(
+    () => currentOrganization?.ownerId === userId,
+    [currentOrganization?.ownerId, userId]
+  );
+
+  function formatRole(role: string) {
+    return role === Role.ADMIN ? "Admin" : "Membro";
+  }
+
+  function planBadge(plan: string) {
+    return plan === "free" ? (
+      <p className="text-left text-xs text-emerald-400 font-medium">Free</p>
+    ) : (
+      <p className="text-left text-xs text-violet-900 font-medium">Pago</p>
+    );
+  }
+
+  if (!organizations) return <Skeleton className="h-10 rounded-md w-full" />;
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex w-[168px] items-center gap-2 rounded p-1 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary">
+      <DropdownMenuTrigger className="flex w-full hover:bg-neutral-200/50 items-center gap-2 rounded-md p-2 text-sm font-medium outline-none">
         {currentOrganization ? (
-          <>
-            <span className="truncate text-left">
-              {currentOrganization.name}
-            </span>
-          </>
+          <div className="flex flex-col w-full">
+            <div className="flex truncate text-left items-center space-x-2 w-full">
+              <span>{currentOrganization.name}</span>
+              {isOwner ? (
+                <p className="text-xs font-light">(Dono)</p>
+              ) : (
+                <p className="text-xs font-light">
+                  ({formatRole(currentOrganization.role)})
+                </p>
+              )}
+            </div>
+            {isOwner && planBadge(currentOrganization.plan)}
+          </div>
         ) : (
           <span className="text-muted-foreground truncate">
             Selecione a organização
           </span>
         )}
+
         <Icons.chevronsUpDown className="ml-auto size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        alignOffset={-16}
-        sideOffset={12}
-        className="w-[200px]"
-      >
+      <DropdownMenuContent className="ml-2 max-h-80 w-full sm:w-64 sm:text-sm">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Organizações</DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          <p className="px-1 text-xs font-medium text-neutral-500 py-2">
+            Organizações
+          </p>
           {!organizations ||
             (organizations.length === 0 && (
               <DropdownMenuItem asChild>
-                <span className="text-muted-foreground">Sem organizações</span>
+                <span className="truncate text-sm leading-5 text-neutral-800 sm:max-w-[140px]">
+                  Sem organizações
+                </span>
               </DropdownMenuItem>
             ))}
           {organizations &&
@@ -65,18 +109,19 @@ export function OrganizationSwitcher({
                   asChild
                   className="cursor-pointer"
                 >
-                  <Link href={`/org/${organization.slug}`}>
-                    <span className="line-clamp-1">{organization.name}</span>
+                  <Link href={`/${organization.slug}`}>
+                    <span className="truncate text-sm leading-5 text-neutral-800 sm:max-w-[140px]">
+                      {organization.name}
+                    </span>
                   </Link>
                 </DropdownMenuItem>
               );
             })}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
         <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={appRoutes.createOrganization}>
-            <Icons.circlePlus className="mr-2 size-4" />
-            Criar organização
+            <Icons.circlePlus className="mr-4 size-4 text-neutral-500" />
+            <span className="text-sm text-neutral-800">Criar organização</span>
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
