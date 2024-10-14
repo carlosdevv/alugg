@@ -9,55 +9,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetOrganizationsService } from "@/http/organizations/use-organizations-service";
 import { appRoutes } from "@/lib/constants";
-import { useAuth } from "@clerk/nextjs";
-import { Role } from "@prisma/client";
-import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import useOrganizationSwitcher from "./use-organization-switcher";
 
 export function OrganizationSwitcher() {
-  const { data: organizations } = useGetOrganizationsService();
-  const { userId } = useAuth();
-
-  const { slug: currentSlug } = useParams() as {
-    slug?: string;
-  };
-
-  // Prevent slug from changing to empty to avoid UI switching during nav animation
-  const [slug, setSlug] = useState(currentSlug);
-  useEffect(() => {
-    if (currentSlug) setSlug(currentSlug);
-  }, [currentSlug]);
-
-  const currentOrganization = useMemo(() => {
-    const selectedOrganization = organizations?.find(
-      (organization) => organization.slug === slug
-    );
-
-    if (slug && organizations && selectedOrganization) {
-      return {
-        ...selectedOrganization,
-      };
-    }
-
-    return null;
-  }, [organizations, slug]);
-
-  const isOwner = useMemo(
-    () => currentOrganization?.ownerId === userId,
-    [currentOrganization?.ownerId, userId]
-  );
-
-  function formatRole(role: string) {
-    return role === Role.ADMIN ? "Admin" : "Membro";
-  }
+  const {
+    organizations,
+    currentOrganization,
+    isOwner,
+    formatRole,
+    slug,
+    userId,
+    avatar,
+  } = useOrganizationSwitcher();
 
   function planBadge(plan: string) {
     return plan === "free" ? (
-      <p className="text-left text-xs text-emerald-400 font-medium">Free</p>
+      <p className="text-left text-xs text-emerald-400 font-medium">Grátis</p>
     ) : (
-      <p className="text-left text-xs text-violet-900 font-medium">Pago</p>
+      <p className="text-left text-xs text-violet-900 font-medium">Pro</p>
     );
   }
 
@@ -69,16 +41,21 @@ export function OrganizationSwitcher() {
         {currentOrganization ? (
           <div className="flex flex-col w-full">
             <div className="flex truncate text-left items-center space-x-2 w-full">
-              <span>{currentOrganization.name}</span>
-              {isOwner ? (
-                <p className="text-xs font-light">(Dono)</p>
-              ) : (
-                <p className="text-xs font-light">
-                  ({formatRole(currentOrganization.role)})
-                </p>
-              )}
+              <Avatar className="size-7 shrink-0 overflow-hidden rounded-full">
+                <AvatarImage src={currentOrganization.logo || `${avatar}`} />
+                <AvatarFallback className="size-7" />
+              </Avatar>
+              <div>
+                <span>{currentOrganization.name}</span>
+                {isOwner ? (
+                  <p className="text-xs font-light">Dono</p>
+                ) : (
+                  <p className="text-xs font-light">
+                    {formatRole(currentOrganization.role)}
+                  </p>
+                )}
+              </div>
             </div>
-            {isOwner && planBadge(currentOrganization.plan)}
           </div>
         ) : (
           <span className="text-muted-foreground truncate">
@@ -90,7 +67,7 @@ export function OrganizationSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="ml-2 max-h-80 w-full sm:w-64 sm:text-sm">
         <DropdownMenuGroup>
-          <p className="px-1 text-xs font-medium text-neutral-500 py-2">
+          <p className="px-1 text-xs font-medium text-neutral-500 pt-2">
             Organizações
           </p>
           {!organizations ||
@@ -103,16 +80,52 @@ export function OrganizationSwitcher() {
             ))}
           {organizations &&
             organizations.map((organization) => {
+              const isActive = organization.slug === slug;
+              const isOwner = organization.ownerId === userId;
+              const initials = `${organization?.name
+                .charAt(0)
+                .toUpperCase()}${organization?.name.charAt(1).toUpperCase()}`;
+              const avatarVercel = `https://avatar.vercel.sh/${encodeURIComponent(
+                organization.id
+              )}.svg?text=${initials}`;
+
               return (
                 <DropdownMenuItem
                   key={organization.id}
                   asChild
-                  className="cursor-pointer"
+                  className={cn(
+                    "cursor-pointer flex flex-col items-start my-1.5",
+                    isActive && "bg-neutral-200/50"
+                  )}
                 >
-                  <Link href={`/${organization.slug}`}>
-                    <span className="truncate text-sm leading-5 text-neutral-800 sm:max-w-[140px]">
-                      {organization.name}
-                    </span>
+                  <Link href={`/${organization.slug}`} shallow={false}>
+                    <div className="flex items-center gap-x-2 justify-between">
+                      <Avatar className="size-7 shrink-0 overflow-hidden rounded-full">
+                        <AvatarImage
+                          src={organization.logo || `${avatarVercel}`}
+                        />
+                        <AvatarFallback className="size-7" />
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="truncate text-sm leading-5 text-neutral-800 sm:max-w-[140px]">
+                          {organization.name}
+                        </span>
+                        {isOwner ? (
+                          <p className="text-xs">
+                            {planBadge(organization.plan)}
+                          </p>
+                        ) : (
+                          <p className="text-xs">
+                            {formatRole(organization.role)}
+                          </p>
+                        )}
+                      </div>
+                      {isActive && (
+                        <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-black">
+                          <Icons.check className="size-4" aria-hidden="true" />
+                        </span>
+                      )}
+                    </div>
                   </Link>
                 </DropdownMenuItem>
               );

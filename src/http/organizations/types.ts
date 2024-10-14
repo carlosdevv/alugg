@@ -5,6 +5,7 @@ export type GetOrganizationsApiProps = {
     id: string;
     name: string;
     slug: string;
+    logo?: string;
     role: Role;
     plan: "free" | "pro";
     ownerId: string;
@@ -13,6 +14,32 @@ export type GetOrganizationsApiProps = {
 
 export type GetOrganizationsResponse =
   GetOrganizationsApiProps["organizations"];
+
+export type GetOrganizationProps = {
+  slug: string;
+};
+
+export type GetOrganizationResponse = {
+  id: string;
+  name: string;
+  slug: string;
+  logo?: string;
+  role: Role;
+  plan: "free" | "pro";
+  ownerId: string;
+};
+
+export type GetOrganizationApiProps = {
+  organization: {
+    id: string;
+    name: string;
+    slug: string;
+    logo?: string;
+    role: Role;
+    plan: "free" | "pro";
+    ownerId: string;
+  };
+};
 
 export type CreateOrganizationServiceBody = {
   name: string;
@@ -23,6 +50,15 @@ export type CreateOrganizationServiceResponse = {
   organizationId: string;
   slug: string;
 };
+
+export type UpdateOrganizationServiceBody = {
+  slug: string;
+  newSlug?: string;
+  name?: string;
+};
+
+export type UpdateOrganizationServiceResponse =
+  CreateOrganizationServiceResponse;
 
 export type GetMembershipProps = {
   org: string;
@@ -35,4 +71,12 @@ export type GetMembershipResponse = {
     organizationId: string;
     userId: string;
   };
+};
+
+export type FetchExistentSlugServiceProps = {
+  slug: string;
+};
+
+export type FetchExistentSlugServiceResponse = {
+  hasOrganization: boolean;
 };

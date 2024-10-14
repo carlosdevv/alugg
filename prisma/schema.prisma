@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   // directUrl = env("DIRECT_URL")
 }
 
@@ -25,17 +25,19 @@ enum TokenType {
 }
 
 model User {
-  id                 String         @id @default(uuid())
-  name               String
-  email              String         @unique
-  passwordHash       String         @map("password_hash")
-  createdAt          DateTime       @default(now()) @map("created_at")
-  updatedAt          DateTime       @updatedAt @map("updated_at")
-  invites            Invite[]
-  member_on          Member[]
-  owns_organizations Organization[]
-  Inventory          Inventory?
+  id                  String         @id @default(uuid())
+  name                String
+  email               String         @unique
+  passwordHash        String         @map("password_hash")
+  defaultOrganization String? // slug of the user's default organization
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+  invites             Invite[]
+  member_on           Member[]
+  owns_organizations  Organization[]
+  Inventory           Inventory?
 
+  @@index(defaultOrganization)
   @@map("users")
 }
 
@@ -44,6 +46,7 @@ model Organization {
   name      String
   slug      String   @unique
   plan      String   @default("free")
+  logo      String?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   owner     User     @relation(fields: [ownerId], references: [id])

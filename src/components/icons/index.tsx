@@ -25,6 +25,7 @@ import {
   LogOutIcon,
   MoveUpRight,
   Package,
+  PanelLeftIcon,
   PenLineIcon,
   ReceiptTextIcon,
   Settings2,
@@ -73,4 +74,5 @@ export const Icons = {
   alert: ShieldAlertIcon,
   cog: CogIcon,
   receipt: ReceiptTextIcon,
+  panelLeft: PanelLeftIcon,
 };

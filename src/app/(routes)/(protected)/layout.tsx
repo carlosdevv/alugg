@@ -9,7 +9,7 @@ export default function ProtectedLayout({
 }>) {
   return (
     <>
-      <main className="flex h-screen w-screen overflow-hidden">
+      <main className="min-h-screen w-full bg-white">
         <MainNav>
           {children}
           {sheet}

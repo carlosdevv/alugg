@@ -1,3 +1,6 @@
+import { PageContent } from "@/components/page-layout";
+import { PageWrapper } from "@/components/page-layout/page-wrapper";
+
 interface HomePageProps {
   params: {
     slug: string;
@@ -11,8 +14,12 @@ export default async function HomePage({ params }: HomePageProps) {
     .join(" ");
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Bem vindo, {parsedSlug}</h1>
-    </div>
+    <PageContent title={`Bem vindo, ${parsedSlug}`}>
+      <div className="flex w-full items-center pt-3">
+        <PageWrapper className="flex flex-col gap-y-3">
+          <h1 className="text-2xl font-bold">a</h1>
+        </PageWrapper>
+      </div>
+    </PageContent>
   );
 }

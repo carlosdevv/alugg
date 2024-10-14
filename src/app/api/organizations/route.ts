@@ -116,12 +116,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (!organization) {
-      return NextResponse.json(
-        { message: "Erro ao criar organização." },
-        { status: 500 }
-      );
-    }
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        defaultOrganization: organization.slug,
+      },
+    });
 
     return NextResponse.json(
       { organizationId: organization.id, slug: organization.slug },

@@ -83,9 +83,6 @@ export function Navbar() {
           ))}
         </div>
       </nav>
-      <div className="relative mt-6 flex grow flex-col justify-end">
-        UserSurveyButton Usage
-      </div>
     </ClientOnly>
   );
 }
