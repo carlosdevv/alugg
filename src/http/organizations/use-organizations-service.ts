@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   createOrganizationService,
+  deleteOrganizationService,
   fetchExistentSlugService,
   getOrganizationService,
   getOrganizationsService,
@@ -19,6 +20,7 @@ import type { ErrorResponse } from "../types";
 import type {
   CreateOrganizationServiceBody,
   CreateOrganizationServiceResponse,
+  DeleteOrganizationServiceBody,
   FetchExistentSlugServiceProps,
   FetchExistentSlugServiceResponse,
   GetOrganizationProps,
@@ -66,7 +68,7 @@ export function useCreateOrganizationService(
     onSuccess: (data) => {
       toast.success("Organização criada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["getOrganizations"] });
-      router.push(`org/${data.slug}`);
+      router.push(`/${data.slug}`);
     },
     onError: async (error) => {
       const { message } = await error.response.json();
@@ -116,6 +118,35 @@ export function useFetchExistentSlugService(
   return useQuery({
     queryKey: ["fetchExistentSlug", props.slug],
     queryFn: async () => await fetchExistentSlugService(props),
+    ...options,
+  });
+}
+
+export function useDeleteOrganizationService(
+  options?: UseMutationOptions<
+    void,
+    HTTPError<ErrorResponse>,
+    DeleteOrganizationServiceBody
+  >
+) {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["deleteOrganization"],
+    mutationFn: async (body: DeleteOrganizationServiceBody) =>
+      await deleteOrganizationService(body),
+    onSuccess: () => {
+      toast.success("Organização deletada com sucesso!");
+      queryClient.invalidateQueries({
+        queryKey: ["getOrganizations"],
+      });
+      router.push("/");
+    },
+    onError: async (error) => {
+      const { message } = await error.response.json();
+      toast.error(message);
+    },
     ...options,
   });
 }

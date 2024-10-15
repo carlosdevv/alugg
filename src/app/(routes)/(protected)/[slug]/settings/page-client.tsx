@@ -4,6 +4,7 @@ import { useGetOrganizationService } from "@/http/organizations/use-organization
 import { useRouter } from "next/navigation";
 import ChangeOrgNameForm from "./components/change-org-name-form";
 import ChangeOrgSlugForm from "./components/change-org-slug-form";
+import DeleteOrg from "./components/delete-org";
 
 type SettingsPageClientProps = {
   slug: string;
@@ -24,6 +25,7 @@ export default function SettingsPageClient({ slug }: SettingsPageClientProps) {
     <>
       <ChangeOrgNameForm organization={organization} />
       <ChangeOrgSlugForm organization={organization} />
+      <DeleteOrg organization={organization} />
     </>
   );
 }

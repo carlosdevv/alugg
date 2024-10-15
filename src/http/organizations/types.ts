@@ -80,3 +80,7 @@ export type FetchExistentSlugServiceProps = {
 export type FetchExistentSlugServiceResponse = {
   hasOrganization: boolean;
 };
+
+export type DeleteOrganizationServiceBody = {
+  slug: string;
+};

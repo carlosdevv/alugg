@@ -62,7 +62,10 @@ export default function ChangeOrgNameForm({
             <p className="text-sm text-muted-foreground pl-2">
               Máximo de 42 caracteres.
             </p>
-            <Button type="submit" disabled={isPending}>
+            <Button
+              type="submit"
+              disabled={isPending || organization.name === form.watch("name")}
+            >
               {isPending && (
                 <Icons.loader className="animate-spin size-4 mr-2" />
               )}

@@ -2,6 +2,7 @@ import { api } from "../api-client";
 import type {
   CreateOrganizationServiceBody,
   CreateOrganizationServiceResponse,
+  DeleteOrganizationServiceBody,
   FetchExistentSlugServiceProps,
   FetchExistentSlugServiceResponse,
   GetMembershipProps,
@@ -80,4 +81,10 @@ export async function fetchExistentSlugService({
     .json<FetchExistentSlugServiceResponse>();
 
   return response;
+}
+
+export async function deleteOrganizationService({
+  slug,
+}: DeleteOrganizationServiceBody): Promise<void> {
+  await api.delete(`api/organizations/${slug}`);
 }

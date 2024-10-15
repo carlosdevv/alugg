@@ -54,6 +54,9 @@ export default function useChangeOrgSlugForm({
   const { mutateAsync: updateOrganization, isPending } =
     useUpdateOrganizationService({
       onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: ["getOrganizations"],
+        });
         toast.success("Organização atualizada com sucesso!");
 
         if (data.slug !== organization.slug) {

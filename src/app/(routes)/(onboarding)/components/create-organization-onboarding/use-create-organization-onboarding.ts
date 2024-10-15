@@ -26,7 +26,7 @@ export default function useCreateOrganizationOnboarding() {
       plan: data.plan || "free",
     };
 
-    createOrganization(props);
+    await createOrganization(props);
   }
   return { form, onSubmit, isPending };
 }
