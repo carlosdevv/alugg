@@ -9,7 +9,7 @@ const createOrganizationFormSchema = z.object({
     message: "Máximo de 32 caracteres",
   }),
   slug: z
-    .string()
+    .string({ required_error: "Slug é obrigatório" })
     .min(3, { message: "Slug deve ter no mínimo 3 caracteres" })
     .max(48, { message: "Slug deve ter no máximo 48 caracteres" })
     .regex(/^[a-zA-Z0-9\-]+$/, {
@@ -37,6 +37,7 @@ export default function useCreateOrganizationForm() {
     };
 
     await createOrganization(props);
+    form.reset();
   }
 
   return { form, onSubmit, isPending };

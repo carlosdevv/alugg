@@ -1,3 +1,4 @@
+import { useModalStore } from "@/hooks/use-modal-store";
 import { useGetOrganizationsService } from "@/http/organizations/use-organizations-service";
 import { useAuth } from "@clerk/nextjs";
 import { Role } from "@prisma/client";
@@ -6,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 
 export default function useOrganizationSwitcher() {
   const { userId } = useAuth();
+  const { setShowOrganizationModal } = useModalStore();
 
   const { data: organizations } = useGetOrganizationsService();
 
@@ -60,5 +62,6 @@ export default function useOrganizationSwitcher() {
     slug,
     userId,
     avatar,
+    setShowOrganizationModal,
   };
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Icons } from "@/components/icons";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { appRoutes } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import useOrganizationSwitcher from "./use-organization-switcher";
 
 export function OrganizationSwitcher() {
@@ -23,6 +22,7 @@ export function OrganizationSwitcher() {
     slug,
     userId,
     avatar,
+    setShowOrganizationModal,
   } = useOrganizationSwitcher();
 
   function planBadge(plan: string) {
@@ -46,7 +46,10 @@ export function OrganizationSwitcher() {
                 <AvatarFallback className="size-7" />
               </Avatar>
               <div>
-                <span>{currentOrganization.name}</span>
+                <span>
+                  {currentOrganization.name.charAt(0).toUpperCase() +
+                    currentOrganization.name.slice(1)}
+                </span>
                 {isOwner ? (
                   <p className="text-xs font-light">Dono</p>
                 ) : (
@@ -108,7 +111,8 @@ export function OrganizationSwitcher() {
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="truncate text-sm leading-5 text-neutral-800 sm:max-w-[140px]">
-                          {organization.name}
+                          {organization.name.charAt(0).toUpperCase() +
+                            organization.name.slice(1)}
                         </span>
                         {isOwner ? (
                           <p className="text-xs">
@@ -131,11 +135,12 @@ export function OrganizationSwitcher() {
               );
             })}
         </DropdownMenuGroup>
-        <DropdownMenuItem asChild className="cursor-pointer">
-          <Link href={appRoutes.createOrganization}>
-            <Icons.circlePlus className="mr-4 size-4 text-neutral-500" />
-            <span className="text-sm text-neutral-800">Criar organização</span>
-          </Link>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={() => setShowOrganizationModal(true)}
+        >
+          <Icons.circlePlus className="mr-4 size-4 text-neutral-500" />
+          <span className="text-sm text-neutral-800">Criar organização</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

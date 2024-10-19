@@ -16,7 +16,7 @@ export function Modal({
   desktopOnly,
   preventDefaultClose,
   drawerRootProps,
-  defaultOpen,
+  isOpen,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -26,7 +26,7 @@ export function Modal({
   desktopOnly?: boolean;
   preventDefaultClose?: boolean;
   drawerRootProps?: ComponentProps<typeof Drawer.Root>;
-  defaultOpen?: boolean;
+  isOpen?: boolean;
 }) {
   const router = useRouter();
 
@@ -50,7 +50,7 @@ export function Modal({
   if (isMobile && !desktopOnly) {
     return (
       <Drawer.Root
-        open={(defaultOpen && true) || setShowModal ? showModal : true}
+        open={(isOpen && isOpen) || setShowModal ? showModal : true}
         onOpenChange={(open) => {
           if (!open) {
             closeModal({ dragged: true });
@@ -79,7 +79,7 @@ export function Modal({
 
   return (
     <Dialog.Root
-      open={(defaultOpen && true) || setShowModal ? showModal : true}
+      open={(isOpen && isOpen) || setShowModal ? showModal : true}
       onOpenChange={(open) => {
         if (!open) {
           closeModal();

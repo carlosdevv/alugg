@@ -1,3 +1,5 @@
+import { useModalStore } from "@/hooks/use-modal-store";
+import { appRoutes } from "@/lib/constants";
 import {
   useMutation,
   useQuery,
@@ -60,6 +62,7 @@ export function useCreateOrganizationService(
 ) {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { showOrganizationModal, setShowOrganizationModal } = useModalStore();
 
   return useMutation({
     mutationKey: ["createOrganization"],
@@ -68,7 +71,10 @@ export function useCreateOrganizationService(
     onSuccess: (data) => {
       toast.success("Organização criada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["getOrganizations"] });
+
       router.push(`/${data.slug}`);
+
+      if (showOrganizationModal) setShowOrganizationModal(false);
     },
     onError: async (error) => {
       const { message } = await error.response.json();
@@ -129,7 +135,6 @@ export function useDeleteOrganizationService(
     DeleteOrganizationServiceBody
   >
 ) {
-  const queryClient = useQueryClient();
   const router = useRouter();
 
   return useMutation({
@@ -138,10 +143,7 @@ export function useDeleteOrganizationService(
       await deleteOrganizationService(body),
     onSuccess: () => {
       toast.success("Organização deletada com sucesso!");
-      queryClient.invalidateQueries({
-        queryKey: ["getOrganizations"],
-      });
-      router.push("/");
+      router.push(appRoutes.onboarding);
     },
     onError: async (error) => {
       const { message } = await error.response.json();

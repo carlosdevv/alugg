@@ -1,13 +1,13 @@
 import prisma from "@/lib/prismadb";
 import type { User } from "@prisma/client";
 
-export async function getDefaultOrganization(user: User) {
-  let defaultOrganization = user.defaultOrganization;
+export async function getDefaultOrganization(user: User | null) {
+  let defaultOrganization = user?.defaultOrganization;
 
   if (!defaultOrganization) {
     const refreshedUser = await prisma.user.findUnique({
       where: {
-        id: user.id,
+        id: user?.id,
       },
       select: {
         defaultOrganization: true,
@@ -22,8 +22,19 @@ export async function getDefaultOrganization(user: User) {
 
     defaultOrganization =
       refreshedUser?.defaultOrganization ||
-      refreshedUser?.owns_organizations[0].slug ||
+      refreshedUser?.owns_organizations[0]?.slug ||
       null;
+
+    if (defaultOrganization) {
+      await prisma.user.update({
+        where: {
+          id: user?.id,
+        },
+        data: {
+          defaultOrganization,
+        },
+      });
+    }
   }
 
   return defaultOrganization;

@@ -67,7 +67,11 @@ const DubButton = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={props.disabled || loading}
         {...props}
       >
-        {loading ? <Icons.loader /> : icon ? icon : null}
+        {loading ? (
+          <Icons.loader className="size-4 animate-spin" />
+        ) : icon ? (
+          icon
+        ) : null}
         {text && (
           <div
             className={cn(

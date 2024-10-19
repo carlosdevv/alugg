@@ -143,6 +143,23 @@ export async function DELETE(
       );
     }
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (user?.defaultOrganization === organization.slug) {
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          defaultOrganization: null,
+        },
+      });
+    }
+
     await prisma.organization.delete({
       where: {
         id: organization.id,
