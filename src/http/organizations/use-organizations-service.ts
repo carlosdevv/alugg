@@ -144,6 +144,7 @@ export function useDeleteOrganizationService(
     onSuccess: () => {
       toast.success("Organização deletada com sucesso!");
       router.push(appRoutes.onboarding);
+      router.refresh();
     },
     onError: async (error) => {
       const { message } = await error.response.json();
