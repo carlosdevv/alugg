@@ -2,6 +2,8 @@
 
 import googleImg from "@/assets/google-icon.svg";
 import { Icons } from "@/components/icons";
+import EmailInput from "@/components/inputs/email-input";
+import PasswordInput from "@/components/inputs/password-input";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -26,8 +28,6 @@ export default function SignUpForm() {
   const {
     form,
     onSubmit,
-    showPassword,
-    setShowPassword,
     isPending,
     verifyCodeScreen,
     setVerifyCodeScreen,
@@ -131,7 +131,7 @@ export default function SignUpForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="email@exemplo.com" {...field} />
+                  <EmailInput placeholder="email@exemplo.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -145,23 +145,8 @@ export default function SignUpForm() {
                 <FormLabel>Senha</FormLabel>
                 <div className="relative">
                   <FormControl>
-                    <Input
-                      placeholder="••••••••"
-                      type={showPassword ? "text" : "password"}
-                      {...field}
-                    />
+                    <PasswordInput placeholder="••••••••" {...field} />
                   </FormControl>
-                  {showPassword ? (
-                    <Icons.eye
-                      className="absolute size-4 right-3 top-2.5 cursor-pointer"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    />
-                  ) : (
-                    <Icons.eyeOff
-                      className="absolute size-4 right-3 top-2.5 cursor-pointer"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    />
-                  )}
                 </div>
                 <FormMessage />
               </FormItem>

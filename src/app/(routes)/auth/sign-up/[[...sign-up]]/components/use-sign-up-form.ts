@@ -25,7 +25,6 @@ export default function useSignUpForm() {
     resolver: zodResolver(signUpFormSchema),
   });
 
-  const [showPassword, setShowPassword] = useState(false);
   const [verifyCodeScreen, setVerifyCodeScreen] = useState(false);
   const [code, setCode] = useState<string>();
 
@@ -65,8 +64,6 @@ export default function useSignUpForm() {
   return {
     form,
     onSubmit,
-    showPassword,
-    setShowPassword,
     isPending,
     isSendingEmail,
     verifyCodeScreen,

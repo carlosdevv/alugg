@@ -3,7 +3,6 @@ import { appRoutes } from "@/lib/constants";
 import { useSignIn } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -26,8 +25,6 @@ export default function useSignInForm() {
 
   const { signIn, setActive } = useSignIn();
   const router = useRouter();
-
-  const [showPassword, setShowPassword] = useState(false);
 
   const { mutateAsync: signInService, isPending } = useSignInService({
     onSuccess: async () => {
@@ -63,5 +60,5 @@ export default function useSignInForm() {
     await signInService(data);
   }
 
-  return { form, onSubmit, showPassword, setShowPassword, isPending };
+  return { form, onSubmit, isPending };
 }

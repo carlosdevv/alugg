@@ -2,6 +2,8 @@
 
 import googleImg from "@/assets/google-icon.svg";
 import { Icons } from "@/components/icons";
+import EmailInput from "@/components/inputs/email-input";
+import PasswordInput from "@/components/inputs/password-input";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,15 +13,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { appRoutes } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import useSignInForm from "./use-sign-in-form";
 
 export default function SignInForm() {
-  const { form, onSubmit, showPassword, setShowPassword, isPending } =
-    useSignInForm();
+  const { form, onSubmit, isPending } = useSignInForm();
 
   return (
     <div className="flex flex-col gap-5">
@@ -51,7 +51,7 @@ export default function SignInForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="email@exemplo.com" {...field} />
+                  <EmailInput placeholder="email@exemplo.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -74,23 +74,8 @@ export default function SignInForm() {
                 </div>
                 <div className="relative">
                   <FormControl>
-                    <Input
-                      placeholder="••••••••"
-                      type={showPassword ? "text" : "password"}
-                      {...field}
-                    />
+                    <PasswordInput placeholder="••••••••" {...field} />
                   </FormControl>
-                  {showPassword ? (
-                    <Icons.eye
-                      className="absolute size-4 right-3 top-2.5 cursor-pointer"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    />
-                  ) : (
-                    <Icons.eyeOff
-                      className="absolute size-4 right-3 top-2.5 cursor-pointer"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    />
-                  )}
                 </div>
                 <FormMessage />
               </FormItem>

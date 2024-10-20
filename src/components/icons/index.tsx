@@ -2,6 +2,7 @@
 
 import {
   ApertureIcon,
+  AtSignIcon,
   CalendarDaysIcon,
   CheckCircle2Icon,
   CheckIcon,
@@ -75,4 +76,5 @@ export const Icons = {
   cog: CogIcon,
   receipt: ReceiptTextIcon,
   panelLeft: PanelLeftIcon,
+  atSign: AtSignIcon,
 };

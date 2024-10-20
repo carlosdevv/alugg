@@ -1,13 +1,25 @@
+"use client";
+
+import { Icons } from "@/components/icons";
+import UserDropdown from "@/components/navbar/user-dropdown";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { PropsWithChildren, ReactNode } from "react";
-import UserDropdown from "../navbar/user-dropdown";
+import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import { NavButton } from "./nav-button";
 import { PageWrapper } from "./page-wrapper";
 
+type PageContentProps = {
+  title?: ReactNode;
+  children: ReactNode;
+  hasBackButton?: boolean;
+};
 export function PageContent({
   title,
   children,
-}: PropsWithChildren<{ title?: ReactNode }>) {
+  hasBackButton,
+}: PageContentProps) {
+  const router = useRouter();
   const hasTitle = title !== undefined;
 
   return (
@@ -16,6 +28,11 @@ export function PageContent({
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <NavButton />
+            {hasBackButton && (
+              <Button size="sm" variant="ghost" onClick={() => router.back()}>
+                <Icons.chevronLeft className="size-4" />
+              </Button>
+            )}
             {hasTitle && (
               <h1 className="text-xl font-semibold leading-7 text-neutral-900 md:text-2xl">
                 {title}

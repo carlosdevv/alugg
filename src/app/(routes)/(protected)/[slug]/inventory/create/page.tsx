@@ -1,46 +1,15 @@
-import { Icons } from "@/components/icons";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { appRoutes } from "@/lib/constants";
-import Link from "next/link";
+import { PageContent } from "@/components/page-layout";
+import { PageWrapper } from "@/components/page-layout/page-wrapper";
 import CreateItemForm from "./components/create-item-form";
 
 export default function CreateItemPage() {
   return (
-    <div>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href={appRoutes.inventory.root}>
-              Estoque
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href={appRoutes.inventory.create}>
-              Criar Item
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      <div className="flex items-center space-x-4 mt-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href={appRoutes.inventory.root}>
-            <Icons.chevronLeft className="size-4" />
-          </Link>
-        </Button>
-        <h1 className="font-semibold text-2xl">Criar Item</h1>
+    <PageContent hasBackButton title="Criar Item">
+      <div className="flex w-full items-center pt-3 pb-6">
+        <PageWrapper className="flex flex-col gap-y-3">
+          <CreateItemForm />
+        </PageWrapper>
       </div>
-      <Separator className="mt-2 mb-6" />
-      <CreateItemForm />
-    </div>
+    </PageContent>
   );
 }
