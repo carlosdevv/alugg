@@ -97,6 +97,13 @@ export async function PATCH(
       },
     });
 
+    if (slug !== newSlug) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { defaultOrganization: newSlug },
+      });
+    }
+
     return NextResponse.json(
       { organizationId: organization.id, slug: updatedOrg.slug },
       { status: 200 }

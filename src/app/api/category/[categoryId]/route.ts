@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import prisma from "../../../../lib/prismadb";
+import { z } from "zod";
 
 export async function GET(
   req: NextRequest,
@@ -38,7 +39,13 @@ export async function GET(
   }
 }
 
-export async function PUT(
+
+const updateCategorySchema = z.object({
+  name: z.string().optional(),
+  inventoryId: z.string().optional()
+});
+
+export async function PATCH(
   req: NextRequest,
   { params }: { params: { categoryId: string } }
 ) {
@@ -54,6 +61,16 @@ export async function PUT(
     }
 
     const body = await req.json();
+    const parsed = updateCategorySchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: "Informações incorretas." },
+        { status: 401 }
+      );
+    }
+
+    const { name, inventoryId} = parsed.data;
 
     const existentCategory = await prisma.category.findUnique({
       where: {
@@ -63,18 +80,19 @@ export async function PUT(
 
     if (!existentCategory) {
       return NextResponse.json(
-        { message: `Categoria <${body.id}> não encontrada.` },
+        { message: `Categoria <${categoryId}> não encontrada.` },
         { status: 404 }
       );
     }
 
-    body.id = categoryId;
-
     const updatedCategory = await prisma.category.update({
       where: {
-        id: body.id,
+        id: categoryId
       },
-      data: body,
+      data: {
+        name: name || existentCategory.name,
+        inventoryId: inventoryId || existentCategory.inventoryId
+      },
     });
 
     return NextResponse.json(
