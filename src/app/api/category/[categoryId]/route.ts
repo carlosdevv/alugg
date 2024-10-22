@@ -2,7 +2,10 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import prisma from "../../../../lib/prismadb";
 
-export async function GET({ params }: { params: { categoryId: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { categoryId: string } }
+) {
   try {
     const { userId } = auth();
     const { categoryId } = params;
@@ -14,15 +17,18 @@ export async function GET({ params }: { params: { categoryId: string } }) {
       );
     }
 
-    const foundCategory = await prisma.category.findUnique({
+    const existentCategory = await prisma.category.findUnique({
       where: {
         id: categoryId,
       },
     });
 
-    return foundCategory
-      ? NextResponse.json({ message: `Categoria <${categoryId}> não encontrada.` }, { status: 204 })
-      : NextResponse.json({ foundCategory }, { status: 200 });
+    return existentCategory
+      ? NextResponse.json(
+          { message: `Categoria <${categoryId}> não encontrada.` },
+          { status: 204 }
+        )
+      : NextResponse.json({ foundCategory: existentCategory }, { status: 200 });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
@@ -84,7 +90,10 @@ export async function PUT(
   }
 }
 
-export async function DELETE({ params }: { params: { categoryId: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { categoryId: string } }
+) {
   try {
     const { userId } = auth();
     const { categoryId } = params;
@@ -126,7 +135,8 @@ export async function DELETE({ params }: { params: { categoryId: string } }) {
 
     return NextResponse.json(
       { message: `Categoria <${categoryId}> deletada com sucesso.` },
-      { status: 200 });
+      { status: 200 }
+    );
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(

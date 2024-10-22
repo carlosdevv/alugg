@@ -16,9 +16,11 @@ export async function GET(req: NextRequest) {
     const foundCategories = await prisma.category.findMany();
 
     return foundCategories.length === 0
-      ? NextResponse.json({ message: `Categorias não encontradas.` }, { status: 204 })
+      ? NextResponse.json(
+          { message: `Categorias não encontradas.` },
+          { status: 204 }
+        )
       : NextResponse.json({ foundCategories }, { status: 200 });
-
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
