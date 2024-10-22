@@ -35,24 +35,24 @@ model User {
   invites             Invite[]
   member_on           Member[]
   owns_organizations  Organization[]
-  Inventory           Inventory?
 
   @@index(defaultOrganization)
   @@map("users")
 }
 
 model Organization {
-  id        String   @id @default(uuid())
+  id        String      @id @default(uuid())
   name      String
-  slug      String   @unique
-  plan      String   @default("free")
+  slug      String      @unique
+  plan      String      @default("free")
   logo      String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  owner     User     @relation(fields: [ownerId], references: [id])
-  ownerId   String   @map("owner_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  owner     User        @relation(fields: [ownerId], references: [id])
+  ownerId   String      @map("owner_id")
   invites   Invite[]
   members   Member[]
+  Inventory Inventory[]
 
   @@map("organizations")
 }
@@ -95,19 +95,20 @@ model Token {
 }
 
 model Inventory {
-  id         String          @id @default(cuid())
-  items      InventoryItem[]
-  categories Category[]
-  owner      User            @relation(fields: [ownerId], references: [id])
-  ownerId    String          @unique @map("owner_id")
-  createdAt  DateTime        @default(now()) @map("created_at")
-  updatedAt  DateTime        @updatedAt @map("updated_at")
+  id             String          @id @default(cuid())
+  items          InventoryItem[]
+  categories     Category[]
+  ownerId        String          @unique @map("owner_id")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  organizationId String
 
   @@map("inventories")
 }
 
 model InventoryItem {
-  id               BigInt     @id
+  id               String     @id @unique @default(uuid())
   name             String
   code             String?
   objectPrice      Float      @map("object_price")
@@ -121,8 +122,8 @@ model InventoryItem {
   imageUrl         String?    @map("image_url")
   category         Category   @relation(fields: [categoryId], references: [id])
   categoryId       String
-  Inventory        Inventory? @relation(fields: [inventoryId], references: [id])
-  inventoryId      String?
+  Inventory        Inventory @relation(fields: [inventoryId], references: [id])
+  inventoryId      String
   createdAt        DateTime   @default(now()) @map("created_at")
   updatedAt        DateTime   @updatedAt @map("updated_at")
 
