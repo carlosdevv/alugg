@@ -13,14 +13,20 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const foundCategories = await prisma.category.findMany();
+    const categories = await prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+        inventoryId: true
+      }
+    });
 
-    return foundCategories.length === 0
+    return categories.length === 0
       ? NextResponse.json(
           { message: `Categorias não encontradas.` },
           { status: 204 }
         )
-      : NextResponse.json({ foundCategories }, { status: 200 });
+      : NextResponse.json({ categories }, { status: 200 });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
@@ -42,21 +48,6 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-
-    const existentCategory = await prisma.category.findUnique({
-      where: {
-        id: body.id,
-      },
-    });
-
-    if (existentCategory) {
-      return NextResponse.json(
-        {
-          message: `Categoria <${existentCategory.id}> já existe como: ${existentCategory.name}.`,
-        },
-        { status: 409 }
-      );
-    }
 
     const newCategory = await prisma.category.create({
       data: body,

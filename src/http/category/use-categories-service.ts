@@ -29,7 +29,7 @@ import type {
   UpdateCategoryServiceResponse,
 } from "./types";
 
-export function useGetCatgoriesService(
+export function useGetCategoriesService(
   options?: UseQueryOptions<GetCategoriesResponse, HTTPError<ErrorResponse>>
 ) {
   return useQuery({
@@ -59,7 +59,6 @@ export function useCreateCategoryService(
 ) {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { showOrganizationModal, setShowOrganizationModal } = useModalStore();
 
   return useMutation({
     mutationKey: ["createCategory"],
@@ -69,9 +68,7 @@ export function useCreateCategoryService(
       toast.success("Categoria criada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["getCategories"] });
 
-      router.push(`/${data.id}`);
-
-      if (showOrganizationModal) setShowOrganizationModal(false);
+      router.back();
     },
     onError: async (error) => {
       const { message } = await error.response.json();
