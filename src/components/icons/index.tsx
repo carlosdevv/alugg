@@ -22,6 +22,7 @@ import {
   EyeOffIcon,
   Home,
   ImageIcon,
+  LayersIcon,
   LoaderIcon,
   LogOutIcon,
   MoveUpRight,
@@ -31,6 +32,7 @@ import {
   ReceiptTextIcon,
   Settings2,
   ShieldAlertIcon,
+  ShoppingBagIcon,
   ShoppingCart,
   SlashIcon,
   Trash2Icon,
@@ -77,4 +79,6 @@ export const Icons = {
   receipt: ReceiptTextIcon,
   panelLeft: PanelLeftIcon,
   atSign: AtSignIcon,
+  bag: ShoppingBagIcon,
+  layers: LayersIcon
 };
