@@ -15,7 +15,7 @@ export type GetOrganizationsApiProps = {
 export type GetOrganizationsResponse =
   GetOrganizationsApiProps["organizations"];
 
-export type GetOrganizationProps = {
+export type GetOrganizationServiceProps = {
   slug: string;
 };
 
@@ -59,19 +59,6 @@ export type UpdateOrganizationServiceBody = {
 
 export type UpdateOrganizationServiceResponse =
   CreateOrganizationServiceResponse;
-
-export type GetMembershipProps = {
-  org: string;
-};
-
-export type GetMembershipResponse = {
-  membership: {
-    id: string;
-    role: Role;
-    organizationId: string;
-    userId: string;
-  };
-};
 
 export type FetchExistentSlugServiceProps = {
   slug: string;

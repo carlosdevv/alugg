@@ -1,15 +1,21 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { roleSchema } from "@/lib/casl/roles";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
+import { z } from "zod";
 
-export async function GET(
+const updateMemberSchema = z.object({
+  role: roleSchema,
+});
+
+export async function PUT(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { slug: string; memberId: string } }
 ) {
   try {
     const { userId } = auth();
-    const { slug } = params;
+    const { slug, memberId } = params;
 
     if (!userId) {
       return NextResponse.json(
@@ -25,39 +31,31 @@ export async function GET(
       );
     }
 
+    const body = await req.json();
+    const parsed = updateMemberSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: "Informações incorretas." },
+        { status: 401 }
+      );
+    }
+
+    const { role } = parsed.data;
+
     const { organization } = await getUserMembership(slug);
 
-    const members = await prisma.member.findMany({
-      select: {
-        id: true,
-        role: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
+    await prisma.member.update({
       where: {
+        id: memberId,
         organizationId: organization.id,
       },
-      orderBy: {
-        role: "asc",
+      data: {
+        role,
       },
     });
 
-    const membersWithRoles = members.map(
-      ({ user: { id: userId, ...user }, ...member }) => {
-        return {
-          ...user,
-          ...member,
-          userId,
-        };
-      }
-    );
-
-    return NextResponse.json({ membersWithRoles }, { status: 200 });
+    return NextResponse.json({}, { status: 204 });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(

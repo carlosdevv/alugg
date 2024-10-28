@@ -5,12 +5,10 @@ import type {
   DeleteOrganizationServiceBody,
   FetchExistentSlugServiceProps,
   FetchExistentSlugServiceResponse,
-  GetMembershipProps,
-  GetMembershipResponse,
   GetOrganizationApiProps,
-  GetOrganizationProps,
   GetOrganizationResponse,
   GetOrganizationsApiProps,
+  GetOrganizationServiceProps,
   GetOrganizationsResponse,
   UpdateOrganizationServiceBody,
   UpdateOrganizationServiceResponse,
@@ -26,7 +24,7 @@ export async function getOrganizationsService(): Promise<GetOrganizationsRespons
 
 export async function getOrganizationService({
   slug,
-}: GetOrganizationProps): Promise<GetOrganizationResponse> {
+}: GetOrganizationServiceProps): Promise<GetOrganizationResponse> {
   const result = await api
     .get(`api/organizations/${slug}`)
     .json<GetOrganizationApiProps>();
@@ -61,16 +59,6 @@ export async function updateOrganizationService({
       },
     })
     .json<UpdateOrganizationServiceResponse>();
-}
-
-export async function getMembershipService({
-  org,
-}: GetMembershipProps): Promise<GetMembershipResponse> {
-  const result = await api
-    .get(`organization/${org}/membership`)
-    .json<GetMembershipResponse>();
-
-  return result;
 }
 
 export async function fetchExistentSlugService({

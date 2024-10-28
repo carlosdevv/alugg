@@ -16,6 +16,7 @@ import {
   CirclePlusIcon,
   Clock1Icon,
   CogIcon,
+  CrownIcon,
   EllipsisIcon,
   EllipsisVertical,
   EyeIcon,
@@ -36,6 +37,8 @@ import {
   ShoppingCart,
   SlashIcon,
   Trash2Icon,
+  UserMinusIcon,
+  UserPlusIcon,
   XIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -80,5 +83,8 @@ export const Icons = {
   panelLeft: PanelLeftIcon,
   atSign: AtSignIcon,
   bag: ShoppingBagIcon,
-  layers: LayersIcon
+  layers: LayersIcon,
+  userPlus: UserPlusIcon,
+  userMinus: UserMinusIcon,
+  crown: CrownIcon
 };

@@ -117,6 +117,7 @@ export function NavUser() {
             <DropdownMenuItem asChild>
               <Button
                 variant="ghost"
+                className="w-full justify-start cursor-pointer"
                 onClick={() => signOut({ redirectUrl: appRoutes.signIn })}
               >
                 <Icons.signOut className="size-4 mr-2" />
