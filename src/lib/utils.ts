@@ -23,3 +23,13 @@ export const stableSort = <T>(arr: T[], compare: (a: T, b: T) => number) =>
     .map((item, index) => ({ item, index }))
     .sort((a, b) => compare(a.item, b.item) || a.index - b.index)
     .map(({ item }) => item);
+
+export function getInitials(name: string): string {
+  const initials = name
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join("");
+
+  return initials;
+}

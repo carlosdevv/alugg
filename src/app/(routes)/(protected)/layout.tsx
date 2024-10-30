@@ -1,9 +1,9 @@
 "use client";
+import { AppSidebar } from "@/components/app-sidebar";
 import LayoutLoader from "@/components/layout-loader";
-import { MainNav } from "@/components/main-nav";
 import { useGetOrganizationService } from "@/http/organizations/use-organizations-service";
 import { appRoutes } from "@/lib/constants";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 
 export default function ProtectedLayout({
   children,
@@ -13,6 +13,7 @@ export default function ProtectedLayout({
   sheet: React.ReactNode;
 }>) {
   const router = useRouter();
+  const pathname = usePathname();
   const { slug } = useParams() as { slug: string };
   const {
     data: organization,
@@ -28,16 +29,19 @@ export default function ProtectedLayout({
 
   if (isLoading) return <LayoutLoader />;
 
-  if (!organization || isError || !slug)
-    return router.push(appRoutes.onboarding);
+  if (!organization || isError || !slug) {
+    router.push(appRoutes.onboarding);
+    return null;
+  }
 
   return (
     <>
       <main className="min-h-screen w-full bg-white">
-        <MainNav>
+        {sheet}
+        <section className="flex size-full">
+          <AppSidebar  />
           {children}
-          {sheet}
-        </MainNav>
+        </section>
       </main>
     </>
   );

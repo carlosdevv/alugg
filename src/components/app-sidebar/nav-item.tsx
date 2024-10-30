@@ -1,23 +1,31 @@
+import { type IconType } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
-import { type NavItem as NavItemType } from "./items";
+import type { NavItemsProps } from "./nav-main";
 
-export function NavItem({ item }: { item: NavItemType }) {
-  const { name, icon: Icon, href, exact } = item;
+export type NavItemType = {
+  name: string;
+  icon: IconType;
+  href: string;
+  exact?: boolean;
+};
+
+export function NavItem({ item }: { item: NavItemsProps }) {
+  const { name, icon: Icon, href, exact, items } = item;
 
   const [hovered, setHovered] = useState(false);
 
   const pathname = usePathname();
 
   const isActive = useMemo(() => {
-    return exact ? pathname === href : pathname.startsWith(href);
+    return exact ? pathname === href : pathname.startsWith(href!);
   }, [pathname, href, exact]);
 
   return (
     <Link
-      href={href}
+      href={href!}
       data-active={isActive}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}

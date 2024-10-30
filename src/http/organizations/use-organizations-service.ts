@@ -16,7 +16,7 @@ import {
   fetchExistentSlugService,
   getOrganizationService,
   getOrganizationsService,
-  updateOrganizationService,
+  updateOrganizationService
 } from ".";
 import type { ErrorResponse } from "../types";
 import type {
@@ -25,11 +25,11 @@ import type {
   DeleteOrganizationServiceBody,
   FetchExistentSlugServiceProps,
   FetchExistentSlugServiceResponse,
-  GetOrganizationProps,
   GetOrganizationResponse,
+  GetOrganizationServiceProps,
   GetOrganizationsResponse,
   UpdateOrganizationServiceBody,
-  UpdateOrganizationServiceResponse,
+  UpdateOrganizationServiceResponse
 } from "./types";
 
 export function useGetOrganizationsService(
@@ -43,7 +43,7 @@ export function useGetOrganizationsService(
 }
 
 export function useGetOrganizationService(
-  props: GetOrganizationProps,
+  props: GetOrganizationServiceProps,
   options?: UseQueryOptions<GetOrganizationResponse, HTTPError<ErrorResponse>>
 ) {
   return useQuery({
