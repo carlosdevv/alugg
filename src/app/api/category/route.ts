@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const categories = await prisma.category.findMany({
+    const allCategories = await prisma.category.findMany({
       select: {
         id: true,
         name: true,
@@ -21,12 +21,27 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    return categories.length === 0
-      ? NextResponse.json(
-          { message: `Categorias não encontradas.` },
-          { status: 204 }
-        )
-      : NextResponse.json({ categories }, { status: 200 });
+    if(allCategories.length === 0){
+      return NextResponse.json(
+        { message: `Categorias não encontradas.` },
+        { status: 204 }
+      )
+    }
+
+    const categories = await Promise.all(allCategories.map(async (category) => {
+      const itemCount = await prisma.inventoryItem.count({
+        where: {
+          categoryId: category.id
+        }
+      });
+    
+      return {
+        ...category,
+        totalItems: itemCount
+      };
+    }));
+
+    return NextResponse.json({ categories }, { status: 200 });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(

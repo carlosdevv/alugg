@@ -24,12 +24,28 @@ export async function GET(
       },
     });
 
-    return existentCategory
-      ? NextResponse.json(
-          { message: `Categoria <${categoryId}> não encontrada.` },
-          { status: 204 }
-        )
-      : NextResponse.json({ foundCategory: existentCategory }, { status: 200 });
+    if (existentCategory === null) {
+      return NextResponse.json(
+        { message: `Categoria <${categoryId}> não encontrada.` },
+        { status: 204 }
+      );
+    }
+
+    const itemCount = await prisma.inventoryItem.count({
+      where: {
+        categoryId: existentCategory.id,
+      },
+    });
+
+    const foundCategory = {
+      ...existentCategory,
+      totalItems: itemCount
+    };
+
+    return NextResponse.json(
+      { foundCategory: foundCategory },
+      { status: 200 }
+    );
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
@@ -39,10 +55,9 @@ export async function GET(
   }
 }
 
-
 const updateCategorySchema = z.object({
   name: z.string().optional(),
-  inventoryId: z.string().optional()
+  inventoryId: z.string().optional(),
 });
 
 export async function PATCH(
@@ -70,7 +85,7 @@ export async function PATCH(
       );
     }
 
-    const { name, inventoryId} = parsed.data;
+    const { name, inventoryId } = parsed.data;
 
     const existentCategory = await prisma.category.findUnique({
       where: {
@@ -87,11 +102,11 @@ export async function PATCH(
 
     const updatedCategory = await prisma.category.update({
       where: {
-        id: categoryId
+        id: categoryId,
       },
       data: {
         name: name || existentCategory.name,
-        inventoryId: inventoryId || existentCategory.inventoryId
+        inventoryId: inventoryId || existentCategory.inventoryId,
       },
     });
 

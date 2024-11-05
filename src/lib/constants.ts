@@ -10,4 +10,9 @@ export const appRoutes = {
     update: "inventory/update",
     createCategory: "create/create-category",
   },
+  categories: {
+    root: "categories",
+    create: "categories/create",
+    edit: "categories/edit"
+  },
 };

@@ -5,6 +5,7 @@ export type GetCategoriesApiProps = {
   categories: {
     id: string;
     name: string;
+    totalItems: number;
     inventoryId: string | null
   }[];
 };
@@ -13,6 +14,7 @@ export type GetCategoryApiProps = {
   category: {
     id: string;
     name: string;
+    totalItems: number;
     inventoryId: string | null;
   };
 };
@@ -26,6 +28,7 @@ export type GetCategoryProps = {
 export type GetCategoryResponse = {
   id: string;
   name: string;
+  totalItems: number;
   inventoryId: string | null;
 };
 
