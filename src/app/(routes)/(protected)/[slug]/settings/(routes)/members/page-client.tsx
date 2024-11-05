@@ -1,7 +1,7 @@
 "use client";
 
-import MemberCard from "./components/member-card";
-import UserSkeleton from "./components/user-skeleton";
+import InvitesTabContent from "./components/invite-tab-content";
+import MembersTabContent from "./components/members-tab-content";
 import useMembersPage from "./use-members-page";
 
 type MembersPageClientProps = {
@@ -9,8 +9,15 @@ type MembersPageClientProps = {
 };
 
 export default function MembersPageClient({ slug }: MembersPageClientProps) {
-  const { tabs, currentTab, setCurrentTab, members, isLoadingMembers } =
-    useMembersPage({ slug });
+  const {
+    tabs,
+    currentTab,
+    setCurrentTab,
+    members,
+    isLoadingMembers,
+    invites,
+    isLoadingInvites,
+  } = useMembersPage({ slug });
 
   return (
     <>
@@ -32,33 +39,20 @@ export default function MembersPageClient({ slug }: MembersPageClientProps) {
         ))}
       </div>
       <div className="grid divide-y divide-gray-200">
-        {isLoadingMembers &&
-          Array.from({ length: 5 }).map((_, i) => <UserSkeleton key={i} />)}
-
-        {members &&
-          members.length > 0 &&
-          members.map((member) => (
-            <MemberCard
-              key={member.id}
-              slug={slug}
-              member={member}
-              currentTab={currentTab}
-            />
-          ))}
-
-        {!members ||
-          (members.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-10">
-              <img
-                src="https://assets.dub.co/misc/video-park.svg"
-                alt="No invitations sent"
-                width={300}
-                height={300}
-                className="pointer-events-none -my-8"
-              />
-              <p className="text-sm text-gray-500">Sem convites.</p>
-            </div>
-          ))}
+        {currentTab === "Membros" && (
+          <MembersTabContent
+            members={members}
+            isLoadingMembers={isLoadingMembers}
+            slug={slug}
+          />
+        )}
+        {currentTab === "Convites" && (
+          <InvitesTabContent
+            invites={invites}
+            isLoadingInvites={isLoadingInvites}
+            slug={slug}
+          />
+        )}
       </div>
     </>
   );

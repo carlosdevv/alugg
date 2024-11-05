@@ -27,13 +27,10 @@ type MemberCardProps = {
     userId: string;
     isOwner: boolean;
   };
-  currentTab: "Membros" | "Convites";
 };
 
-export default function MemberCard({ slug, member, currentTab }: MemberCardProps) {
+export default function MemberCard({ slug, member }: MemberCardProps) {
   const { id, name, email, role: currentRole, isOwner } = member;
-  const membersTab = currentTab === "Membros";
-  const invitesTab = currentTab === "Convites";
 
   const { openPopover, setOpenPopover, updateMemberRole } = useMemberCard({
     memberId: id,

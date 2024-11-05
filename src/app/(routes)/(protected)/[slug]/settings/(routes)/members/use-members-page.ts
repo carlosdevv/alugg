@@ -1,3 +1,4 @@
+import { useGetInvitesService } from "@/http/invites/use-invites-service";
 import { useGetMembersService } from "@/http/members/use-members-service";
 import { useState } from "react";
 
@@ -22,5 +23,21 @@ export default function useMembersPage({ slug }: UseMembersPageProps) {
     }
   );
 
-  return { tabs, currentTab, setCurrentTab, members, isLoadingMembers };
+  const { data: invites, isLoading: isLoadingInvites } = useGetInvitesService(
+    { slug },
+    {
+      queryKey: ["getInvites", slug],
+      enabled: currentTab === "Convites",
+    }
+  );
+
+  return {
+    tabs,
+    currentTab,
+    setCurrentTab,
+    members,
+    isLoadingMembers,
+    invites,
+    isLoadingInvites,
+  };
 }
