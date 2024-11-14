@@ -1,5 +1,4 @@
 import prisma from "@/lib/prismadb";
-import { createSlug } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
@@ -75,6 +74,7 @@ export async function GET(req: NextRequest) {
 
 const createOrganizationSchema = z.object({
   name: z.string(),
+  slug: z.string(),
   plan: z.enum(["free", "pro"]),
 });
 
@@ -99,12 +99,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, plan } = parsed.data;
-
+    const { name, plan, slug } = parsed.data;
     const organization = await prisma.organization.create({
       data: {
         name,
-        slug: createSlug(name),
+        slug,
         plan,
         ownerId: userId,
         members: {

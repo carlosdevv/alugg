@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import slugify from "slugify";
 import useCreateOrganizationOnboarding from "./use-create-organization-onboarding";
 
 export default function CreateOrganizationOnboarding() {
@@ -40,12 +41,52 @@ export default function CreateOrganizationOnboarding() {
                       </FormLabel>
                       <div>
                         <FormControl>
-                          <Input placeholder="Nome da organização" {...field} />
+                          <Input
+                            placeholder="Nome da organização"
+                            {...field}
+                            onChange={(e) => {
+                              form.setValue("name", e.target.value);
+                              form.setValue(
+                                "slug",
+                                slugify(e.target.value, { lower: true })
+                              );
+                            }}
+                          />
                         </FormControl>
                         <FormDescription className="mt-1.5 ml-2">
                           Insira o nome da sua empresa
                         </FormDescription>
                       </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="slug"
+                  render={({ field }) => (
+                    <FormItem className="px-6 pb-4 grid grid-cols-[8rem_1fr] w-full justify-between">
+                      <FormLabel className="text-sm break-all text-muted-foreground">
+                        Slug
+                      </FormLabel>
+                      <FormControl>
+                        <div className="flex items-center gap-x-3">
+                          <Input
+                            placeholder="Slug da organização"
+                            className="max-w-96"
+                            {...field}
+                            onChange={(e) => {
+                              form.setValue(
+                                "slug",
+                                slugify(e.target.value, { lower: true })
+                              );
+                              field.onBlur();
+                            }}
+                          />
+                        </div>
+                      </FormControl>
+
                       <FormMessage />
                     </FormItem>
                   )}

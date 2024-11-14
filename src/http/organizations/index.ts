@@ -34,12 +34,14 @@ export async function getOrganizationService({
 
 export async function createOrganizationService({
   name,
+  slug,
   plan,
 }: CreateOrganizationServiceBody): Promise<CreateOrganizationServiceResponse> {
   return await api
     .post("api/organizations", {
       json: {
         name,
+        slug,
         plan,
       },
     })

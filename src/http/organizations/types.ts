@@ -43,6 +43,7 @@ export type GetOrganizationApiProps = {
 
 export type CreateOrganizationServiceBody = {
   name: string;
+  slug: string;
   plan: "free" | "pro";
 };
 
