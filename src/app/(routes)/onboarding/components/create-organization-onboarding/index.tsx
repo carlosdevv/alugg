@@ -83,11 +83,27 @@ export default function CreateOrganizationOnboarding() {
                               );
                               field.onBlur();
                             }}
+                            onBlur={() => {
+                              fetch(
+                                `/api/organizations/${form.getValues(
+                                  "slug"
+                                )}/exists`
+                              ).then(async (res) => {
+                                const value = await res.json();
+                                if (value.hasOrganization) {
+                                  form.setError("slug", {
+                                    message: `O slug "${form.getValues(
+                                      "slug"
+                                    )}" já está em uso.`,
+                                  });
+                                } else form.clearErrors("slug");
+                              });
+                            }}
                           />
                         </div>
                       </FormControl>
 
-                      <FormMessage />
+                      <FormMessage className="col-span-2 w-full ml-32" />
                     </FormItem>
                   )}
                 />
