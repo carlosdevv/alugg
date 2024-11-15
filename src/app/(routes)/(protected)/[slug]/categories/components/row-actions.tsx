@@ -38,7 +38,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href={`${appRoutes.categories.edit}/${categoryId}`}>
+                <Link href={`categories/${categoryId}/update`}>
                   <Button variant="link" className="flex items-center">
                     <Icons.update className="size-4 mr-2" />
                     Editar

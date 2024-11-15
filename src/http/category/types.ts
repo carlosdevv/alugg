@@ -1,5 +1,3 @@
-import type { Role } from "@/lib/casl/roles";
-import { InventoryItem } from "../../lib/types";
 
 export type GetCategoriesApiProps = {
   categories: {
@@ -25,12 +23,7 @@ export type GetCategoryProps = {
   categoryId: string;
 };
 
-export type GetCategoryResponse = {
-  id: string;
-  name: string;
-  totalItems: number;
-  inventoryId: string | null;
-};
+export type GetCategoryResponse = GetCategoryApiProps["category"];
 
 export type CreateCategoryServiceBody = {
   name: string;
@@ -46,7 +39,6 @@ export type UpdateCategoryServiceBody = {
   categoryId: string;
   name?: string;
   inventoryId?: string;
-  items?: InventoryItem[];
 };
 
 export type UpdateCategoryServiceResponse = CreateCategoryServiceResponse;

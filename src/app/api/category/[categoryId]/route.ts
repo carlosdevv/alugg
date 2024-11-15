@@ -19,6 +19,11 @@ export async function GET(
     }
 
     const existentCategory = await prisma.category.findUnique({
+      select: {
+        id: true,
+        name: true,
+        inventoryId: true
+      },
       where: {
         id: categoryId,
       },
@@ -37,13 +42,13 @@ export async function GET(
       },
     });
 
-    const foundCategory = {
+    const category = {
       ...existentCategory,
       totalItems: itemCount
     };
 
     return NextResponse.json(
-      { foundCategory: foundCategory },
+      { category: category },
       { status: 200 }
     );
   } catch (error) {

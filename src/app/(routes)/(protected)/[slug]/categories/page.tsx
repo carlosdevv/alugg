@@ -17,8 +17,8 @@ export default function InventoryPage() {
     itemInactive: false,
   })) ?? [
     {
-      id: "1",
-      name: "MENSAGEM MOCKADA",
+      id: "",
+      name: "",
       totalItems: 2,
       itemInactive: false,
     },
