@@ -9,6 +9,7 @@ const updateMemberSchema = z.object({
   role: roleSchema,
 });
 
+// PUT /api/organizations/:slug/members/:memberId - Update a member's role
 export async function PUT(
   req: NextRequest,
   { params }: { params: { slug: string; memberId: string } }
@@ -57,7 +58,7 @@ export async function PUT(
 
     return NextResponse.json({}, { status: 204 });
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }

@@ -11,6 +11,7 @@ const signUpSchema = z.object({
   code: z.string(),
 });
 
+// POST /api/auth/sign-up - Sign up
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -103,7 +104,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }

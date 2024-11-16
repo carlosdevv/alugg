@@ -40,7 +40,7 @@ export async function GET(
 
     return NextResponse.json({ hasOrganization: true }, { status: 200 });
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }

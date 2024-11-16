@@ -8,6 +8,7 @@ const signInSchema = z.object({
   password: z.string().min(6),
 });
 
+// POST /api/auth/sign-in - Sign in
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({});
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }

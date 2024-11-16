@@ -1,9 +1,8 @@
-import { getUserMembership } from "@/actions/get-user-membership";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
-// GET /api/organizations/:slug/members - Get all members of an organization
+// GET /api/organizations/:slug/invites/pending-invites - Get all pending invites
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -26,45 +25,43 @@ export async function GET(
       );
     }
 
-    const { organization } = await getUserMembership(slug);
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
 
-    const members = await prisma.member.findMany({
+    if (!user) {
+      return NextResponse.json(
+        { message: "Usuário não encontrado." },
+        { status: 404 }
+      );
+    }
+
+    const invites = await prisma.invite.findMany({
       select: {
         id: true,
+        email: true,
         role: true,
-        user: {
+        createdAt: true,
+        author: {
           select: {
             id: true,
             name: true,
-            email: true,
-            owns_organizations: {
-              select: {
-                id: true,
-              },
-            },
+          },
+        },
+        organization: {
+          select: {
+            name: true,
           },
         },
       },
       where: {
-        organizationId: organization.id,
-      },
-      orderBy: {
-        role: "asc",
+        email: user.email,
       },
     });
 
-    const membersWithRoles = members.map(
-      ({ user: { id: userId, owns_organizations, ...user }, ...member }) => {
-        return {
-          ...user,
-          ...member,
-          userId,
-          isOwner: owns_organizations.some((org) => org.id === organization.id),
-        };
-      }
-    );
-
-    return NextResponse.json({ members: membersWithRoles }, { status: 200 });
+    return NextResponse.json({ invites }, { status: 200 });
   } catch (error) {
     console.error("ERR:", error);
     return NextResponse.json(

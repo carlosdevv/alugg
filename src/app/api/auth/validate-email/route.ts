@@ -3,16 +3,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
 
-const signUpSchema = z.object({
+const validateEmailSchema = z.object({
   email: z.string().email(),
   name: z.string(),
 });
 
+// POST /api/auth/validate-email - Validate email
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const parsed = signUpSchema.safeParse(body);
+    const parsed = validateEmailSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }

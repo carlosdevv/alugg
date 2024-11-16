@@ -13,7 +13,7 @@ export type NavItemType = {
 };
 
 export function NavItem({ item }: { item: NavItemsProps }) {
-  const { name, icon: Icon, href, exact, items } = item;
+  const { name, icon: Icon, href, exact } = item;
 
   const [hovered, setHovered] = useState(false);
 

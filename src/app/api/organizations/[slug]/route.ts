@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+// GET /api/organizations/:slug - Get an organization
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -30,7 +31,7 @@ export async function GET(
 
     return NextResponse.json({ organization }, { status: 200 });
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }
@@ -52,6 +53,7 @@ const updateOrganizationSchema = z.object({
     .optional(),
 });
 
+// PATCH /api/organizations/:slug - Update an organization
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -102,7 +104,7 @@ export async function PATCH(
       { status: 200 }
     );
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }
@@ -110,6 +112,7 @@ export async function PATCH(
   }
 }
 
+// DELETE /api/organizations/:slug - Delete an organization
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -168,7 +171,7 @@ export async function DELETE(
 
     return NextResponse.json({}, { status: 200 });
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }

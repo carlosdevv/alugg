@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+// GET /api/organizations - Get all organizations for an user
 export async function GET(req: NextRequest) {
   try {
     const { userId } = auth();
@@ -65,7 +66,7 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }
@@ -78,6 +79,7 @@ const createOrganizationSchema = z.object({
   plan: z.enum(["free", "pro"]),
 });
 
+// POST /api/organizations - Create a new organization
 export async function POST(req: NextRequest) {
   try {
     const { userId } = auth();
@@ -130,7 +132,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.log("ERR:", error);
+    console.error("ERR:", error);
     return NextResponse.json(
       { message: "Ocorreu um erro, tente novamente mais tarde." },
       { status: 500 }

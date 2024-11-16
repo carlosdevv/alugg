@@ -14,7 +14,6 @@ export default function InvitesTabContent({
   isLoadingInvites,
   slug,
 }: InvitesTabContentProps) {
-  console.log(invites?.length)
   return (
     <>
       {isLoadingInvites &&
