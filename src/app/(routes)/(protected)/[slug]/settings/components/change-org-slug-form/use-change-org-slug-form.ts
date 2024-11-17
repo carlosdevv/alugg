@@ -94,7 +94,7 @@ export default function useChangeOrgSlugForm({
         message: "Slug já está em uso",
       });
     }
-  }, [validSlug]);
+  }, [form, validSlug]);
 
   return { form, onSubmit, isPending, checkingSlug };
 }
