@@ -20,20 +20,18 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
-    
+
     const { email, password } = parsed.data;
-    
-    const hasUser = await prisma.user.findUnique(
-      {
-        where: {
-          email,
-        },
-        select: {
-          id: true,
-          passwordHash: true,
-        },
-      }
-    )
+
+    const hasUser = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+        passwordHash: true,
+      },
+    });
 
     if (!hasUser) {
       return NextResponse.json(

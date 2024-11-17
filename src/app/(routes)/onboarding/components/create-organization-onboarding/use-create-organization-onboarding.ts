@@ -1,6 +1,4 @@
-import {
-  useCreateOrganizationService
-} from "@/http/organizations/use-organizations-service";
+import { useCreateOrganizationService } from "@/http/organizations/use-organizations-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
