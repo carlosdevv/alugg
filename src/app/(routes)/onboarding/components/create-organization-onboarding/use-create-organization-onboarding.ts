@@ -1,4 +1,6 @@
-import { useCreateOrganizationService } from "@/http/organizations/use-organizations-service";
+import {
+  useCreateOrganizationService
+} from "@/http/organizations/use-organizations-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -6,6 +8,7 @@ import { z } from "zod";
 const createOrganizationOnboardingFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
   plan: z.enum(["free", "pro"]).optional(),
+  slug: z.string({ required_error: "Slug é obrigatório" }),
 });
 
 type CreateOrganizationOnboardingFormValues = z.infer<
