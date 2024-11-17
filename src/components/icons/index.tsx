@@ -31,6 +31,7 @@ import {
   PanelLeftIcon,
   PenLineIcon,
   ReceiptTextIcon,
+  Rotate3dIcon,
   Settings2,
   ShieldAlertIcon,
   ShoppingBagIcon,
@@ -86,5 +87,6 @@ export const Icons = {
   layers: LayersIcon,
   userPlus: UserPlusIcon,
   userMinus: UserMinusIcon,
-  crown: CrownIcon
+  crown: CrownIcon,
+  transferOwnership: Rotate3dIcon,
 };

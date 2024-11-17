@@ -1,7 +1,7 @@
+import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import type { GetInvitesServiceResponse } from "@/http/invites/types";
-import { getInitials } from "@/lib/utils";
 import useInviteCard from "./use-invite-card";
 
 type InviteCardProps = {
@@ -10,9 +10,12 @@ type InviteCardProps = {
 };
 
 export default function InviteCard({ slug, invite }: InviteCardProps) {
-  const { id, author, email, role: currentRole } = invite;
+  const { id, author, email, role } = invite;
 
-  const {} = useInviteCard({});
+  const { normalizeRole, revokeInvite, isRevokingInvite } = useInviteCard({
+    slug,
+    inviteId: id,
+  });
 
   return (
     <>
@@ -23,30 +26,32 @@ export default function InviteCard({ slug, invite }: InviteCardProps) {
         <div className="flex items-start space-x-3">
           <div className="flex items-center space-x-3">
             <Avatar className="size-7">
-              <AvatarFallback className="bg-black/15">
-                <span className="text-xs">{getInitials(name ?? "AA")}</span>
-              </AvatarFallback>
+              <AvatarFallback className="bg-black/15" />
             </Avatar>
             <div className="flex flex-col">
-              <h3 className="text-sm font-medium">{author?.name || email}</h3>
-              <p className="text-xs text-gray-500">{email}</p>
+              <h3 className="text-sm font-medium">{email}</h3>
+              <p className="text-xs text-gray-500">
+                Enviado por - <b>{author?.name}</b>
+              </p>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-x-3">
-          <Button
-            type="button"
-            className="h-8 space-x-0 px-1 py-2"
-            variant="outline"
-          >
-            Recusar Convite
+          <Button type="button" variant="outline" className="cursor-default">
+            {normalizeRole(role)}
           </Button>
           <Button
             type="button"
-            className="h-8 space-x-0 px-1 py-2"
-            variant="outline"
+            variant="destructive"
+            onClick={async () => await revokeInvite()}
+            disabled={isRevokingInvite}
           >
-            Aceitar Convite
+            {isRevokingInvite ? (
+              <Icons.loader className="animate-spin size-4 mr-2" />
+            ) : (
+              <Icons.circleMinus className="size-4 mr-2" />
+            )}
+            Revogar Convite
           </Button>
         </div>
       </div>

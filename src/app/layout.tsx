@@ -1,4 +1,4 @@
-import CreateOrganizationModal from "@/components/modals/create-organization-modal";
+import AppModals from "@/components/modals";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppProviders } from "@/providers/app-provider";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -24,7 +24,7 @@ export default function RootLayout({
         <body className={inter.className}>
           <SidebarProvider>
             <AppProviders>
-              <CreateOrganizationModal className="bg-gray-50 px-4 py-8 sm:px-16" />
+              <AppModals />
               {children}
             </AppProviders>
           </SidebarProvider>

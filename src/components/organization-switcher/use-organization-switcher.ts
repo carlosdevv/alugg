@@ -1,19 +1,20 @@
-import { useModalStore } from "@/hooks/use-modal-store";
 import { useGetOrganizationsService } from "@/http/organizations/use-organizations-service";
 import { useAuth } from "@clerk/nextjs";
 import { Role } from "@prisma/client";
 import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 
 export default function useOrganizationSwitcher() {
   const { userId } = useAuth();
-  const { setShowOrganizationModal } = useModalStore();
 
   const { data: organizations } = useGetOrganizationsService();
 
   const { slug: currentSlug } = useParams() as {
     slug?: string;
   };
+
+  const [, setModal] = useQueryState("modal");
 
   // Prevent slug from changing to empty to avoid UI switching during nav animation
   const [slug, setSlug] = useState(currentSlug);
@@ -62,6 +63,6 @@ export default function useOrganizationSwitcher() {
     slug,
     userId,
     avatar,
-    setShowOrganizationModal,
+    setModal,
   };
 }

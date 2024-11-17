@@ -27,3 +27,18 @@ export type GetInvitesServiceApiProps = {
     } | null;
   }[];
 };
+
+export type CreateInviteServiceBody = {
+  slug: string;
+  email: string;
+  role: Role;
+};
+
+export type CreateInviteServiceResponse = {
+  inviteId: string;
+};
+
+export type RevokeInviteServiceBody = {
+  slug: string;
+  inviteId: string;
+};

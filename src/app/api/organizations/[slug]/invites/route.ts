@@ -1,4 +1,5 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import { roleSchema } from "@/lib/casl/roles";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
@@ -28,7 +29,16 @@ export async function GET(
       );
     }
 
-    const { organization } = await getUserMembership(slug);
+    const { organization, membership } = await getUserMembership(slug);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("get", "Invite")) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para visualizar os convites." },
+        { status: 403 }
+      );
+    }
 
     const invites = await prisma.invite.findMany({
       where: {
@@ -100,7 +110,16 @@ export async function POST(
     }
 
     const { email, role } = parsed.data;
-    const { organization } = await getUserMembership(slug);
+    const { organization, membership } = await getUserMembership(slug);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("create", "Invite")) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para criar convites." },
+        { status: 403 }
+      );
+    }
 
     const inviteWithSameEmail = await prisma.invite.findUnique({
       where: {

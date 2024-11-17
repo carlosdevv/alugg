@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import LayoutLoader from "@/components/layout-loader";
 import { useGetOrganizationService } from "@/http/organizations/use-organizations-service";
 import { appRoutes } from "@/lib/constants";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function ProtectedLayout({
   children,
@@ -13,8 +13,8 @@ export default function ProtectedLayout({
   sheet: React.ReactNode;
 }>) {
   const router = useRouter();
-  const pathname = usePathname();
   const { slug } = useParams() as { slug: string };
+
   const {
     data: organization,
     isError,
@@ -39,7 +39,7 @@ export default function ProtectedLayout({
       <main className="min-h-screen w-full bg-white">
         {sheet}
         <section className="flex size-full">
-          <AppSidebar  />
+          <AppSidebar />
           {children}
         </section>
       </main>

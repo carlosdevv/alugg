@@ -1,4 +1,6 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserPermissions } from "@/lib/casl/get-user-permissions";
+import { organizationSchema } from "@/lib/casl/models/organization";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
@@ -87,7 +89,18 @@ export async function PATCH(
       );
     }
 
-    const { organization } = await getUserMembership(slug);
+    const { organization, membership } = await getUserMembership(slug);
+
+    const authOrganization = organizationSchema.parse(organization);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("update", authOrganization)) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para atualizar essa organização." },
+        { status: 401 }
+      );
+    }
 
     const updatedOrg = await prisma.organization.update({
       where: {
@@ -135,7 +148,18 @@ export async function DELETE(
       );
     }
 
-    const { organization } = await getUserMembership(slug);
+    const { organization, membership } = await getUserMembership(slug);
+
+    const authOrganization = organizationSchema.parse(organization);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("delete", authOrganization)) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para deletar essa organização." },
+        { status: 401 }
+      );
+    }
 
     const isOwner = organization.ownerId === userId;
 

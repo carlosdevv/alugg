@@ -6,12 +6,20 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import type { HTTPError } from "ky";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { getMembersService, updateMemberRoleService } from ".";
+import {
+  deleteMemberService,
+  getMembersService,
+  transferOwnershipService,
+  updateMemberRoleService,
+} from ".";
 import type { ErrorResponse } from "../types";
 import type {
+  DeleteMemberServiceBody,
   GetMembersServiceProps,
   GetMembersServiceResponse,
+  TransferOwnershipServiceBody,
   UpdateMemberRoleServiceBody,
 } from "./types";
 
@@ -41,6 +49,59 @@ export function useUpdateMemberRoleService(
       await updateMemberRoleService(body),
     onSuccess: () => {
       toast.success("Membro atualizado com sucesso!");
+      queryClient.invalidateQueries({
+        queryKey: ["getMembers"],
+      });
+    },
+    onError: async (error) => {
+      const { message } = await error.response.json();
+      toast.error(message);
+    },
+    ...options,
+  });
+}
+
+export function useTransferOwnershipService(
+  options?: UseMutationOptions<
+    void,
+    HTTPError<ErrorResponse>,
+    TransferOwnershipServiceBody
+  >
+) {
+  const router = useRouter();
+  const { slug } = useParams() as { slug: string };
+
+  return useMutation({
+    mutationKey: ["transferOwnership"],
+    mutationFn: async (body: TransferOwnershipServiceBody) =>
+      await transferOwnershipService(body),
+    onSuccess: () => {
+      toast.success("Organização transferida com sucesso!");
+      router.push(`/${slug}`);
+    },
+    onError: async (error) => {
+      const { message } = await error.response.json();
+      toast.error(message);
+    },
+    ...options,
+  });
+}
+
+export function useDeleteMemberService(
+  options?: UseMutationOptions<
+    void,
+    HTTPError<ErrorResponse>,
+    DeleteMemberServiceBody
+  >
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["deleteMember"],
+    mutationFn: async (body: DeleteMemberServiceBody) =>
+      await deleteMemberService(body),
+    onSuccess: () => {
+      toast.success("Membro deletado com sucesso!");
       queryClient.invalidateQueries({
         queryKey: ["getMembers"],
       });

@@ -8,6 +8,8 @@ import { z } from "zod";
 
 import { User } from "./models/user";
 import { permissions } from "./permissions";
+import { inviteSubject } from "./subjects/invite-subject";
+import { organizationSubject } from "./subjects/organization-subject";
 import { userSubject } from "./subjects/user-subject";
 
 export * from "./models/user";
@@ -15,6 +17,8 @@ export * from "./roles";
 
 const appAbilitiesSchema = z.union([
   userSubject,
+  organizationSubject,
+  inviteSubject,
 
   z.tuple([z.literal("manage"), z.literal("all")]),
 ]);

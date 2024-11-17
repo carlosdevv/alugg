@@ -12,11 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { InfoTooltip } from "@/components/ui/tooltip";
-import { useModalStore } from "@/hooks/use-modal-store";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
 import slugify from "slugify";
-import useCreateOrganizationForm from "./use-create-organization-form";
+import useCreateOrganizationModal from "./use-create-organization-modal";
 
 type CreateOrganizationModalProps = {
   className?: string;
@@ -25,21 +23,12 @@ type CreateOrganizationModalProps = {
 export default function CreateOrganizationModal({
   className,
 }: CreateOrganizationModalProps) {
-  const { showOrganizationModal, setShowOrganizationModal } = useModalStore();
-  const [showModal, setShowModal] = useState(showOrganizationModal);
-  const { form, onSubmit, isPending } = useCreateOrganizationForm();
-
-  useEffect(() => {
-    setShowModal(showOrganizationModal);
-  }, [showOrganizationModal]);
+  const { form, onSubmit, isPending, setShowModal, showModal, onClose } =
+    useCreateOrganizationModal();
 
   return (
-    <Modal
-      showModal={showModal}
-      setShowModal={setShowModal}
-      onClose={() => setShowOrganizationModal(false)}
-    >
-      <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 px-4 py-4 pt-8 sm:px-16">
+    <Modal showModal={showModal} setShowModal={setShowModal} onClose={onClose}>
+      <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 p-4 pt-8 sm:px-16">
         <h3 className="text-lg font-medium">Criar nova organização</h3>
       </div>
 
@@ -62,7 +51,7 @@ export default function CreateOrganizationModal({
                   <div className="mt-2 flex rounded-md shadow-sm">
                     <Input
                       placeholder="Nome da Organização"
-                      className="text-gray-900 placeholder-gray-400 sm:text-sm"
+                      className="text-gray-900 bg-white placeholder-gray-400 sm:text-sm"
                       {...field}
                       onChange={(e) => {
                         form.setValue(
@@ -94,7 +83,7 @@ export default function CreateOrganizationModal({
                 </FormLabel>
                 <FormControl>
                   <div className="relative mt-2 flex rounded-md shadow-sm">
-                    <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-5 text-gray-500 sm:text-sm">
+                    <span className="inline-flex bg-gray-100 items-center rounded-l-md border border-r-0 border-gray-300 px-5 text-gray-700 sm:text-sm">
                       alugg.vercel.app
                     </span>
                     <Input
@@ -105,10 +94,12 @@ export default function CreateOrganizationModal({
                         form.formState.errors.slug
                           ? "border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500"
                           : "border-gray-300 text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:ring-gray-500"
-                      } block w-full rounded-r-md focus:outline-none sm:text-sm rounded-l-none`}
+                      } block w-full rounded-r-md focus:outline-none sm:text-sm rounded-l-none bg-white`}
                       placeholder="Slug"
                       {...field}
                       onBlur={() => {
+                        if (!form.getValues("slug")) return;
+
                         fetch(
                           `/api/organizations/${form.getValues("slug")}/exists`
                         ).then(async (res) => {
@@ -137,7 +128,12 @@ export default function CreateOrganizationModal({
               <FormItem>
                 <FormLabel>Plano</FormLabel>
                 <FormControl>
-                  <Input placeholder="Gratuíto - R$0/mês" readOnly {...field} />
+                  <Input
+                    placeholder="Gratuíto - R$0/mês"
+                    className="bg-white"
+                    readOnly
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

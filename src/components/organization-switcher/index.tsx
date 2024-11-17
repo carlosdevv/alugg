@@ -30,7 +30,7 @@ export function OrganizationSwitcher() {
     slug,
     userId,
     avatar,
-    setShowOrganizationModal,
+    setModal,
   } = useOrganizationSwitcher();
 
   function planBadge(plan: string) {
@@ -157,7 +157,7 @@ export function OrganizationSwitcher() {
             </DropdownMenuGroup>
             <DropdownMenuItem
               className="cursor-pointer gap-2 p-2"
-              onClick={() => setShowOrganizationModal(true)}
+              onClick={() => setModal("create-organization")}
             >
               <Icons.circlePlus className="mr-4 size-4 text-neutral-500" />
               <span className="font-medium text-muted-foreground">

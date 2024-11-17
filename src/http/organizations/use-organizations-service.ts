@@ -1,4 +1,3 @@
-import { useModalStore } from "@/hooks/use-modal-store";
 import { appRoutes } from "@/lib/constants";
 import {
   useMutation,
@@ -16,7 +15,7 @@ import {
   fetchExistentSlugService,
   getOrganizationService,
   getOrganizationsService,
-  updateOrganizationService
+  updateOrganizationService,
 } from ".";
 import type { ErrorResponse } from "../types";
 import type {
@@ -29,7 +28,7 @@ import type {
   GetOrganizationServiceProps,
   GetOrganizationsResponse,
   UpdateOrganizationServiceBody,
-  UpdateOrganizationServiceResponse
+  UpdateOrganizationServiceResponse,
 } from "./types";
 
 export function useGetOrganizationsService(
@@ -62,7 +61,6 @@ export function useCreateOrganizationService(
 ) {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { showOrganizationModal, setShowOrganizationModal } = useModalStore();
 
   return useMutation({
     mutationKey: ["createOrganization"],
@@ -73,8 +71,6 @@ export function useCreateOrganizationService(
       queryClient.invalidateQueries({ queryKey: ["getOrganizations"] });
 
       router.push(`/${data.slug}`);
-
-      if (showOrganizationModal) setShowOrganizationModal(false);
     },
     onError: async (error) => {
       const { message } = await error.response.json();

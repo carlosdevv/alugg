@@ -22,3 +22,13 @@ export type UpdateMemberRoleServiceBody = {
   memberId: string;
   role: Role;
 };
+
+export type DeleteMemberServiceBody = {
+  slug: string;
+  memberId: string;
+};
+
+export type TransferOwnershipServiceBody = {
+  slug: string;
+  transferToUserId: string;
+};

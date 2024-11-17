@@ -2,10 +2,13 @@ import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -32,7 +35,13 @@ type MemberCardProps = {
 export default function MemberCard({ slug, member }: MemberCardProps) {
   const { id, name, email, role: currentRole, isOwner } = member;
 
-  const { openPopover, setOpenPopover, updateMemberRole } = useMemberCard({
+  const {
+    openPopover,
+    setOpenPopover,
+    updateMemberRole,
+    transferOwnership,
+    deleteMember,
+  } = useMemberCard({
     memberId: id,
     slug,
   });
@@ -75,8 +84,8 @@ export default function MemberCard({ slug, member }: MemberCardProps) {
           )}
 
           {!isOwner && (
-            <Popover>
-              <PopoverTrigger>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
                 <Button
                   type="button"
                   onClick={() => setOpenPopover(!openPopover)}
@@ -85,14 +94,30 @@ export default function MemberCard({ slug, member }: MemberCardProps) {
                 >
                   <Icons.verticalEllipsis className="size-4" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="grid w-full gap-1 p-2 sm:w-48">
-                <Button className="text-red-500">
-                  <Icons.userMinus className="size-4 mr-2" />
-                  Remover membro
-                </Button>
-              </PopoverContent>
-            </Popover>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="grid w-full gap-1 p-2 sm:w-48">
+                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Button
+                    className="text-red-500"
+                    onClick={async () => await transferOwnership()}
+                  >
+                    <Icons.transferOwnership className="size-4 mr-2" />
+                    Transferir organização
+                  </Button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Button
+                    className="text-red-500"
+                    onClick={async () => await deleteMember()}
+                  >
+                    <Icons.userMinus className="size-4 mr-2" />
+                    Remover membro
+                  </Button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

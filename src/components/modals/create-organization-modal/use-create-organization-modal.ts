@@ -1,6 +1,8 @@
 "use client";
 import { useCreateOrganizationService } from "@/http/organizations/use-organizations-service";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -22,13 +24,26 @@ type CreateOrganizationFormValues = z.infer<
   typeof createOrganizationFormSchema
 >;
 
-export default function useCreateOrganizationForm() {
+export default function useCreateOrganizationModal() {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const [showModal, setShowModal] = useState(false);
+
   const form = useForm<CreateOrganizationFormValues>({
     resolver: zodResolver(createOrganizationFormSchema),
   });
 
   const { mutateAsync: createOrganization, isPending } =
     useCreateOrganizationService();
+
+  const onClose = useCallback(() => {
+    const nextSearchParams = new URLSearchParams(searchParams.toString());
+    nextSearchParams.delete("modal");
+    router.replace(`${pathname}?${nextSearchParams}`);
+    setShowModal(false);
+  }, [pathname, router, searchParams]);
 
   async function onSubmit(data: CreateOrganizationFormValues) {
     const props = {
@@ -40,5 +55,15 @@ export default function useCreateOrganizationForm() {
     form.reset();
   }
 
-  return { form, onSubmit, isPending };
+  useEffect(() => {
+    const isShowModal = searchParams.get("modal") === "create-organization";
+
+    if (isShowModal) {
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+  }, [searchParams]);
+
+  return { form, onSubmit, isPending, onClose, showModal, setShowModal };
 }

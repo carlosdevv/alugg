@@ -1,4 +1,5 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
@@ -103,7 +104,16 @@ export async function DELETE(
       );
     }
 
-    const { organization } = await getUserMembership(slug);
+    const { organization, membership } = await getUserMembership(slug);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("delete", "Invite")) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para revogar convites." },
+        { status: 403 }
+      );
+    }
 
     const invite = await prisma.invite.findUnique({
       where: {
@@ -125,7 +135,7 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json({}, { status: 204 });
+    return NextResponse.json({});
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
