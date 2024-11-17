@@ -3,6 +3,7 @@
 import {
   ApertureIcon,
   AtSignIcon,
+  BellIcon,
   CalendarDaysIcon,
   CheckCircle2Icon,
   CheckIcon,
@@ -89,4 +90,5 @@ export const Icons = {
   userMinus: UserMinusIcon,
   crown: CrownIcon,
   transferOwnership: Rotate3dIcon,
+  bell: BellIcon,
 };

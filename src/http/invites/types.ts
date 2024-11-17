@@ -42,3 +42,47 @@ export type RevokeInviteServiceBody = {
   slug: string;
   inviteId: string;
 };
+
+export type PendingInvitesServiceProps = {
+  slug: string;
+};
+
+export type PendingInvitesServiceApiProps = {
+  invites: {
+    id: string;
+    role: Role;
+    email: string;
+    createdAt: Date;
+    author: {
+      id: string;
+      name: string;
+    } | null;
+    organization: {
+      name: string;
+    };
+  }[];
+};
+
+export type PendingInvitesServiceResponse = {
+  id: string;
+  role: Role;
+  email: string;
+  createdAt: Date;
+  author: {
+    id: string;
+    name: string;
+  } | null;
+  organization: {
+    name: string;
+  };
+};
+
+export type AcceptInviteServiceBody = {
+  slug: string;
+  inviteId: string;
+};
+
+export type RejectInviteServiceBody = {
+  slug: string;
+  inviteId: string;
+};

@@ -3,8 +3,8 @@
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as React from "react";
 
+import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
-import { Icons } from "../icons";
 
 const TooltipProvider = TooltipPrimitive.Provider;
 
