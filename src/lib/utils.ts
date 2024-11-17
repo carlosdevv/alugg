@@ -11,6 +11,7 @@ export function createSlug(text: string): string {
     lower: true,
     remove: /[*+~.()'"!:@]/g,
     strict: true,
+    trim: true
   });
 }
 

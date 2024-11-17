@@ -1,4 +1,5 @@
 export const appRoutes = {
+  landingPage: "/",
   signIn: "/auth/sign-in",
   signUp: "/auth/sign-up",
   forgotPassword: "/auth/forgot-password",
@@ -10,4 +11,9 @@ export const appRoutes = {
     update: "inventory/update",
     createCategory: "inventory/create/create-category",
   },
+  user: {
+    profile: "user/profile",
+    settings: "user/settings",
+    organizationSettings: "user/organization-settings",
+  }
 };

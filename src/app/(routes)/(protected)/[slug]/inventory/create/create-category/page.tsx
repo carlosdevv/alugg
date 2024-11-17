@@ -43,7 +43,7 @@ export default function CreateCategoryPage() {
             <Icons.chevronLeft className="size-4" />
           </Link>
         </Button>
-        <h1 className="font-semibold text-2xl">Criar Categoria</h1>
+        <h1 className="font-semibold text-2xl hover:cursor-pointer">Criar Categoria</h1>
       </div>
       <Separator className="mt-2 mb-6" />
       <CreateCategoryForm />

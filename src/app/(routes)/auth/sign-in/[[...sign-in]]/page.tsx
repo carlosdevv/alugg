@@ -28,7 +28,11 @@ export default function SignInPage() {
           </div>
         </div>
       </div>
-      <aside className="flex-col items-center justify-center flex-1 flex-shrink hidden basis-1/4 xl:flex bg-muted" />
+      <aside className="flex-col items-center justify-center flex-1 flex-shrink hidden basis-1/4 xl:flex bg-muted" >
+          <div className="text-4xl ">
+        Allug logo
+          </div>
+      </aside>
     </section>
   );
 }

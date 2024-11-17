@@ -24,13 +24,16 @@ import {
   Home,
   ImageIcon,
   LayersIcon,
+  List,
   LoaderIcon,
   LogOutIcon,
+  MessageSquareDot,
   MoveUpRight,
   Package,
   PanelLeftIcon,
   PenLineIcon,
   ReceiptTextIcon,
+  Settings,
   Settings2,
   ShieldAlertIcon,
   ShoppingBagIcon,
@@ -48,6 +51,8 @@ import { ComponentType, SVGProps } from "react";
 export type IconType = LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
 
 export const Icons = {
+  list: List,
+  notification: MessageSquareDot,
   package: Package,
   home: Home,
   shoppingCart: ShoppingCart,
@@ -62,6 +67,7 @@ export const Icons = {
   horizontalEllipsis: EllipsisIcon,
   delete: Trash2Icon,
   settings: Settings2,
+  configuration: Settings,
   circle: CircleIcon,
   clock: Clock1Icon,
   checkCircle: CheckCircle2Icon,
@@ -86,5 +92,5 @@ export const Icons = {
   layers: LayersIcon,
   userPlus: UserPlusIcon,
   userMinus: UserMinusIcon,
-  crown: CrownIcon
+  crown: CrownIcon,
 };

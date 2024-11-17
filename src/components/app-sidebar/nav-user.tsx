@@ -76,41 +76,51 @@ export function NavUser() {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                {user ? (
-                  <Avatar className="size-7">
-                    <AvatarFallback className="bg-black/15">
-                      <span className="text-xs">
-                        {getInitials(user.firstName ?? "AA")}
-                      </span>
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <Avatar className="size-7">
-                    <AvatarFallback className="bg-black/15">
-                      <span className="text-xs">{getInitials("AA")}</span>
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                {user ? (
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {user.firstName ||
-                        user.primaryEmailAddress?.emailAddress?.split("@")[0]}
+          <DropdownMenuLabel className="p-0 font-normal">
+            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+              {user ? (
+                <Avatar className="size-7">
+                  <AvatarFallback className="bg-black/15">
+                    <span className="text-xs">
+                      {getInitials(user.firstName ?? "AA")}
                     </span>
-                    <span className="truncate text-xs">
-                      {user.primaryEmailAddress?.emailAddress}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <div className="h-3 w-12 animate-pulse rounded-full bg-neutral-200" />
-                    <div className="h-3 w-20 animate-pulse rounded-full bg-neutral-200" />
-                  </div>
-                )}
-              </div>
-            </DropdownMenuLabel>
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <Avatar className="size-7">
+                  <AvatarFallback className="bg-black/15">
+                    <span className="text-xs">{getInitials("AA")}</span>
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              {user ? (
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">
+                    {user.firstName ||
+                      user.primaryEmailAddress?.emailAddress?.split("@")[0]}
+                  </span>
+                  <span className="truncate text-xs">
+                    {user.primaryEmailAddress?.emailAddress}
+                  </span>
+                </div>
+              ) : (
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <div className="h-3 w-12 animate-pulse rounded-full bg-neutral-200" />
+                  <div className="h-3 w-20 animate-pulse rounded-full bg-neutral-200" />
+                </div>
+              )}
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuItem asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-start cursor-pointer"
+                onClick={() => signOut({ redirectUrl: appRoutes.user.settings })}
+              >
+                <Icons.configuration className="size-6 mr-2" />
+                Atualizar Dados
+              </Button>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuGroup></DropdownMenuGroup>
             <DropdownMenuSeparator />
