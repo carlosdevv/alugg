@@ -66,7 +66,9 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json({}, { status: 204 });
+    return new Response(null, {
+      status: 204,
+    });
   } catch (error) {
     console.error("ERR:", error);
     return NextResponse.json(
@@ -131,7 +133,9 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json({}, { status: 204 });
+    return new Response(null, {
+      status: 204,
+    });
   } catch (error) {
     console.error("ERR:", error);
     return NextResponse.json(

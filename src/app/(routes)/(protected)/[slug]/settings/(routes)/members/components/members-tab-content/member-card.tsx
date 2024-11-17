@@ -77,8 +77,12 @@ export default function MemberCard({ slug, member }: MemberCardProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ADMIN">Admin</SelectItem>
-                <SelectItem value="MEMBER">Membro</SelectItem>
+                <SelectItem value="ADMIN" className="cursor-pointer">
+                  Admin
+                </SelectItem>
+                <SelectItem value="MEMBER" className="cursor-pointer">
+                  Membro
+                </SelectItem>
               </SelectContent>
             </Select>
           )}
@@ -88,33 +92,29 @@ export default function MemberCard({ slug, member }: MemberCardProps) {
               <DropdownMenuTrigger>
                 <Button
                   type="button"
+                  size="icon"
                   onClick={() => setOpenPopover(!openPopover)}
-                  className="h-8 space-x-0 px-1 py-2"
-                  variant="outline"
+                  variant="ghost"
                 >
                   <Icons.verticalEllipsis className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="grid w-full gap-1 p-2 sm:w-48">
+              <DropdownMenuContent className="min-w-52 space-y-2">
                 <DropdownMenuLabel>Ações</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Button
-                    className="text-red-500"
-                    onClick={async () => await transferOwnership()}
-                  >
-                    <Icons.transferOwnership className="size-4 mr-2" />
-                    Transferir organização
-                  </Button>
+                <DropdownMenuItem
+                  className="w-full justify-between items-center cursor-pointer"
+                  onClick={async () => await transferOwnership()}
+                >
+                  Transferir organização
+                  <Icons.transferOwnership className="size-4" />
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Button
-                    className="text-red-500"
-                    onClick={async () => await deleteMember()}
-                  >
-                    <Icons.userMinus className="size-4 mr-2" />
-                    Remover membro
-                  </Button>
+                <DropdownMenuItem
+                  className="w-full justify-between items-center cursor-pointer text-rose-500 hover:text-white hover:bg-rose-500"
+                  onClick={async () => await deleteMember()}
+                >
+                  Remover membro
+                  <Icons.userMinus className="size-4" />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
