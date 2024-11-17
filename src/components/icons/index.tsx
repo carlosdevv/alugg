@@ -27,6 +27,7 @@ import {
   LayersIcon,
   LoaderIcon,
   LogOutIcon,
+  MoonIcon,
   MoveUpRight,
   Package,
   PanelLeftIcon,
@@ -38,6 +39,7 @@ import {
   ShoppingBagIcon,
   ShoppingCart,
   SlashIcon,
+  SunIcon,
   Trash2Icon,
   UserMinusIcon,
   UserPlusIcon,
@@ -91,4 +93,6 @@ export const Icons = {
   crown: CrownIcon,
   transferOwnership: Rotate3dIcon,
   bell: BellIcon,
+  sun: SunIcon,
+  moon: MoonIcon,
 };
