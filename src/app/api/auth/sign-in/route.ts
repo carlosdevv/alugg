@@ -20,14 +20,20 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
-
+    
     const { email, password } = parsed.data;
-
-    const hasUser = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    
+    const hasUser = await prisma.user.findUnique(
+      {
+        where: {
+          email,
+        },
+        select: {
+          id: true,
+          passwordHash: true,
+        },
+      }
+    )
 
     if (!hasUser) {
       return NextResponse.json(
@@ -36,7 +42,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const isPasswordValid = compare(password, hasUser.passwordHash);
+    const isPasswordValid = await compare(password, hasUser.passwordHash);
 
     if (!isPasswordValid) {
       return NextResponse.json(
