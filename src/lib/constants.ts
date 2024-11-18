@@ -8,6 +8,11 @@ export const appRoutes = {
     root: "inventory",
     create: "inventory/create",
     update: "inventory/update",
-    createCategory: "inventory/create/create-category",
+    createCategory: "create/create-category",
+  },
+  categories: {
+    root: "categories",
+    create: "categories/create",
+    edit: "categories/edit"
   },
 };

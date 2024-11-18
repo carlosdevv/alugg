@@ -31,9 +31,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { appRoutes } from "@/lib/constants";
 import Link from "next/link";
 import useCreateItemForm from "./use-create-item-form";
+import { useGetCategoriesService } from "@/http/category/use-categories-service";
 
 export default function CreateItemForm() {
   const { form, onSubmit } = useCreateItemForm();
+  const { data: categories } = useGetCategoriesService();
 
   return (
     <Form {...form}>
@@ -78,12 +80,20 @@ export default function CreateItemForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="m@example.com">
-                              m@example.com
-                            </SelectItem>
-                            <SelectItem value="m@google.com">
-                              m@google.com
-                            </SelectItem>
+                            {categories?.length ? (
+                              categories.map((category) => (
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.name}
+                                >
+                                  {category.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem disabled value="no-category">
+                                Nenhuma categoria disponível
+                              </SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
 
