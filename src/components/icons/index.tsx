@@ -31,10 +31,10 @@ import {
   MoveUpRight,
   Package,
   PanelLeftIcon,
-  PenLineIcon,
   ReceiptTextIcon,
   Rotate3dIcon,
   Settings2,
+  Settings2Icon,
   ShieldAlertIcon,
   ShoppingBagIcon,
   ShoppingCart,
@@ -44,7 +44,7 @@ import {
   UserMinusIcon,
   UserPlusIcon,
   XIcon,
-  type LucideIcon,
+  type LucideIcon
 } from "lucide-react";
 
 import { ComponentType, SVGProps } from "react";
@@ -77,7 +77,7 @@ export const Icons = {
   verticalEllipsis: EllipsisVertical,
   moveUpRight: MoveUpRight,
   x: XIcon,
-  update: PenLineIcon,
+  update: Settings2Icon,
   signOut: LogOutIcon,
   eye: EyeIcon,
   eyeOff: EyeOffIcon,

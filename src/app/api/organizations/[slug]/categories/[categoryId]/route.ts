@@ -1,20 +1,37 @@
+import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserPermissions } from "@/lib/casl/get-user-permissions";
+import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
-import prisma from "../../../../lib/prismadb";
 import { z } from "zod";
 
+// GET /api/organizations/:slug/categories/:categoryId – Get a category
 export async function GET(
   req: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: { slug: string; categoryId: string } }
 ) {
   try {
     const { userId } = auth();
-    const { categoryId } = params;
+    const { slug, categoryId } = params;
 
     if (!userId) {
       return NextResponse.json(
-        { message: `Usuário <${userId}> não encontrado.` },
+        { message: "Usuário não encontrado." },
         { status: 404 }
+      );
+    }
+
+    if (!slug) {
+      return NextResponse.json(
+        { message: "É necessário informar o ID da Organização." },
+        { status: 400 }
+      );
+    }
+
+    if (!categoryId) {
+      return NextResponse.json(
+        { message: "É necessário informar o ID da Categoria." },
+        { status: 400 }
       );
     }
 
@@ -22,7 +39,6 @@ export async function GET(
       select: {
         id: true,
         name: true,
-        inventoryId: true
       },
       where: {
         id: categoryId,
@@ -30,10 +46,9 @@ export async function GET(
     });
 
     if (existentCategory === null) {
-      return NextResponse.json(
-        { message: `Categoria <${categoryId}> não encontrada.` },
-        { status: 204 }
-      );
+      return new Response(null, {
+        status: 204,
+      });
     }
 
     const itemCount = await prisma.inventoryItem.count({
@@ -44,13 +59,10 @@ export async function GET(
 
     const category = {
       ...existentCategory,
-      totalItems: itemCount
+      totalItems: itemCount,
     };
 
-    return NextResponse.json(
-      { category: category },
-      { status: 200 }
-    );
+    return NextResponse.json({ category: category }, { status: 200 });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
@@ -62,21 +74,35 @@ export async function GET(
 
 const updateCategorySchema = z.object({
   name: z.string().optional(),
-  inventoryId: z.string().optional(),
 });
 
+// PATCH /api/organizations/:slug/categories/:categoryId – Update a category
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: { slug: string; categoryId: string } }
 ) {
   try {
     const { userId } = auth();
-    const { categoryId } = params;
+    const { slug, categoryId } = params;
 
     if (!userId) {
       return NextResponse.json(
-        { message: `Usuário <${userId}> não encontrado.` },
+        { message: "Usuário não encontrado." },
         { status: 404 }
+      );
+    }
+
+    if (!slug) {
+      return NextResponse.json(
+        { message: "É necessário informar o ID da Organização." },
+        { status: 400 }
+      );
+    }
+
+    if (!categoryId) {
+      return NextResponse.json(
+        { message: "É necessário informar o ID da Categoria." },
+        { status: 400 }
       );
     }
 
@@ -90,7 +116,17 @@ export async function PATCH(
       );
     }
 
-    const { name, inventoryId } = parsed.data;
+    const { name } = parsed.data;
+    const { membership } = await getUserMembership(slug);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("update", "Category")) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para atualizar categorias." },
+        { status: 403 }
+      );
+    }
 
     const existentCategory = await prisma.category.findUnique({
       where: {
@@ -100,7 +136,7 @@ export async function PATCH(
 
     if (!existentCategory) {
       return NextResponse.json(
-        { message: `Categoria <${categoryId}> não encontrada.` },
+        { message: `Categoria não encontrada.` },
         { status: 404 }
       );
     }
@@ -111,7 +147,6 @@ export async function PATCH(
       },
       data: {
         name: name || existentCategory.name,
-        inventoryId: inventoryId || existentCategory.inventoryId,
       },
     });
 
@@ -128,18 +163,44 @@ export async function PATCH(
   }
 }
 
+// DELETE /api/organizations/:slug/categories/:categoryId – Delete a category
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: { slug: string; categoryId: string } }
 ) {
   try {
     const { userId } = auth();
-    const { categoryId } = params;
+    const { slug, categoryId } = params;
 
     if (!userId) {
       return NextResponse.json(
-        { message: `Usuário <${userId}> não encontrado.` },
+        { message: "Usuário não encontrado." },
         { status: 404 }
+      );
+    }
+
+    if (!slug) {
+      return NextResponse.json(
+        { message: "É necessário informar o ID da Organização." },
+        { status: 400 }
+      );
+    }
+
+    if (!categoryId) {
+      return NextResponse.json(
+        { message: "É necessário informar o ID da Categoria." },
+        { status: 400 }
+      );
+    }
+
+    const { membership } = await getUserMembership(slug);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("delete", "Category")) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para deletar categorias." },
+        { status: 403 }
       );
     }
 
@@ -151,7 +212,7 @@ export async function DELETE(
 
     if (!existentCategory) {
       return NextResponse.json(
-        { message: `Categoria <${categoryId}> não encontrada.` },
+        { message: `Categoria não encontrada.` },
         { status: 404 }
       );
     }
@@ -161,7 +222,7 @@ export async function DELETE(
         categoryId: categoryId,
       },
       data: {
-        categoryId: "",
+        categoryId: undefined,
       },
     });
 
@@ -172,7 +233,7 @@ export async function DELETE(
     });
 
     return NextResponse.json(
-      { message: `Categoria <${categoryId}> deletada com sucesso.` },
+      { message: `Categoria deletada com sucesso.` },
       { status: 200 }
     );
   } catch (error) {

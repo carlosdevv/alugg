@@ -51,9 +51,11 @@ export function PendingInvites() {
 
       <PopoverContent className="space-y-2 w-60">
         {isGettingInvites && <Icons.loader className="animate-spin size-4" />}
-        <span className="block text-sm font-medium">
-          Convites Pendentes ({invites?.length ?? 0})
-        </span>
+        {!isGettingInvites && (
+          <span className="block text-sm font-medium">
+            Convites Pendentes ({invites?.length ?? 0})
+          </span>
+        )}
 
         {invites?.length === 0 && (
           <p className="text-sm text-muted-foreground">Sem convites.</p>

@@ -27,17 +27,18 @@ export const columns: ColumnDef<InventoryItemColumn>[] = [
     cell: ({ row }) => {
       const totalItems = row.getValue("totalItems");
       return (
-        <div className="text-center text-gray-600">
-          {totalItems?.toLocaleString()} {/* Formata o número com separadores de milhar */}
-        </div>
+        <div className="text-gray-600">{totalItems?.toLocaleString()}</div>
       );
     },
   },
   {
-    header: "Opções",
+    accessorKey: "actions",
+    header: () => {
+      return <div className="flex justify-end pr-2">Opções</div>;
+    },
     cell: ({ row }) => {
       return (
-        <div className="flex justify-center">
+        <div className="flex justify-end pr-4">
           <RowActions row={row} />
         </div>
       );

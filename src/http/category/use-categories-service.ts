@@ -1,5 +1,3 @@
-import { useModalStore } from "@/hooks/use-modal-store";
-import { appRoutes } from "@/lib/constants";
 import {
   useMutation,
   useQuery,
@@ -8,7 +6,7 @@ import {
   type UseQueryOptions,
 } from "@tanstack/react-query";
 import type { HTTPError } from "ky";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import {
   createCategoryService,
@@ -22,19 +20,21 @@ import type {
   CreateCategoryServiceBody,
   CreateCategoryServiceResponse,
   DeleteCategoryServiceBody,
+  GetCategoriesProps,
+  GetCategoriesResponse,
   GetCategoryProps,
   GetCategoryResponse,
-  GetCategoriesResponse,
   UpdateCategoryServiceBody,
   UpdateCategoryServiceResponse,
 } from "./types";
 
 export function useGetCategoriesService(
+  props: GetCategoriesProps,
   options?: UseQueryOptions<GetCategoriesResponse, HTTPError<ErrorResponse>>
 ) {
   return useQuery({
-    queryKey: ["getCategories"],
-    queryFn: async () => await getCategoriesService(),
+    queryKey: ["getCategories", props.slug],
+    queryFn: async () => await getCategoriesService(props),
     ...options,
   });
 }
@@ -58,17 +58,15 @@ export function useCreateCategoryService(
   >
 ) {
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const { slug } = useParams() as { slug: string };
 
   return useMutation({
     mutationKey: ["createCategory"],
     mutationFn: async (body: CreateCategoryServiceBody) =>
       await createCategoryService(body),
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Categoria criada com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["getCategories"] });
-
-      router.back();
+      queryClient.invalidateQueries({ queryKey: ["getCategories", slug] });
     },
     onError: async (error) => {
       const { message } = await error.response.json();
@@ -86,18 +84,16 @@ export function useUpdateCategoryService(
   >
 ) {
   const queryClient = useQueryClient();
+  const { slug } = useParams() as { slug: string };
 
   return useMutation({
     mutationKey: ["updateCategory"],
     mutationFn: async (body: UpdateCategoryServiceBody) =>
       await updateCategoryService(body),
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Categoria atualizada com sucesso!");
       queryClient.invalidateQueries({
-        queryKey: ["getCategory", data.id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["getCategories"],
+        queryKey: ["getCategories", slug],
       });
     },
     onError: async (error) => {
@@ -115,7 +111,8 @@ export function useDeleteCategoryService(
     DeleteCategoryServiceBody
   >
 ) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { slug } = useParams() as { slug: string };
 
   return useMutation({
     mutationKey: ["deleteCategory"],
@@ -123,8 +120,9 @@ export function useDeleteCategoryService(
       await deleteCategoryService(body),
     onSuccess: () => {
       toast.success("Categoria deletada com sucesso!");
-      router.push(appRoutes.onboarding);
-      router.refresh();
+      queryClient.invalidateQueries({
+        queryKey: ["getCategories", slug],
+      });
     },
     onError: async (error) => {
       const { message } = await error.response.json();

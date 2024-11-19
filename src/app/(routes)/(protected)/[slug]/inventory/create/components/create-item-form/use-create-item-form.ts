@@ -1,4 +1,7 @@
+import { useGetCategoriesService } from "@/http/category/use-categories-service";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -28,6 +31,8 @@ const createItemFormSchema = z.object({
 type CreateItemFormValues = z.infer<typeof createItemFormSchema>;
 
 export default function useCreateItemForm() {
+  const { slug } = useParams() as { slug: string };
+
   const form = useForm<CreateItemFormValues>({
     resolver: zodResolver(createItemFormSchema),
     defaultValues: {
@@ -36,9 +41,16 @@ export default function useCreateItemForm() {
     },
   });
 
+  const [, setModal] = useQueryState("modal");
+
+  const { data: categories } = useGetCategoriesService(
+    { slug },
+    { enabled: !!slug, queryKey: ["getCategories", slug] }
+  );
+
   function onSubmit(data: CreateItemFormValues) {
     console.log(data);
   }
 
-  return { form, onSubmit };
+  return { form, onSubmit, categories, setModal };
 }

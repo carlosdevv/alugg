@@ -26,16 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { appRoutes } from "@/lib/constants";
-import Link from "next/link";
 import useCreateItemForm from "./use-create-item-form";
-import { useGetCategoriesService } from "@/http/category/use-categories-service";
 
 export default function CreateItemForm() {
-  const { form, onSubmit } = useCreateItemForm();
-  const { data: categories } = useGetCategoriesService();
+  const { form, onSubmit, categories, setModal } = useCreateItemForm();
 
   return (
     <Form {...form}>
@@ -97,11 +92,13 @@ export default function CreateItemForm() {
                           </SelectContent>
                         </Select>
 
-                        <Button size="sm" type="button" asChild>
-                          <Link href={appRoutes.inventory.createCategory}>
-                            <Icons.circlePlus className="size-4 mr-2" />
-                            Adicionar
-                          </Link>
+                        <Button
+                          size="sm"
+                          type="button"
+                          onClick={() => setModal("create-category")}
+                        >
+                          <Icons.circlePlus className="size-4 mr-2" />
+                          Adicionar
                         </Button>
                       </div>
                       <FormMessage />

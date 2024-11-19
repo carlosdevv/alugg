@@ -7,7 +7,6 @@ import { useParams, useRouter } from "next/navigation";
 
 export default function ProtectedLayout({
   children,
-  sheet,
 }: Readonly<{
   children: React.ReactNode;
   sheet: React.ReactNode;
@@ -37,7 +36,6 @@ export default function ProtectedLayout({
   return (
     <>
       <main className="min-h-screen w-full bg-white">
-        {sheet}
         <section className="flex size-full">
           <AppSidebar />
           {children}

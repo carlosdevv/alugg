@@ -28,9 +28,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
-import Link from "next/link";
-import { appRoutes } from "@/lib/constants";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -43,6 +42,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
+  const [, setModal] = useQueryState("modal");
 
   const table = useReactTable({
     data,
@@ -70,11 +70,9 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-60"
         />
-        <Button size="sm" asChild>
-          <Link href={appRoutes.categories.create}>
-            <Icons.circlePlus className="size-4 mr-2" />
-            Criar Categoria
-          </Link>
+        <Button size="sm" onClick={() => setModal("create-category")}>
+          <Icons.circlePlus className="size-4 mr-2" />
+          Criar Categoria
         </Button>
       </div>
       <div className="rounded-md border mb-2">

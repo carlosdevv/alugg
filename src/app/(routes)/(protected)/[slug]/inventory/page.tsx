@@ -1,13 +1,5 @@
 import { PageContent } from "@/components/page-layout";
 import { PageWrapper } from "@/components/page-layout/page-wrapper";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { appRoutes } from "@/lib/constants";
 import { columns, type InventoryItemColumn } from "./components/columns";
 import { DataTable } from "./components/data-table";
 

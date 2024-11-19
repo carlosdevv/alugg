@@ -3,67 +3,67 @@ import type {
   CreateCategoryServiceBody,
   CreateCategoryServiceResponse,
   DeleteCategoryServiceBody,
-  GetCategoryProps,
-  GetCategoryApiProps,
   GetCategoriesApiProps,
+  GetCategoriesProps,
   GetCategoriesResponse,
+  GetCategoryApiProps,
+  GetCategoryProps,
   GetCategoryResponse,
   UpdateCategoryServiceBody,
   UpdateCategoryServiceResponse,
 } from "./types";
 
-export async function getCategoriesService(): Promise<GetCategoriesResponse> {
+export async function getCategoriesService({
+  slug,
+}: GetCategoriesProps): Promise<GetCategoriesResponse> {
   const result = await api
-    .get("api/category")
+    .get(`api/organizations/${slug}/categories`)
     .json<GetCategoriesApiProps>();
 
   return result.categories;
 }
 
 export async function getCategoryService({
+  slug,
   categoryId,
 }: GetCategoryProps): Promise<GetCategoryResponse> {
   const result = await api
-    .get(`api/category/${categoryId}`)
+    .get(`api/organizations/${slug}/categories/${categoryId}`)
     .json<GetCategoryApiProps>();
 
   return result.category;
 }
 
 export async function createCategoryService({
+  slug,
   name,
-  inventoryId,
 }: CreateCategoryServiceBody): Promise<CreateCategoryServiceResponse> {
   return await api
-    .post("api/category", {
+    .post(`api/organizations/${slug}/categories`, {
       json: {
         name,
-        inventoryId,
       },
     })
     .json<CreateCategoryServiceResponse>();
 }
 
 export async function updateCategoryService({
+  slug,
+  categoryId,
   name,
-  inventoryId,
-  items,
-  categoryId
 }: UpdateCategoryServiceBody): Promise<UpdateCategoryServiceResponse> {
   return await api
-    .patch(`api/category/${categoryId}`, {
+    .patch(`api/organizations/${slug}/categories/${categoryId}`, {
       json: {
         name,
-        inventoryId,
-        items
       },
     })
     .json<UpdateCategoryServiceResponse>();
 }
 
-
 export async function deleteCategoryService({
+  slug,
   categoryId,
 }: DeleteCategoryServiceBody): Promise<void> {
-  await api.delete(`api/category/${categoryId}`);
+  await api.delete(`api/organizations/${slug}/categories/${categoryId}`);
 }

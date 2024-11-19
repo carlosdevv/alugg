@@ -11,10 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Row } from "@tanstack/react-table";
-import Link from "next/link";
-import { appRoutes } from "@/lib/constants";
+import { useQueryState } from "nuqs";
 import type { InventoryItemColumn } from "./columns";
-import { DeleteDialog } from "./delete-dialog";
+import { DeleteCategoryDialog } from "./delete-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
@@ -22,7 +21,9 @@ type RowActionsProps<TData> = {
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
   const props = row.original as InventoryItemColumn;
-  const categoryId = `${props.id}`;
+  const categoryId = props.id;
+  const [, setModal] = useQueryState("modal");
+  const [, setCategoryId] = useQueryState("id");
 
   return (
     <AlertDialog>
@@ -33,30 +34,32 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
               <Icons.verticalEllipsis className="size-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
+          <DropdownMenuContent className="min-w-44">
             <DropdownMenuLabel>Opções</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href={`categories/${categoryId}/update`}>
-                  <Button variant="link" className="flex items-center">
-                    <Icons.update className="size-4 mr-2" />
-                    Editar
-                  </Button>
-                </Link>
+              <DropdownMenuItem
+                className="flex justify-between cursor-pointer"
+                onClick={() => {
+                  setModal("update-category");
+                  setCategoryId(categoryId);
+                }}
+              >
+                Editar
+                <Icons.update className="size-4" />
               </DropdownMenuItem>
 
               <AlertDialogTrigger asChild>
-                <DropdownMenuItem className="cursor-pointer flex items-center">
-                  <Icons.delete className="size-4 mr-2" />
+                <DropdownMenuItem className="cursor-pointer flex justify-between text-rose-500">
                   Remover
+                  <Icons.delete className="size-4" />
                 </DropdownMenuItem>
               </AlertDialogTrigger>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DeleteDialog />
+      <DeleteCategoryDialog categoryId={categoryId} />
     </AlertDialog>
   );
 }

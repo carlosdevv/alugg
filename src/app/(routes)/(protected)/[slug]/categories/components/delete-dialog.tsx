@@ -7,8 +7,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useDeleteCategoryService } from "@/http/category/use-categories-service";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
 
-export function DeleteDialog() {
+type DeleteCategoryDialogProps = {
+  categoryId: string;
+};
+
+export function DeleteCategoryDialog({
+  categoryId,
+}: DeleteCategoryDialogProps) {
+  const { slug } = useParams() as { slug: string };
+  const { mutateAsync: deleteCategoryService } = useDeleteCategoryService();
+
   return (
     <>
       <AlertDialogContent>
@@ -20,7 +32,14 @@ export function DeleteDialog() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction className="bg-rose-500 hover:bg-rose-600 transition-all">
+          <AlertDialogAction
+            onClick={async () => {
+              toast.promise(deleteCategoryService({ slug, categoryId }), {
+                loading: "Removendo categoria...",
+              });
+            }}
+            className="bg-rose-500 hover:bg-rose-600 transition-all"
+          >
             Remover
           </AlertDialogAction>
         </AlertDialogFooter>

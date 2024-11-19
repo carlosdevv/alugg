@@ -6,7 +6,7 @@ interface HomePageProps {
   };
 }
 
-export default async function HomePage({ params }: HomePageProps) {
+export default function HomePage({ params }: HomePageProps) {
   return (
     <>
       <HomePageClient slug={params.slug} />

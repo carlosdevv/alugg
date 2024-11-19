@@ -1,10 +1,8 @@
-
 export type GetCategoriesApiProps = {
   categories: {
     id: string;
     name: string;
     totalItems: number;
-    inventoryId: string | null
   }[];
 };
 
@@ -13,21 +11,25 @@ export type GetCategoryApiProps = {
     id: string;
     name: string;
     totalItems: number;
-    inventoryId: string | null;
   };
+};
+
+export type GetCategoriesProps = {
+  slug: string;
 };
 
 export type GetCategoriesResponse = GetCategoriesApiProps["categories"];
 
 export type GetCategoryProps = {
+  slug: string;
   categoryId: string;
 };
 
 export type GetCategoryResponse = GetCategoryApiProps["category"];
 
 export type CreateCategoryServiceBody = {
+  slug: string;
   name: string;
-  inventoryId?: string;
 };
 
 export type CreateCategoryServiceResponse = {
@@ -36,13 +38,14 @@ export type CreateCategoryServiceResponse = {
 };
 
 export type UpdateCategoryServiceBody = {
+  slug: string;
   categoryId: string;
   name?: string;
-  inventoryId?: string;
 };
 
 export type UpdateCategoryServiceResponse = CreateCategoryServiceResponse;
 
 export type DeleteCategoryServiceBody = {
+  slug: string;
   categoryId: string;
 };
