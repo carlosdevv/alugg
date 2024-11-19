@@ -15,7 +15,7 @@ import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
 import slugify from "slugify";
 import type { InventoryItemColumn } from "./columns";
-import { DeleteDialog } from "./delete-dialog";
+import { DeleteInventoryItemDialog } from "./delete-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
@@ -59,7 +59,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DeleteDialog />
+      <DeleteInventoryItemDialog />
     </AlertDialog>
   );
 }
