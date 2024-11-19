@@ -26,14 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { appRoutes } from "@/lib/constants";
-import Link from "next/link";
 import useCreateItemForm from "./use-create-item-form";
 
 export default function CreateItemForm() {
-  const { form, onSubmit } = useCreateItemForm();
+  const { form, onSubmit, categories, setModal } = useCreateItemForm();
 
   return (
     <Form {...form}>
@@ -78,20 +75,30 @@ export default function CreateItemForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="m@example.com">
-                              m@example.com
-                            </SelectItem>
-                            <SelectItem value="m@google.com">
-                              m@google.com
-                            </SelectItem>
+                            {categories?.length ? (
+                              categories.map((category) => (
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.name}
+                                >
+                                  {category.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem disabled value="no-category">
+                                Nenhuma categoria disponível
+                              </SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
 
-                        <Button size="sm" type="button" asChild>
-                          <Link href={appRoutes.inventory.createCategory}>
-                            <Icons.circlePlus className="size-4 mr-2" />
-                            Adicionar
-                          </Link>
+                        <Button
+                          size="sm"
+                          type="button"
+                          onClick={() => setModal("create-category")}
+                        >
+                          <Icons.circlePlus className="size-4 mr-2" />
+                          Adicionar
                         </Button>
                       </div>
                       <FormMessage />

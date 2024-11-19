@@ -35,25 +35,24 @@ model User {
   invites             Invite[]
   member_on           Member[]
   owns_organizations  Organization[]
-  Inventory           Inventory?
 
   @@index(defaultOrganization)
   @@map("users")
 }
 
 model Organization {
-  id        String      @id @default(uuid())
-  name      String
-  slug      String      @unique
-  plan      String      @default("free")
-  logo      String?
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
-  owner     User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId   String      @map("owner_id")
-  invites   Invite[]
-  members   Member[]
-  inventory Inventory[]
+  id         String          @id @default(cuid())
+  name       String
+  slug       String          @unique
+  plan       String          @default("free")
+  logo       String?
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
+  owner      User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId    String          @map("owner_id")
+  invites    Invite[]
+  members    Member[]
+  stockItems InventoryItem[]
 
   @@map("organizations")
 }
@@ -95,52 +94,35 @@ model Token {
   @@map("tokens")
 }
 
-model Inventory {
-  id             String          @id @default(cuid())
-  items          InventoryItem[]
-  categories     Category[]
-  owner          User            @relation(fields: [ownerId], references: [id])
-  ownerId        String          @unique @map("owner_id")
-  name           String
-  createdAt      DateTime        @default(now()) @map("created_at")
-  updatedAt      DateTime        @updatedAt @map("updated_at")
-  Organization   Organization?   @relation(fields: [organizationId], references: [id])
-  organizationId String?
-
-  @@map("inventories")
-}
-
 model InventoryItem {
-  id               String    @id @default(cuid())
+  id               BigInt        @id
   name             String
   code             String?
-  objectPrice      Float     @map("object_price")
-  rentPrice        Float     @map("rent_price")
+  objectPrice      Float         @map("object_price")
+  rentPrice        Float         @map("rent_price")
   size             String?
   color            String?
   description      String?
   amount           Int
-  itemInRenovation Boolean   @default(false) @map("item_in_renovation")
-  status           Status    @default(ACTIVE) @map("item_inactive")
-  imageUrl         String?   @map("image_url")
-  category         Category  @relation(fields: [categoryId], references: [id])
+  itemInRenovation Boolean       @default(false) @map("item_in_renovation")
+  status           Status        @default(ACTIVE)
+  imageUrl         String?       @map("image_url")
+  category         Category      @relation(fields: [categoryId], references: [id])
   categoryId       String
-  Inventory        Inventory @relation(fields: [inventoryId], references: [id])
-  inventoryId      String
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+  Organization     Organization? @relation(fields: [organizationId], references: [id])
+  organizationId   String?
 
   @@map("inventory_items")
 }
 
 model Category {
-  id          String          @id @default(cuid())
-  name        String
-  items       InventoryItem[]
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
-  Inventory   Inventory?      @relation(fields: [inventoryId], references: [id])
-  inventoryId String?
+  id        String          @id @default(cuid())
+  name      String
+  items     InventoryItem[]
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
 
   @@map("categories")
 }

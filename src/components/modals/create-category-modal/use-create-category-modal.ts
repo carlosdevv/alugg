@@ -1,6 +1,5 @@
-import { useCreateInviteService } from "@/http/invites/use-invites-service";
+import { useCreateCategoryService } from "@/http/category/use-categories-service";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Role } from "@prisma/client";
 import {
   useParams,
   usePathname,
@@ -9,36 +8,32 @@ import {
 } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
-const createInviteFormSchema = z.object({
-  email: z.string({ required_error: "Email é obrigatório" }).email({
-    message: "Email inválido",
-  }),
+const createCategoryFormSchema = z.object({
+  name: z.string({ required_error: "Nome é obrigatório" }),
 });
 
-type CreateInviteFormValues = z.infer<typeof createInviteFormSchema>;
+type CreateCategoryFormValues = z.infer<typeof createCategoryFormSchema>;
 
-export default function useCreateInviteModal() {
+export default function useCreateCategoryModal() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const { slug } = useParams() as { slug: string };
 
   const [showModal, setShowModal] = useState(false);
-  const [roleSelected, setRoleSelected] = useState<Role>("MEMBER");
 
-  const form = useForm<CreateInviteFormValues>({
-    resolver: zodResolver(createInviteFormSchema),
+  const form = useForm<CreateCategoryFormValues>({
+    resolver: zodResolver(createCategoryFormSchema),
   });
 
   const {
-    mutateAsync: createInviteService,
+    mutateAsync: createCategoryService,
     isPending,
     isSuccess,
     reset,
-  } = useCreateInviteService();
+  } = useCreateCategoryService();
 
   const onClose = useCallback(() => {
     const nextSearchParams = new URLSearchParams(searchParams.toString());
@@ -47,22 +42,18 @@ export default function useCreateInviteModal() {
     setShowModal(false);
   }, [pathname, router, searchParams]);
 
-  async function onSubmit(data: CreateInviteFormValues) {
+  async function onSubmit(data: CreateCategoryFormValues) {
     const props = {
       ...data,
       slug,
-      role: roleSelected,
     };
 
-    toast.promise(createInviteService(props), {
-      loading: "Enviando...",
-    });
+    await createCategoryService(props);
     form.reset();
-    setRoleSelected("MEMBER");
   }
 
   useEffect(() => {
-    const isShowModal = searchParams.get("modal") === "create-invite";
+    const isShowModal = searchParams.get("modal") === "create-category";
 
     if (isShowModal) {
       setShowModal(true);
@@ -84,8 +75,6 @@ export default function useCreateInviteModal() {
     setShowModal,
     form,
     onSubmit,
-    roleSelected,
-    setRoleSelected,
     isPending,
   };
 }
