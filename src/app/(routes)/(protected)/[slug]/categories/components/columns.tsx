@@ -15,7 +15,7 @@ export const columns: ColumnDef<InventoryItemColumn>[] = [
     header: "Nome da Categoria",
     cell: ({ row }) => {
       return (
-        <div className="truncate max-w-xs font-medium text-gray-800 hover:text-blue-600 transition-colors">
+        <div className="truncate max-w-xs">
           {row.getValue("name")}
         </div>
       );
@@ -27,7 +27,7 @@ export const columns: ColumnDef<InventoryItemColumn>[] = [
     cell: ({ row }) => {
       const totalItems = row.getValue("totalItems");
       return (
-        <div className="text-gray-600">{totalItems?.toLocaleString()}</div>
+        <div>{totalItems?.toLocaleString()}</div>
       );
     },
   },
