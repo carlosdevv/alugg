@@ -53,7 +53,7 @@ export default function ChangeOrgSlugForm({
                     <div className="flex items-center gap-x-3">
                       <Input
                         placeholder="Slug da organização"
-                        className="max-w-96"
+                        className="max-w-96 dark:border-zinc-700 dark:bg-neutral-900"
                         {...field}
                         onBlur={(e) => {
                           field.onChange(
@@ -73,7 +73,7 @@ export default function ChangeOrgSlugForm({
               )}
             />
           </CardContent>
-          <CardFooter className="bg-gray-50 flex items-center p-4 justify-between w-full rounded-b-xl">
+          <CardFooter className="bg-gray-50 dark:bg-zinc-900 flex items-center p-4 justify-between w-full rounded-b-xl">
             <p className="text-sm text-muted-foreground pl-2">
               Apenas letras minúsculas, números e hífens são permitidos. Máximo
               de 48 caracteres.

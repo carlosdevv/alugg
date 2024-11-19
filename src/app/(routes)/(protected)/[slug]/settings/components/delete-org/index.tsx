@@ -35,7 +35,7 @@ export default function DeleteOrg({ organization }: ChangeOrgSlugFormProps) {
 
   return (
     <>
-      <Card className="border-rose-500">
+      <Card className="border-rose-500 dark:border-rose-800">
         <CardHeader>
           <CardTitle>Deletar organização</CardTitle>
           <CardDescription>
@@ -43,7 +43,7 @@ export default function DeleteOrg({ organization }: ChangeOrgSlugFormProps) {
             pode ser desfeita - Prossiga com cautela.
           </CardDescription>
         </CardHeader>
-        <CardFooter className="bg-rose-50 flex border-t border-rose-500 items-center p-4 justify-end w-full rounded-b-xl">
+        <CardFooter className="bg-rose-50 dark:bg-zinc-950 flex border-t dark:border-rose-800 border-rose-500 items-center p-4 justify-end w-full rounded-b-xl">
           <Button variant="destructive" onClick={() => setShowModal(true)}>
             Deletar
           </Button>
@@ -51,9 +51,9 @@ export default function DeleteOrg({ organization }: ChangeOrgSlugFormProps) {
       </Card>
 
       <Modal showModal={showModal} setShowModal={setShowModal}>
-        <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 px-4 py-4 pt-8 sm:px-16">
+        <div className="flex flex-col items-center justify-center space-y-2 border-b dark:border-gray-800 border-gray-200 px-4 py-4 pt-8 sm:px-16">
           <h3 className="text-lg font-medium">Deletar organização</h3>
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-gray-500 dark:text-gray-300">
             Cuidado: Isso irá deletar permanentemente sua organização, domínio,
             e todos os links associados e suas respectivas estatísticas.
           </p>
@@ -61,16 +61,16 @@ export default function DeleteOrg({ organization }: ChangeOrgSlugFormProps) {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col space-y-6 bg-gray-50 px-4 py-8 text-left sm:px-16"
+            className="flex flex-col space-y-6 bg-gray-50 dark:bg-neutral-900 px-4 py-8 text-left sm:px-16"
           >
             <FormField
               control={form.control}
               name="organization_slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="block text-sm font-medium text-gray-700">
+                  <FormLabel className="block text-sm font-medium">
                     Informe o slug da organização{" "}
-                    <span className="font-semibold text-black">
+                    <span className="font-semibold text-black dark:text-gray-400">
                       {organization.slug}
                     </span>{" "}
                     para continuar:
@@ -82,7 +82,7 @@ export default function DeleteOrg({ organization }: ChangeOrgSlugFormProps) {
                         pattern={organization.slug}
                         disabled={!isOwner}
                         className={cn(
-                          "block w-full rounded-md text-gray-900 placeholder-gray-400 sm:text-sm",
+                          "block w-full rounded-md text-gray-900 dark:border-zinc-700 dark:bg-neutral-900 dark:text-gray-100 placeholder-gray-400 sm:text-sm",
                           {
                             "cursor-not-allowed bg-gray-100": !isOwner,
                           }
@@ -101,9 +101,9 @@ export default function DeleteOrg({ organization }: ChangeOrgSlugFormProps) {
               name="verification"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="block text-sm text-gray-700">
+                  <FormLabel className="block text-sm">
                     Para verificar, digite{" "}
-                    <span className="font-semibold text-black">
+                    <span className="font-semibold text-black dark:text-gray-400">
                       deletar organização
                     </span>{" "}
                     no campo abaixo
@@ -115,7 +115,7 @@ export default function DeleteOrg({ organization }: ChangeOrgSlugFormProps) {
                         pattern="deletar organização"
                         disabled={!isOwner}
                         className={cn(
-                          "block w-full rounded-md text-gray-900 placeholder-gray-400 sm:text-sm",
+                          "block w-full rounded-md dark:border-zinc-700 dark:bg-neutral-900 text-gray-900 placeholder-gray-400 sm:text-sm",
                           {
                             "cursor-not-allowed bg-gray-100": !isOwner,
                           }

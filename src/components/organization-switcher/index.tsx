@@ -50,7 +50,7 @@ export function OrganizationSwitcher() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex w-full hover:bg-neutral-200/50 items-center gap-2 rounded-md p-2 text-sm font-medium outline-none"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex w-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800/70 items-center gap-2 rounded-md p-2 text-sm font-medium outline-none"
             >
               {currentOrganization ? (
                 <div className="flex truncate text-left items-center space-x-2 w-full">
@@ -115,7 +115,7 @@ export function OrganizationSwitcher() {
                       asChild
                       className={cn(
                         "cursor-pointer flex flex-col items-start my-1.5",
-                        isActive && "bg-neutral-200/50"
+                        isActive && "bg-neutral-200/50 dark:bg-neutral-800"
                       )}
                     >
                       <Link href={`/${organization.slug}`} shallow={false}>
@@ -127,7 +127,7 @@ export function OrganizationSwitcher() {
                             <AvatarFallback className="size-7" />
                           </Avatar>
                           <div className="flex flex-col">
-                            <span className="truncate text-sm leading-5 text-neutral-800 sm:max-w-[140px]">
+                            <span className="truncate text-sm leading-5 text-neutral-800 dark:text-neutral-200 sm:max-w-[140px]">
                               {organization.name.charAt(0).toUpperCase() +
                                 organization.name.slice(1)}
                             </span>
@@ -142,7 +142,7 @@ export function OrganizationSwitcher() {
                             )}
                           </div>
                           {isActive && (
-                            <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-black">
+                            <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-black dark:text-neutral-200">
                               <Icons.check
                                 className="size-4"
                                 aria-hidden="true"

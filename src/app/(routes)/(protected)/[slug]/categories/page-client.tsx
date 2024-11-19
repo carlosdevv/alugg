@@ -30,7 +30,7 @@ export default function CategoriesPageClient({
           {isLoading ? (
             <Skeleton className="w-20 h-6 rounded-md" />
           ) : (
-            <div className="bg-gray-100 rounded-md flex space-x-4 py-1 px-2">
+            <div className="bg-gray-100 dark:bg-zinc-900 rounded-md flex space-x-4 py-1 px-2">
               <span className="font-medium uppercase">Total</span>
               <span className="font-light">
                 {categories == null ? 0 : categories.length}

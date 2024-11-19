@@ -31,14 +31,14 @@ export default function MembersPageClient({ slug }: MembersPageClientProps) {
           >
             <button
               onClick={() => setCurrentTab(tab)}
-              className="rounded-md px-3 py-1.5 text-sm transition-all duration-75 hover:bg-gray-100 active:bg-gray-200"
+              className="rounded-md px-3 py-1.5 text-sm transition-all duration-75 hover:bg-gray-100 dark:hover:bg-zinc-800 active:bg-gray-200 dark:active:bg-zinc-800"
             >
               {tab}
             </button>
           </div>
         ))}
       </div>
-      <div className="grid divide-y divide-gray-200">
+      <div className="grid divide-y divide-gray-200 dark:divide-border">
         {currentTab === "Membros" && (
           <MembersTabContent
             members={members}

@@ -29,14 +29,17 @@ export function PageContent({
           <header className="flex shrink-0 items-center gap-2 transition-[width,height] ease-linear">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="size-5 md:hidden" />
-              <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 h-4 md:hidden"
+              />
               {hasBackButton && (
                 <Button size="sm" variant="ghost" onClick={() => router.back()}>
                   <Icons.chevronLeft className="size-4" />
                 </Button>
               )}
               {hasTitle && (
-                <h1 className="text-xl font-semibold leading-7 text-neutral-900 md:text-2xl">
+                <h1 className="text-xl font-semibold leading-7 dark:text-neutral-100 text-neutral-900 md:text-2xl">
                   {title}
                 </h1>
               )}
