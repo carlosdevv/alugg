@@ -22,10 +22,13 @@ export async function GET(
         id: params.id,
       },
       include: {
-        Inventory: {
-          select: {
-            ownerId: true,
-            name: true,
+        Organization: {
+          include: {
+            owner: {
+              select: {
+                id: true,
+              },
+            },
           },
         },
       },
@@ -35,7 +38,7 @@ export async function GET(
       return NextResponse.json({ message: "Item not found." }, { status: 404 });
     }
 
-    if (item.Inventory?.ownerId != userId) {
+    if (item.Organization?.ownerId != userId) {
       return NextResponse.json(
         {
           message: "You are not allowed to see items that you are not a owner.",

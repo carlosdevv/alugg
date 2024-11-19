@@ -95,7 +95,7 @@ model Token {
 }
 
 model InventoryItem {
-  id               BigInt        @id
+  id               String        @id @default(cuid())
   name             String
   code             String?
   objectPrice      Float         @map("object_price")
