@@ -114,6 +114,12 @@ export async function POST(req: NextRequest) {
             role: "ADMIN",
           },
         },
+        inventory: {
+          create: {
+            ownerId: userId,
+            name: "default inventory",
+          },
+        },
       },
     });
 
