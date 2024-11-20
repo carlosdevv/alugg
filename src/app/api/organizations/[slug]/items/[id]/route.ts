@@ -9,6 +9,8 @@ export async function GET(
   try {
     const { userId } = auth();
 
+    const id = params.id;
+
     if (!userId) {
       return NextResponse.json(
         { message: "User not autheticated" },
@@ -18,7 +20,7 @@ export async function GET(
 
     const item = await prisma.inventoryItem.findUnique({
       where: {
-        id: params.id,
+        id,
       },
       include: {
         Organization: {
@@ -30,14 +32,18 @@ export async function GET(
             },
           },
         },
+        category: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
       },
     });
 
     if (!item) {
       return NextResponse.json({ message: "Item not found." }, { status: 404 });
     }
-
-    console.log(`Authenticated user ${userId} is accessing item ${item.id}`);
 
     if (item.Organization?.ownerId != userId) {
       return NextResponse.json(

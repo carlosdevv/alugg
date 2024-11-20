@@ -53,6 +53,7 @@ model Organization {
   invites    Invite[]
   members    Member[]
   stockItems InventoryItem[]
+  Category   Category[]
 
   @@map("organizations")
 }
@@ -118,12 +119,15 @@ model InventoryItem {
 }
 
 model Category {
-  id        String          @id @default(cuid())
-  name      String
-  items     InventoryItem[]
-  createdAt DateTime        @default(now()) @map("created_at")
-  updatedAt DateTime        @updatedAt @map("updated_at")
+  id             String          @id @default(cuid())
+  name           String
+  items          InventoryItem[]
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  organization   Organization?   @relation(fields: [organizationId], references: [id])
+  organizationId String?
 
+  @@unique([name, organizationId])
   @@map("categories")
 }
 

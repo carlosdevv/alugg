@@ -10,9 +10,7 @@ export type GetItemsApiResponse = {
   items: Item[];
 };
 
-export type GetItemByIdApiResponse = {
-  item: Item;
-};
+export type GetItemByIdApiResponse = Item;
 
 export type Item = {
   id: string;
@@ -24,6 +22,7 @@ export type Item = {
     createdAt: Date;
     updatedAt: Date;
   };
+  createdAt: Date;
   organizationId: string;
   rentPrice: number;
   imageUrl: string;
@@ -34,5 +33,3 @@ export type Item = {
 };
 
 export type GetItemsResponse = GetItemsApiResponse["items"];
-
-export type GetItemResponse = Item;

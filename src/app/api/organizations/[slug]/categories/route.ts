@@ -28,10 +28,15 @@ export async function GET(
       );
     }
 
+    const { organization } = await getUserMembership(slug);
+
     const allCategories = await prisma.category.findMany({
       select: {
         id: true,
         name: true,
+      },
+      where: {
+        organizationId: organization.id,
       },
     });
 
@@ -53,6 +58,8 @@ export async function GET(
         };
       })
     );
+
+    console.log(JSON.stringify(categories));
 
     return NextResponse.json({ categories }, { status: 200 });
   } catch (error) {

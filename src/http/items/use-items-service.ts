@@ -3,9 +3,9 @@ import { HTTPError } from "ky";
 import { getItemByIdService, getItemsService } from ".";
 import { ErrorResponse } from "../types";
 import {
+  GetItemByIdApiResponse,
   GetItemByIdProps,
   GetItemProps,
-  GetItemResponse,
   GetItemsResponse,
 } from "./types";
 
@@ -22,7 +22,7 @@ export function useGetItemsService(
 
 export function useGetItemByIdService(
   props: GetItemByIdProps,
-  options?: UseQueryOptions<GetItemResponse, HTTPError<ErrorResponse>>
+  options?: UseQueryOptions<GetItemByIdApiResponse, HTTPError<ErrorResponse>>
 ) {
   return useQuery({
     queryKey: ["getItemById", props.itemId],

@@ -27,13 +27,13 @@ const updateItemFormSchema = z.object({
 type UpdateItemFormValues = z.infer<typeof updateItemFormSchema>;
 
 type UseUpdateItemFormProps = {
-  props: UpdateItemFormValues;
+  item: UpdateItemFormValues;
 };
-export default function useUpdateItemForm({ props }: UseUpdateItemFormProps) {
+export default function useUpdateItemForm({ item }: UseUpdateItemFormProps) {
   const form = useForm<UpdateItemFormValues>({
     resolver: zodResolver(updateItemFormSchema),
     defaultValues: {
-      ...props,
+      ...item,
     },
   });
 

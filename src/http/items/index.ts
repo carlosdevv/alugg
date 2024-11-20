@@ -3,7 +3,6 @@ import {
   GetItemByIdApiResponse,
   GetItemByIdProps,
   GetItemProps,
-  GetItemResponse,
   GetItemsApiResponse,
   GetItemsResponse,
 } from "./types";
@@ -21,14 +20,10 @@ export async function getItemsService({
 export async function getItemByIdService({
   itemId,
   slug,
-}: GetItemByIdProps): Promise<GetItemResponse> {
-  const route = `/api/organizations/${slug}/items/${itemId}`;
+}: GetItemByIdProps): Promise<GetItemByIdApiResponse> {
+  const result = await api
+    .get(`api/organizations/${slug}/items/${itemId}`)
+    .json<GetItemByIdApiResponse>();
 
-  console.log(`item route: ${route}`);
-
-  const result = await api.get(route).json<GetItemByIdApiResponse>();
-
-  console.log(`GetItemById response: ${result.item}`);
-
-  return result.item;
+  return result;
 }

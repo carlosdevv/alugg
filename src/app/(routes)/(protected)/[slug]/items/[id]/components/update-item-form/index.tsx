@@ -28,14 +28,19 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { InventoryItem } from "@/lib/types";
+import { GetCategoriesResponse } from "../../../../../../../../http/category/types";
 import useUpdateItemForm from "./use-update-item-form";
 
 type UpdateItemFormProps = {
-  props: InventoryItem;
+  item: InventoryItem;
+  categories: GetCategoriesResponse;
 };
 
-export default function UpdateItemForm({ props }: UpdateItemFormProps) {
-  const { form, onSubmit } = useUpdateItemForm({ props });
+export default function UpdateItemForm({
+  item,
+  categories,
+}: UpdateItemFormProps) {
+  const { form, onSubmit } = useUpdateItemForm({ item });
 
   return (
     <Form {...form}>
@@ -78,12 +83,19 @@ export default function UpdateItemForm({ props }: UpdateItemFormProps) {
                             <SelectValue placeholder="Selecione uma categoria" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="m@example.com">
-                            m@example.com
-                          </SelectItem>
-                          <SelectItem value="m@google.com">
-                            m@google.com
+                        <SelectContent defaultValue={field.value.name}>
+                          {categories != undefined && categories.length > 0
+                            ? categories.map((category) => (
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.name}
+                                >
+                                  {category.name}
+                                </SelectItem>
+                              ))
+                            : undefined}
+                          <SelectItem key="other" value="Outro">
+                            Outro
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -292,7 +304,7 @@ export default function UpdateItemForm({ props }: UpdateItemFormProps) {
             </Card>
           </div>
         </div>
-        <Button type="submit" className="w-min mt-8">
+        <Button type="submit" className="w-min my-8">
           <Icons.update className="size-4 mr-2" />
           Atualizar Item
         </Button>
