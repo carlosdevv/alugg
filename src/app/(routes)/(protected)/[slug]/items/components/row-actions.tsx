@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
-import slugify from "slugify";
-import type { InventoryItemColumn } from "./columns";
+import type { Item } from "./columns";
 import { DeleteDialog } from "./delete-dialog";
 
 type RowActionsProps<TData> = {
@@ -22,9 +21,7 @@ type RowActionsProps<TData> = {
 };
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
-  const props = row.original as InventoryItemColumn;
-  const slugName = slugify(props.name, { lower: true, strict: true });
-  const slug = `${props.id}-${slugName}`;
+  const props = row.original as Item;
 
   return (
     <AlertDialog>
@@ -40,7 +37,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="cursor-pointer" asChild>
-                <Link href={`/inventory/${slug}`}>
+                <Link href={`/items/${props.id}`}>
                   Ver Detalhes
                   <DropdownMenuShortcut>
                     <Icons.moveUpRight className="size-4 mr-2" />

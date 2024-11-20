@@ -1,11 +1,13 @@
 export type InventoryItem = {
   name: string;
-  category: string;
+  category: {
+    name: string;
+  };
   amount: number;
   objectPrice: number;
   rentPrice: number;
   itemInRenovation: boolean;
-  itemInactive: boolean;
+  status: string;
   size?: string;
   color?: string;
   description?: string;

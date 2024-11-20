@@ -26,6 +26,13 @@ export async function GET(
       where: {
         organizationId: organization.id,
       },
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({ items });

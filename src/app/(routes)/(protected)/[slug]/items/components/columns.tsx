@@ -4,16 +4,6 @@ import { Icons } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   FloatingPanelBody,
   FloatingPanelCloseButton,
   FloatingPanelContent,
@@ -32,10 +22,12 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { RowActions } from "./row-actions";
 
-export type InventoryItemColumn = {
+export type Item = {
   id: string;
   name: string;
-  category: string;
+  category: {
+    name: string;
+  };
   code?: string;
   objectPrice: number;
   rentPrice: number;
@@ -45,10 +37,10 @@ export type InventoryItemColumn = {
   amount: number;
   imageUrl?: string;
   itemInRenovation: boolean;
-  itemInactive: boolean;
+  status: string;
 };
 
-export const columns: ColumnDef<InventoryItemColumn>[] = [
+export const columns: ColumnDef<Item>[] = [
   {
     accessorKey: "imageUrl",
     header: "Imagem",
@@ -108,10 +100,9 @@ export const columns: ColumnDef<InventoryItemColumn>[] = [
     accessorKey: "category",
     header: "Categoria",
     cell: ({ row }) => {
+      const category = row.getValue("category") as { name: string };
       return (
-        <div className="truncate max-w-60 font-medium">
-          {row.getValue("category")}
-        </div>
+        <div className="truncate max-w-60 font-medium">{category.name}</div>
       );
     },
   },
@@ -157,21 +148,19 @@ export const columns: ColumnDef<InventoryItemColumn>[] = [
     },
   },
   {
-    accessorKey: "itemInactive",
-    header: "Item Ativo",
+    accessorKey: "status",
+    header: "Status",
     cell: ({ row }) => {
-      const itemInactive: string =
-        row.getValue("itemInactive") === true ? "Não" : "Sim";
       return (
         <Badge
           className={cn(
-            itemInactive === "Sim"
+            row.getValue("status") === "ACTIVE"
               ? "bg-emerald-400 hover:bg-emerald-500"
               : "bg-rose-500 hover:bg-rose-600",
             "font-medium"
           )}
         >
-          {itemInactive}
+          {row.getValue("status")}
         </Badge>
       );
     },
@@ -223,10 +212,8 @@ export const columns: ColumnDef<InventoryItemColumn>[] = [
 
   {
     header: "Opções",
-    cell: ({row}) => {
-      return (
-        <RowActions row={row} />
-      );
+    cell: ({ row }) => {
+      return <RowActions row={row} />;
     },
   },
 ];

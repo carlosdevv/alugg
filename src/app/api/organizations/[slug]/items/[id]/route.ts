@@ -7,7 +7,6 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Check if the user is authenticated
     const { userId } = auth();
 
     if (!userId) {
@@ -37,6 +36,8 @@ export async function GET(
     if (!item) {
       return NextResponse.json({ message: "Item not found." }, { status: 404 });
     }
+
+    console.log(`Authenticated user ${userId} is accessing item ${item.id}`);
 
     if (item.Organization?.ownerId != userId) {
       return NextResponse.json(

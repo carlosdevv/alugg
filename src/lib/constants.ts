@@ -4,15 +4,13 @@ export const appRoutes = {
   forgotPassword: "/auth/forgot-password",
   onboarding: "/onboarding",
   createOrganization: "/create-organization",
-  inventory: {
-    root: "inventory",
-    create: "inventory/create",
-    update: "inventory/update",
-    createCategory: "create/create-category",
-  },
   categories: {
     root: "categories",
     create: "categories/create",
-    edit: "categories/edit"
+    edit: "categories/edit",
+  },
+  items: {
+    root: "items",
+    create: "items/create",
   },
 };

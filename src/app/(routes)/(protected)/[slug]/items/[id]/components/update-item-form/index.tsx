@@ -71,7 +71,7 @@ export default function UpdateItemForm({ props }: UpdateItemFormProps) {
                       <FormLabel>Categoria *</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={field.value.name}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -236,14 +236,16 @@ export default function UpdateItemForm({ props }: UpdateItemFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="itemInactive"
+                  name="status"
                   render={({ field }) => (
                     <FormItem className="space-y-3">
                       <FormLabel>Item Inativo</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
-                          defaultValue={field.value === true ? "true" : "false"}
+                          defaultValue={
+                            field.value === "ACTIVE" ? "true" : "false"
+                          }
                           className="flex flex-col space-y-1"
                         >
                           <FormItem className="flex items-center space-x-3 space-y-0">

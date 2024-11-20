@@ -4,7 +4,6 @@ import { Icons, type IconType } from "@/components/icons";
 import {
   GearIcon,
   HomeIcon,
-  InventoryIcon,
   LayersIcon,
   PeopleIcon,
   ReceiptIcon,
@@ -51,9 +50,9 @@ export function NavMain() {
       icon: Icons.bag,
       items: [
         {
-          name: "Inventário",
-          icon: InventoryIcon,
-          href: `/${slug}/inventory`,
+          name: "Items",
+          icon: Icons.list,
+          href: `/${slug}/items`,
         },
         {
           name: "Categorias",

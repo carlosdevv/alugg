@@ -28,9 +28,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
-import Link from "next/link";
 import { appRoutes } from "@/lib/constants";
+import Link from "next/link";
+import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
           className="max-w-60"
         />
         <Button size="sm" asChild>
-          <Link href={appRoutes.inventory.create}>
+          <Link href={appRoutes.items.create}>
             <Icons.circlePlus className="size-4 mr-2" />
             Criar Item
           </Link>

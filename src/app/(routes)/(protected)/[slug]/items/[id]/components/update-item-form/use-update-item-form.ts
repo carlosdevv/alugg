@@ -4,7 +4,9 @@ import { z } from "zod";
 
 const updateItemFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
-  category: z.string({ required_error: "Selecione ao menos uma categoria" }),
+  category: z.object({
+    name: z.string({ required_error: "Nome da categoria é obrigatório" }),
+  }),
   amount: z.coerce
     .number({ required_error: "Quantidade é obrigatória" })
     .positive({ message: "Quantidade deve ser maior que 0" }),
@@ -19,7 +21,7 @@ const updateItemFormSchema = z.object({
   description: z.string().optional(),
   code: z.string().optional(),
   itemInRenovation: z.coerce.boolean().default(false),
-  itemInactive: z.coerce.boolean().default(false),
+  status: z.string().default("ACTIVE"),
 });
 
 type UpdateItemFormValues = z.infer<typeof updateItemFormSchema>;
