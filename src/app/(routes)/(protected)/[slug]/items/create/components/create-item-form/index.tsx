@@ -60,7 +60,7 @@ export default function CreateItemForm() {
                 />
                 <FormField
                   control={form.control}
-                  name="category"
+                  name="categoryId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Categoria *</FormLabel>
@@ -79,7 +79,7 @@ export default function CreateItemForm() {
                               categories.map((category) => (
                                 <SelectItem
                                   key={category.id}
-                                  value={category.name}
+                                  value={category.id}
                                 >
                                   {category.name}
                                 </SelectItem>

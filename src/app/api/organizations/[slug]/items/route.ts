@@ -22,7 +22,7 @@ export async function GET(
 
     const { organization } = await getUserMembership(slug);
 
-    const items = await prisma.inventoryItem.findMany({
+    const items = await prisma.item.findMany({
       where: {
         organizationId: organization.id,
       },
@@ -53,7 +53,6 @@ const createItemSchema = z.object({
   objectPrice: z.number().gte(0),
   amount: z.number().gte(0),
   categoryId: z.string().min(1),
-  organizationId: z.string().min(1),
   color: z.string().optional(),
   size: z.string().optional(),
   itemInRenovation: z.boolean().optional(),
@@ -61,7 +60,10 @@ const createItemSchema = z.object({
   imageUrl: z.string().url().optional(),
 });
 
-export async function POST(req: NextRequest) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { slug: string } }
+) {
   try {
     const { userId } = auth();
 
@@ -72,13 +74,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = req.json();
+    const body = await req.json();
+
     const parsed = createItemSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
         { message: "Bad Request: " + parsed.error.message },
-        { status: 401 }
+        { status: 404 }
       );
     }
 
@@ -95,10 +98,11 @@ export async function POST(req: NextRequest) {
       itemInRenovation,
       status,
       imageUrl,
-      organizationId,
     } = parsed.data;
 
-    const newItem = await prisma.inventoryItem.create({
+    const { organization } = await getUserMembership(params.slug);
+
+    const newItem = await prisma.item.create({
       data: {
         name,
         description,
@@ -112,8 +116,8 @@ export async function POST(req: NextRequest) {
         color,
         size,
         itemInRenovation,
-        Organization: {
-          connect: { id: organizationId },
+        organization: {
+          connect: { id: organization.id },
         },
         status,
         imageUrl,
@@ -182,7 +186,7 @@ export async function PUT(
       imageUrl,
     } = parsed.data;
 
-    const updatedItem = await prisma.inventoryItem.update({
+    const updatedItem = await prisma.item.update({
       where: { id },
       data: {
         name,

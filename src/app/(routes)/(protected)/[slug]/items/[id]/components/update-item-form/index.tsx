@@ -27,20 +27,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { InventoryItem } from "@/lib/types";
 import { GetCategoriesResponse } from "../../../../../../../../http/category/types";
+import { Item } from "../../../../../../../../http/items/types";
 import useUpdateItemForm from "./use-update-item-form";
 
 type UpdateItemFormProps = {
-  item: InventoryItem;
+  item: Item;
   categories: GetCategoriesResponse;
+  id: string;
+  slug: string;
 };
 
 export default function UpdateItemForm({
   item,
   categories,
+  id,
+  slug,
 }: UpdateItemFormProps) {
-  const { form, onSubmit } = useUpdateItemForm({ item });
+  const { form, onSubmit } = useUpdateItemForm({ item, id, slug });
 
   return (
     <Form {...form}>
@@ -158,7 +162,16 @@ export default function UpdateItemForm({
                     <FormItem>
                       <FormLabel>Tamanho</FormLabel>
                       <FormControl>
-                        <Input placeholder="Tamanho do Item" {...field} />
+                        <Input
+                          placeholder="Tamanho do Item"
+                          {...field}
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === "" ? null : e.target.value
+                            )
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

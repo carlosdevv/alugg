@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
+import sessionStore from "../../../../../../hooks/session-context";
+import { useDeleteItemService } from "../../../../../../http/items/use-items-service";
+import { appRoutes } from "../../../../../../lib/constants";
 import type { Item } from "./columns";
 import { DeleteDialog } from "./delete-dialog";
 
@@ -22,6 +25,16 @@ type RowActionsProps<TData> = {
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
   const props = row.original as Item;
+
+  const deleteItemMutation = useDeleteItemService();
+  const { slug } = sessionStore();
+
+  function handleDelete() {
+    deleteItemMutation.mutate({
+      itemId: props.id,
+      slug,
+    });
+  }
 
   return (
     <AlertDialog>
@@ -37,7 +50,11 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="cursor-pointer" asChild>
-                <Link href={`/items/${props.id}`}>
+                <Link
+                  href={{
+                    pathname: `${appRoutes.items.root}/${props.id}`,
+                  }}
+                >
                   Ver Detalhes
                   <DropdownMenuShortcut>
                     <Icons.moveUpRight className="size-4 mr-2" />
@@ -46,10 +63,16 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
               </DropdownMenuItem>
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem className="cursor-pointer">
-                  Remover
-                  <DropdownMenuShortcut>
-                    <Icons.delete className="size-4 mr-2" />
-                  </DropdownMenuShortcut>
+                  <Button
+                    onClick={handleDelete}
+                    variant={"ghost"}
+                    className="w-full justify-between flex"
+                  >
+                    Remover
+                    <DropdownMenuShortcut>
+                      <Icons.delete className="size-4 mr-2" />
+                    </DropdownMenuShortcut>
+                  </Button>
                 </DropdownMenuItem>
               </AlertDialogTrigger>
             </DropdownMenuGroup>

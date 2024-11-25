@@ -46,7 +46,7 @@ export async function GET(
 
     const categories = await Promise.all(
       allCategories.map(async (category) => {
-        const itemCount = await prisma.inventoryItem.count({
+        const itemCount = await prisma.item.count({
           where: {
             categoryId: category.id,
           },
@@ -109,7 +109,7 @@ export async function POST(
     }
 
     const { name } = parsed.data;
-    const { membership } = await getUserMembership(slug);
+    const { membership, organization } = await getUserMembership(slug);
 
     const { cannot } = getUserPermissions(userId, membership.role);
 
@@ -123,6 +123,9 @@ export async function POST(
     const newCategory = await prisma.category.create({
       data: {
         name,
+        organization: {
+          connect: { id: organization.id },
+        },
       },
     });
 

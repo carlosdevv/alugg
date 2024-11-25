@@ -102,7 +102,7 @@ export const columns: ColumnDef<Item>[] = [
     cell: ({ row }) => {
       const category = row.getValue("category") as { name: string };
       return (
-        <div className="truncate max-w-60 font-medium">{category.name}</div>
+        <div className="truncate max-w-60 font-medium">{category?.name}</div>
       );
     },
   },

@@ -9,6 +9,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import sessionStore from "../../../hooks/session-context";
 
 const createCategoryFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
@@ -21,6 +22,7 @@ export default function useCreateCategoryModal() {
   const pathname = usePathname();
   const router = useRouter();
   const { slug } = useParams() as { slug: string };
+  const { addCategory } = sessionStore();
 
   const [showModal, setShowModal] = useState(false);
 
@@ -48,8 +50,13 @@ export default function useCreateCategoryModal() {
       slug,
     };
 
-    await createCategoryService(props);
+    const createdCategory = await createCategoryService(props);
     form.reset();
+    addCategory({
+      id: createdCategory.id,
+      name: createdCategory.name,
+      totalItems: 0,
+    });
   }
 
   useEffect(() => {

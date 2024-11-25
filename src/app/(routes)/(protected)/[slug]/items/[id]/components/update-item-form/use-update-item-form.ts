@@ -1,12 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useUpdateItemByIdService } from "../../../../../../../../http/items/use-items-service";
 
 const updateItemFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
-  category: z.object({
-    name: z.string({ required_error: "Nome da categoria é obrigatório" }),
-  }),
+  category: z.string({ required_error: "Categoria é obrigatório" }),
   amount: z.coerce
     .number({ required_error: "Quantidade é obrigatória" })
     .positive({ message: "Quantidade deve ser maior que 0" }),
@@ -16,20 +15,26 @@ const updateItemFormSchema = z.object({
   rentPrice: z
     .number({ required_error: "Valor do Aluguel é obrigatório" })
     .positive({ message: "Valor do Aluguel deve ser maior que 0" }),
-  size: z.string().optional(),
-  color: z.string().optional(),
-  description: z.string().optional(),
-  code: z.string().optional(),
-  itemInRenovation: z.coerce.boolean().default(false),
-  status: z.string().default("ACTIVE"),
+  size: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  code: z.string().optional().nullable(),
+  itemInRenovation: z.coerce.boolean().optional(),
+  status: z.string().optional().nullable(),
 });
 
 type UpdateItemFormValues = z.infer<typeof updateItemFormSchema>;
 
 type UseUpdateItemFormProps = {
   item: UpdateItemFormValues;
+  id: string;
+  slug: string;
 };
-export default function useUpdateItemForm({ item }: UseUpdateItemFormProps) {
+export default function useUpdateItemForm({
+  item,
+  id,
+  slug,
+}: UseUpdateItemFormProps) {
   const form = useForm<UpdateItemFormValues>({
     resolver: zodResolver(updateItemFormSchema),
     defaultValues: {
@@ -37,8 +42,35 @@ export default function useUpdateItemForm({ item }: UseUpdateItemFormProps) {
     },
   });
 
+  const updateItemMutation = useUpdateItemByIdService({
+    onSuccess: (data) => {
+      console.log("Item updated successfully:", data);
+    },
+    onError: (error) => {
+      console.error("Error updating item:", error);
+    },
+  });
+
   function onSubmit(data: UpdateItemFormValues) {
-    console.log(data);
+    const itemToUpdate = {
+      name: data.name ?? undefined,
+      categoryId: data.category ?? undefined,
+      amount: data.amount ?? undefined,
+      objectPrice: data.objectPrice ?? undefined,
+      rentPrice: data.rentPrice ?? undefined,
+      size: data.size ?? undefined,
+      color: data.color ?? undefined,
+      description: data.description ?? undefined,
+      code: data.code ?? undefined,
+      itemInRenovation: data.itemInRenovation,
+      status: data.status ?? undefined,
+    };
+
+    updateItemMutation.mutate({
+      id,
+      slug,
+      updatedItem: itemToUpdate,
+    });
   }
 
   return { form, onSubmit };

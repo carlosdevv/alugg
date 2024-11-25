@@ -25,10 +25,15 @@ export default function UpdateItemPage({
   return (
     <PageContent title="Editar Item">
       <PageWrapper>
-        {isLoading && isCategoriesLoading ? (
+        {isLoading || isCategoriesLoading ? (
           <Skeleton />
         ) : item ? (
-          <UpdateItemForm item={item} categories={categories!} />
+          <UpdateItemForm
+            item={item}
+            categories={categories!}
+            id={id}
+            slug={slug}
+          />
         ) : (
           <div>Item not found.</div>
         )}
