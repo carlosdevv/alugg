@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getUserMembership } from "../../../../../actions/get-user-membership";
+import { getUserPermissions } from "../../../../../lib/casl/get-user-permissions";
 import prisma from "../../../../../lib/prismadb";
 
 export async function GET(
@@ -100,7 +101,16 @@ export async function POST(
       imageUrl,
     } = parsed.data;
 
-    const { organization } = await getUserMembership(params.slug);
+    const { organization, membership } = await getUserMembership(params.slug);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("create", "Item")) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para criar itens." },
+        { status: 403 }
+      );
+    }
 
     const newItem = await prisma.item.create({
       data: {

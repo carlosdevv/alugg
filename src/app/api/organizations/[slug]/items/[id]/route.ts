@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getUserMembership } from "../../../../../../actions/get-user-membership";
+import { getUserPermissions } from "../../../../../../lib/casl/get-user-permissions";
 import prisma from "../../../../../../lib/prismadb";
 
 export async function GET(
@@ -96,7 +97,7 @@ export async function PATCH(
       );
     }
 
-    const { organization } = await getUserMembership(slug);
+    const { organization, membership } = await getUserMembership(slug);
 
     const item = await prisma.item.findUnique({
       where: {
@@ -108,7 +109,9 @@ export async function PATCH(
       return NextResponse.json({ message: "Item not found." }, { status: 404 });
     }
 
-    if (item.organizationId != organization.id) {
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (item.organizationId != organization.id || cannot("update", "Item")) {
       return NextResponse.json(
         {
           message:
@@ -127,7 +130,6 @@ export async function PATCH(
         { status: 401 }
       );
     }
-
     const {
       name,
       amount,
@@ -137,13 +139,12 @@ export async function PATCH(
       objectPrice,
       organizationId,
       color,
+      code,
       size,
       itemInRenovation,
       status,
       imageUrl,
     } = parsed.data;
-
-    console.log(`updated item schema: ${categoryId} ${description}`);
 
     const updatedItem = await prisma.item.update({
       where: {
@@ -156,16 +157,15 @@ export async function PATCH(
         rentPrice,
         objectPrice,
         color,
+        code,
         size,
         itemInRenovation,
         status,
         imageUrl,
-        category: {
-          connect: { id: categoryId },
-        },
-        organization: {
-          connect: { id: organizationId },
-        },
+        ...(categoryId && { category: { connect: { id: categoryId } } }), // Add category only if categoryId exists
+        ...(organizationId && {
+          organization: { connect: { id: organizationId } },
+        }),
       },
     });
 

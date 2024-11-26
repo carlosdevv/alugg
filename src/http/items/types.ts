@@ -32,6 +32,9 @@ export type Item = {
   status: string;
   itemInRenovation: boolean;
   objectPrice: number;
+  code: string;
+  size: string;
+  color: string;
 };
 
 export type GetItemsResponse = GetItemsApiResponse["items"];

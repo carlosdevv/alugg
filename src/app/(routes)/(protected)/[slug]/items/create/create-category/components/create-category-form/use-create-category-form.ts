@@ -1,7 +1,7 @@
+import { useCreateCategoryService } from "@/http/category/use-categories-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useCreateCategoryService } from "@/http/category/use-categories-service";
 
 const createCategoryFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
@@ -16,9 +16,11 @@ export default function useCreateCategoryForm() {
 
   const { mutate: createCategoryService } = useCreateCategoryService();
 
-   async function onSubmit(data: CreateCategoryFormValues) {
-    await createCategoryService(data)
-    console.log(data);
+  async function onSubmit(data: CreateCategoryFormValues) {
+    await createCategoryService({
+      name: data.name,
+      slug: window.location.pathname.split("/")[3],
+    });
   }
 
   return { form, onSubmit };

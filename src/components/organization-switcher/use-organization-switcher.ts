@@ -4,9 +4,11 @@ import { Role } from "@prisma/client";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
+import sessionStore from "../../hooks/session-context";
 
 export default function useOrganizationSwitcher() {
   const { userId } = useAuth();
+  const { setSlug: setSlugSessionStore } = sessionStore();
 
   const { data: organizations } = useGetOrganizationsService();
 
@@ -19,7 +21,10 @@ export default function useOrganizationSwitcher() {
   // Prevent slug from changing to empty to avoid UI switching during nav animation
   const [slug, setSlug] = useState(currentSlug);
   useEffect(() => {
-    if (currentSlug) setSlug(currentSlug);
+    if (currentSlug) {
+      setSlugSessionStore(currentSlug);
+      setSlug(currentSlug);
+    }
   }, [currentSlug]);
 
   const currentOrganization = useMemo(() => {

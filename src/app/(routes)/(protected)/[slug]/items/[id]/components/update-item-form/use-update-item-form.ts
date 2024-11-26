@@ -5,7 +5,7 @@ import { useUpdateItemByIdService } from "../../../../../../../../http/items/use
 
 const updateItemFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
-  category: z.string({ required_error: "Categoria é obrigatório" }),
+  categoryId: z.string({ required_error: "Selecione ao menos uma categoria" }),
   amount: z.coerce
     .number({ required_error: "Quantidade é obrigatória" })
     .positive({ message: "Quantidade deve ser maior que 0" }),
@@ -42,19 +42,12 @@ export default function useUpdateItemForm({
     },
   });
 
-  const updateItemMutation = useUpdateItemByIdService({
-    onSuccess: (data) => {
-      console.log("Item updated successfully:", data);
-    },
-    onError: (error) => {
-      console.error("Error updating item:", error);
-    },
-  });
+  const updateItemMutation = useUpdateItemByIdService();
 
   function onSubmit(data: UpdateItemFormValues) {
     const itemToUpdate = {
       name: data.name ?? undefined,
-      categoryId: data.category ?? undefined,
+      categoryId: data.categoryId ?? undefined,
       amount: data.amount ?? undefined,
       objectPrice: data.objectPrice ?? undefined,
       rentPrice: data.rentPrice ?? undefined,

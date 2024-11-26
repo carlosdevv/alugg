@@ -25,9 +25,9 @@ type RowActionsProps<TData> = {
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
   const props = row.original as Item;
+  const { slug } = sessionStore();
 
   const deleteItemMutation = useDeleteItemService();
-  const { slug } = sessionStore();
 
   function handleDelete() {
     deleteItemMutation.mutate({

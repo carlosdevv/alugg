@@ -29,7 +29,20 @@ export default function UpdateItemPage({
           <Skeleton />
         ) : item ? (
           <UpdateItemForm
-            item={item}
+            item={{
+              name: item!.name,
+              rentPrice: item!.rentPrice,
+              amount: item!.amount,
+              categoryId: item!.category.id,
+              description: item!.description,
+              status: item!.status,
+              imageUrl: item!.imageUrl,
+              itemInRenovation: item!.itemInRenovation,
+              color: item!.color,
+              size: item!.size,
+              code: item?.code,
+              objectPrice: item!.objectPrice,
+            }}
             categories={categories!}
             id={id}
             slug={slug}

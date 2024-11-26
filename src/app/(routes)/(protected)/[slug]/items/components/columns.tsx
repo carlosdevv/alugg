@@ -151,16 +151,17 @@ export const columns: ColumnDef<Item>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
+      const status: boolean = row.getValue("status") === "ACTIVE";
       return (
         <Badge
           className={cn(
-            row.getValue("status") === "ACTIVE"
+            status
               ? "bg-emerald-400 hover:bg-emerald-500"
               : "bg-rose-500 hover:bg-rose-600",
             "font-medium"
           )}
         >
-          {row.getValue("status")}
+          {status ? "ATIVO" : "INATIVO"}
         </Badge>
       );
     },

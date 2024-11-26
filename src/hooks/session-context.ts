@@ -1,35 +1,20 @@
 import { create } from "zustand";
-import { CategoryModel } from "../http/category/types";
 
 type State = {
   slug: string;
-  organizationCategories: CategoryModel[];
 };
 
 type Action = {
-  setCategories: (categories: CategoryModel[] | undefined) => void;
-  addCategory: (category: CategoryModel) => void;
-  removeCategory: (category: CategoryModel) => void;
   setSlug: (slug: string) => void;
 };
 
-const sessionStore = create<State & Action>((set) => ({
+const sessionStore = create<State & Action>((set, get) => ({
   slug: "",
-  organizationCategories: [],
-  setCategories: (organizationCategories) => set({ organizationCategories }),
-  addCategory: (category) => {
-    set((state) => ({
-      organizationCategories: [...state.organizationCategories, category],
-    }));
+  setSlug: (slug) => {
+    if (get().slug !== slug) {
+      set({ slug });
+    }
   },
-  removeCategory: (category) => {
-    set((state) => ({
-      organizationCategories: state.organizationCategories.filter(
-        (c) => c.id !== category.id
-      ),
-    }));
-  },
-  setSlug: (slug) => set({ slug }),
 }));
 
 export default sessionStore;

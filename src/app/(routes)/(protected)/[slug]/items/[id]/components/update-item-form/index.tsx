@@ -28,11 +28,11 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { GetCategoriesResponse } from "../../../../../../../../http/category/types";
-import { Item } from "../../../../../../../../http/items/types";
+import { CreateItemBody } from "../../../../../../../../http/items/types";
 import useUpdateItemForm from "./use-update-item-form";
 
 type UpdateItemFormProps = {
-  item: Item;
+  item: CreateItemBody;
   categories: GetCategoriesResponse;
   id: string;
   slug: string;
@@ -72,35 +72,34 @@ export default function UpdateItemForm({
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
-                  name="category"
+                  name="categoryId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Categoria *</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value.name}
+                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione uma categoria" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent defaultValue={field.value.name}>
-                          {categories != undefined && categories.length > 0
-                            ? categories.map((category) => (
-                                <SelectItem
-                                  key={category.id}
-                                  value={category.name}
-                                >
-                                  {category.name}
-                                </SelectItem>
-                              ))
-                            : undefined}
-                          <SelectItem key="other" value="Outro">
-                            Outro
-                          </SelectItem>
+                        <SelectContent>
+                          {categories?.length ? (
+                            categories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem disabled value="no-category">
+                              Nenhuma categoria disponível
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -184,7 +183,11 @@ export default function UpdateItemForm({
                     <FormItem>
                       <FormLabel>Cor</FormLabel>
                       <FormControl>
-                        <Input placeholder="Cor do Item" {...field} />
+                        <Input
+                          placeholder="Cor do Item"
+                          {...field}
+                          value={field.value ?? ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -201,6 +204,7 @@ export default function UpdateItemForm({
                           placeholder="Descrição do Item"
                           className="min-h-32"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -223,7 +227,11 @@ export default function UpdateItemForm({
                     <FormItem>
                       <FormLabel>Código</FormLabel>
                       <FormControl>
-                        <Input placeholder="Código do Item" {...field} />
+                        <Input
+                          placeholder="Código do Item"
+                          {...field}
+                          value={field.value ?? ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

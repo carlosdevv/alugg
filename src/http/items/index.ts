@@ -37,8 +37,6 @@ export async function updateItemByIdService({
   slug,
   updatedItem,
 }: UpdateItemByIdProps): Promise<UpdateItemByIdApiResponse> {
-  console.log(`updateItemByIdService update itemById: ${updatedItem} `);
-
   return await api
     .patch(`api/organizations/${slug}/items/${id}`, {
       json: updatedItem,

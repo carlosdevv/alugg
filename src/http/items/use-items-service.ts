@@ -2,9 +2,11 @@ import {
   useMutation,
   UseMutationOptions,
   useQuery,
+  useQueryClient,
   type UseQueryOptions,
 } from "@tanstack/react-query";
 import { HTTPError } from "ky";
+import { toast } from "sonner";
 import {
   createItemService,
   deleteItemService,
@@ -30,7 +32,7 @@ export function useGetItemsService(
   options?: UseQueryOptions<GetItemsResponse, HTTPError<ErrorResponse>>
 ) {
   return useQuery({
-    queryKey: ["getCategories", props.slug],
+    queryKey: ["getItems", props.slug],
     queryFn: async () => await getItemsService(props),
     ...options,
   });
@@ -55,6 +57,7 @@ export function useUpdateItemByIdService(
     UpdateItemByIdProps
   >
 ) {
+  const queryClient = useQueryClient();
   return useMutation<
     UpdateItemByIdApiResponse,
     HTTPError<ErrorResponse>,
@@ -63,6 +66,13 @@ export function useUpdateItemByIdService(
     mutationFn: async (props: UpdateItemByIdProps) =>
       await updateItemByIdService(props),
     mutationKey: ["updateItemById"],
+    onSuccess: (data, variables) => {
+      toast.success("Item atualizado com sucesso!");
+      queryClient.invalidateQueries({
+        queryKey: ["getItems", variables.slug],
+      });
+    },
+
     ...options,
   });
 }
@@ -70,10 +80,17 @@ export function useUpdateItemByIdService(
 export function useCreateItemService(
   options?: UseMutationOptions<Item, HTTPError<ErrorResponse>, CreateItemProps>
 ) {
+  const queryClient = useQueryClient();
   return useMutation<Item, HTTPError<ErrorResponse>, CreateItemProps>({
     mutationFn: async (props: CreateItemProps) =>
       await createItemService(props),
     mutationKey: ["createItem"],
+    onSuccess: (data, variables) => {
+      toast.success("Item criado com sucesso!");
+      queryClient.invalidateQueries({
+        queryKey: ["getItems", variables.slug],
+      });
+    },
     ...options,
   });
 }
@@ -81,10 +98,17 @@ export function useCreateItemService(
 export function useDeleteItemService(
   options?: UseMutationOptions<void, HTTPError<ErrorResponse>, DeleteItemProps>
 ) {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (props) =>
-      deleteItemService({ itemId: props.itemId, slug: props.slug }),
+      await deleteItemService({ itemId: props.itemId, slug: props.slug }),
     mutationKey: ["deleteItem"],
+    onSuccess: (data, variables) => {
+      toast.success("Item deletado com sucesso!");
+      queryClient.invalidateQueries({
+        queryKey: ["getItems", variables.slug],
+      });
+    },
     ...options,
   });
 }
