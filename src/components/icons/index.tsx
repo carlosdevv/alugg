@@ -25,6 +25,7 @@ import {
   Home,
   ImageIcon,
   LayersIcon,
+  List,
   LoaderIcon,
   LogOutIcon,
   MoonIcon,
@@ -44,7 +45,7 @@ import {
   UserMinusIcon,
   UserPlusIcon,
   XIcon,
-  type LucideIcon
+  type LucideIcon,
 } from "lucide-react";
 
 import { ComponentType, SVGProps } from "react";
@@ -52,6 +53,7 @@ import { ComponentType, SVGProps } from "react";
 export type IconType = LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
 
 export const Icons = {
+  list: List,
   package: Package,
   home: Home,
   shoppingCart: ShoppingCart,

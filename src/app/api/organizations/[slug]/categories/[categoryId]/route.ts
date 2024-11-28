@@ -51,7 +51,7 @@ export async function GET(
       });
     }
 
-    const itemCount = await prisma.inventoryItem.count({
+    const itemCount = await prisma.item.count({
       where: {
         categoryId: existentCategory.id,
       },
@@ -217,7 +217,7 @@ export async function DELETE(
       );
     }
 
-    await prisma.inventoryItem.updateMany({
+    await prisma.item.updateMany({
       where: {
         categoryId: categoryId,
       },

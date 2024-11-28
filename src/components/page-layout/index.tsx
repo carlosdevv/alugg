@@ -39,7 +39,7 @@ export function PageContent({
                 </Button>
               )}
               {hasTitle && (
-                <h1 className="text-xl font-semibold leading-7 dark:text-neutral-100 text-neutral-900 md:text-2xl">
+                <h1 className="text-2xl font-semibold leading-7 text-neutral-900 md:text-2xl">
                   {title}
                 </h1>
               )}

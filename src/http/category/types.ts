@@ -49,3 +49,5 @@ export type DeleteCategoryServiceBody = {
   slug: string;
   categoryId: string;
 };
+
+export type CategoryModel = { id: string; name: string; totalItems: number };

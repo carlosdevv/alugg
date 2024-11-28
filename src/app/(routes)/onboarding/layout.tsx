@@ -16,6 +16,7 @@ export default async function OnboardingLayout({
   const defaultOrganization = await getDefaultOrganization(user);
 
   if (defaultOrganization) {
+    
     return redirect(`/${defaultOrganization}`);
   }
 

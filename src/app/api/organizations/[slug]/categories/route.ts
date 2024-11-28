@@ -5,7 +5,6 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
-// GET /api/organizations/:slug/categories – Get all categories
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -28,10 +27,15 @@ export async function GET(
       );
     }
 
+    const { organization } = await getUserMembership(slug);
+
     const allCategories = await prisma.category.findMany({
       select: {
         id: true,
         name: true,
+      },
+      where: {
+        organizationId: organization.id,
       },
     });
 
@@ -41,7 +45,7 @@ export async function GET(
 
     const categories = await Promise.all(
       allCategories.map(async (category) => {
-        const itemCount = await prisma.inventoryItem.count({
+        const itemCount = await prisma.item.count({
           where: {
             categoryId: category.id,
           },
@@ -68,7 +72,6 @@ const createCategorySchema = z.object({
   name: z.string(),
 });
 
-// POST /api/workspaces/[slug]/categories – Create a new category
 export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -102,7 +105,7 @@ export async function POST(
     }
 
     const { name } = parsed.data;
-    const { membership } = await getUserMembership(slug);
+    const { membership, organization } = await getUserMembership(slug);
 
     const { cannot } = getUserPermissions(userId, membership.role);
 
@@ -116,6 +119,9 @@ export async function POST(
     const newCategory = await prisma.category.create({
       data: {
         name,
+        organization: {
+          connect: { id: organization.id },
+        },
       },
     });
 
