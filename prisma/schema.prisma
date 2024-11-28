@@ -35,6 +35,7 @@ model User {
   invites             Invite[]
   member_on           Member[]
   owns_organizations  Organization[]
+  Contract            Contract[]
 
   @@index(defaultOrganization)
   @@map("users")
@@ -96,24 +97,26 @@ model Token {
 }
 
 model Item {
-  id               String       @id @default(cuid())
+  id               String         @id @default(cuid())
   name             String
   code             String?
-  objectPrice      Float        @map("object_price")
-  rentPrice        Float        @map("rent_price")
+  objectPrice      Float          @map("object_price")
+  rentPrice        Float          @map("rent_price")
   size             String?
   color            String?
   description      String?
   amount           Int
-  itemInRenovation Boolean      @default(false) @map("item_in_renovation")
-  status           Status       @default(ACTIVE)
-  imageUrl         String?      @map("image_url")
-  category         Category     @relation(fields: [categoryId], references: [id])
+  //TODO: remove this field in code and schema replacing for a new status IN_REPAIR
+  itemInRenovation Boolean        @default(false) @map("item_in_renovation")
+  status           Status         @default(ACTIVE)
+  imageUrl         String?        @map("image_url")
+  category         Category       @relation(fields: [categoryId], references: [id])
   categoryId       String
-  createdAt        DateTime     @default(now()) @map("created_at")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
-  organization     Organization @relation(fields: [organizationId], references: [id])
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  organization     Organization   @relation(fields: [organizationId], references: [id])
   organizationId   String
+  history          ContractItem[]
 
   @@map("items")
 }
@@ -131,8 +134,126 @@ model Category {
   @@map("categories")
 }
 
+model Customer {
+  id                    String     @id @default(uuid())
+  name                  String
+  document              String
+  secondDocument        String?    @map("second_document")
+  email                 String?
+  phone                 String?
+  address               Address?   @relation(fields: [addressId], references: [id])
+  birthdate             DateTime?
+  mediaContact          String?    @map("media_contact")
+  additionalInformation String?
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
+  addressId             String?
+  Contract              Contract[]
+
+  @@unique([email])
+  @@map("customers")
+}
+
+model Address {
+  id           String     @id @default(cuid())
+  street       String
+  number       Int
+  neighborhood String
+  city         String
+  state        String
+  zipcode      String
+  customer     Customer[]
+}
+
+model Contract {
+  id          String         @id @default(uuid())
+  code        Int            @default(autoincrement())
+  name        String
+  eventDate   DateTime       @map("event_date")
+  startDate   DateTime       @map("start_date")
+  endDate     DateTime       @map("end_date")
+  totalValue  Float          @map("total_value")
+  customer    Customer       @relation(fields: [customerId], references: [id])
+  status      ContractStatus
+  rentedItems ContractItem[]
+  payment     PAYMENT[]
+  createdAt   DateTime       @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  createdBy   User           @relation(fields: [userId], references: [id])
+  documents   Document[]
+  userId      String
+  customerId  String
+
+  @@map("contracts")
+}
+
+model Document {
+  id             String       @id @default(uuid())
+  type           DocumentType
+  content        String?
+  additionalInfo String?
+  fee            Float?
+  contractId     String
+  Contract       Contract     @relation(fields: [contractId], references: [id])
+}
+
+enum DocumentType {
+  COLLECTION
+  DEVOLUTION
+  PAYMENT
+}
+
+model ContractItem {
+  id              String  @id @default(uuid())
+  itemId          String
+  quantity        Int
+  price           Float
+  discount        Float?
+  isFixedDiscount Boolean
+  isCourtesy      Boolean
+
+  Contract   Contract? @relation(fields: [contractId], references: [id])
+  contractId String?
+  Item       Item      @relation(fields: [itemId], references: [id])
+
+  @@map("contract_items")
+}
+
+model PAYMENT {
+  id                 String        @id @default(uuid())
+  value              Float
+  date               DateTime      @map("date")
+  isPaid             Boolean
+  method             PaymentMethod
+  creditParcelAmount Int           @map("credit_parcel_amount")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  Contract           Contract?     @relation(fields: [contractId], references: [id])
+  contractId         String?
+
+  @@map("payments")
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  BANK_TRANSFER
+  VOUCHER
+  CASH
+  OTHER
+}
+
+enum ContractStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+  COLLECTED
+}
+
 enum Status {
   ACTIVE
   INACTIVE
   PENDING
+  AVALIABLE
+  IN_USE
 }
