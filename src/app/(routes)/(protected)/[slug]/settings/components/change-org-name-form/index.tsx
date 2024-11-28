@@ -49,7 +49,7 @@ export default function ChangeOrgNameForm({
                   <FormControl>
                     <Input
                       placeholder="Nome da organização"
-                      className="max-w-96"
+                      className="max-w-96 dark:border-zinc-700 dark:bg-neutral-900"
                       {...field}
                     />
                   </FormControl>
@@ -58,7 +58,7 @@ export default function ChangeOrgNameForm({
               )}
             />
           </CardContent>
-          <CardFooter className="bg-gray-50 flex items-center p-4 justify-between w-full rounded-b-xl">
+          <CardFooter className="bg-gray-50 dark:bg-zinc-900 flex items-center p-4 justify-between w-full rounded-b-xl">
             <p className="text-sm text-muted-foreground pl-2">
               Máximo de 42 caracteres.
             </p>

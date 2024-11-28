@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+CONTRATO/LOCACAO
+- PARA CRIAR UM CONTRATO EH NECESSARIO CRIAR UM CLIENTE
 
-## Getting Started
+DADOS DO CLIENTE
+- NOME, CPF/CNPJ, RG(?), CELULAR, CEP(ESTADO-CIDADE-BAIRRO-ENDERECO-NUMERO -- PEGAR NO CONSULTACEP), DATA-NASCIMENTO(?), EMAIL(?), INSTAGRAM(?), INFORMACOES ADICIONAIS(?)
+- INTEGRAR COM WHATSAPP (VER POSSIBILIDADES)
+-- MANDAR MENSAGES AUTOMATICAS? TRIGERADAS
+-- BOTAO FACIL NA TELA PARA JA CHAMAR NO WHATSAPP
+- VINCULAR CLIENTE AO CONTRATO 
+-- CRIAR HISTORICO DO CLIENTE = MOSTRAR TODO O HISTORICO DE CONTRATOS JA FEITO
 
-First, run the development server:
+ESTOQUE
+- CRIAR HISTORICO DE CADA ITEM DO ESTOQUE
+-- MOSTRAR O HISTORICO DE DATAS FUTURAS E PASSADAS QUE O ITEM FOI LOCADO (CONTRATO FECHADO)
+-- [UI] MOSTRAR EM UM CALENDARIO
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+CONTRATO
+- TER TODAS AS OPCOES DA COLUNA ACOES MENOS: AGENDAR PROVAS
+- STATUS DO CONTRATO (ABERTO, RETIRADO, FECHADO, CANCELADO)
+- SELECIONAR CLIENTE (CASO NAO AJA, MOSTRAR FORM PRA CRIAR UM NOVO ALI MESMO)
+- DATA DO EVENTO
+- DATA DA RETIRADA (QUANDO O CLIENTE PEGA O ITEM) (NAO PODE SER DEPOIS DO EVENTO)
+- DATA DEVOLUCAO (QUANDO O CLIENTE DEVOLVE O ITEM) (NAO PODE SER ANTES DO EVENTO)
+- ESCOLHER ITENS DO ESTOQUE
+-- MOSTRAR COLUNAS (DOS ITEMS SELUCIONADOS) COM: FOTO, NOME, VALOR, QUANTIDADE
+-- MOSTRAR SE AS PEÇAAS ESTAO DISPONIVEIS OU NAO NA DATA SELECIONADA
+-- MOSTRAR OPCAO PARA EXIBIR TODOS OS CLIENTES (COM DATA) QUE JA ALUGARAM AQUELE ITEM
+-- CAMPO PARA OBSERVACOES
+- PAGAMENTO
+-- MOSTRAR TODOS OS ITENS SELECIONADOS E O VALOR TOTAL
+-- CAMPOS PARA ADICIONAR DESCONTO (PORCENTAGEM OU CURRENCY) (POR ITEM - OPCIONAL)
+--- CASO CURRENCY, MOSTRAR SEMPRE O VALOR ORIGIANL DA PECA PARA PARAMETRO
+-- POSSIBILIDADE DE MUDAR O VALOR DO ITEM
+-- CAMPO BONIFICADO (CHECKBOX)
+--- CASO SELECIONADO O ITEM SAI A VALOR 0
+-- CAMPO FORMAS DE PAGAMENTO SENDO:
+--- UM ARRAY ONDE O USUARIO PODE SELECIONAR MAIS DE UMA FORMA DE PAGAMENTO
+--- AS OPCOES SAO: CARTAO DEBITO/CREDITO (MOSTRAR PARCELAS CASO CREDITO), VOUCHER, DINEHIRO, PIX, A RECEBER
+--- CADA FORMA TEM O CAMPO VALOR, DATA E CHECKBOX DE PAGO
+--- SO EH POSSIVEL DAR CONTINUIDADE CASO O VALOR TOTAL SEJA IGUAL A SOMA DOS VALORES DAS FORMAS DE PAGAMENTO
+- SELECIONAR MEMBRO DA EQUIPE QUE FECHOU O CONTRATO
+-- DATA FECHAMENTO DO CONTRATO
+- SELECIONAR TIPO DE CONTRATO
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- PAGINA DE RETIRADA
+- REALIZAR RETIRADA - MOSTRAR DOCUMENTO DE DECLARACAO (ADICIONAR CAMPO DE QUAL FUNCIONARIO FEZ O PROCESSO DE RETIRADA)
+-- OPCAO PRA PAGAMETO
+- CASO REALIZE REITRADA COM DEBITO, MOSTRAR MENSAGEM DE CONFIRMACAO
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- PAGINA DE DEVOLUCAO
+-- MOSTRAR SORTED OS ATRASADOS PRIMEIRO
+-- MOSTRAR DOC DE DEVOLUCAO
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

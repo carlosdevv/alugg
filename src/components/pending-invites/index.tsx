@@ -38,7 +38,7 @@ export function PendingInvites() {
               <Button
                 size="icon"
                 variant="ghost"
-                className="hover:bg-neutral-200/50"
+                className="hover:bg-neutral-200/50 dark:hover:bg-neutral-800"
               >
                 <Icons.bell className="size-4" />
                 <span className="sr-only">Convites pendentes</span>

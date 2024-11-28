@@ -17,7 +17,7 @@ import sessionStore from "../../../../../../hooks/session-context";
 import { useDeleteItemService } from "../../../../../../http/items/use-items-service";
 import { appRoutes } from "../../../../../../lib/constants";
 import type { Item } from "./columns";
-import { DeleteDialog } from "./delete-dialog";
+import { DeleteInventoryItemDialog } from "./delete-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
@@ -79,7 +79,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DeleteDialog />
+      <DeleteInventoryItemDialog />
     </AlertDialog>
   );
 }

@@ -8,7 +8,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export function DeleteDialog() {
+export function DeleteInventoryItemDialog() {
   return (
     <>
       <AlertDialogContent>
