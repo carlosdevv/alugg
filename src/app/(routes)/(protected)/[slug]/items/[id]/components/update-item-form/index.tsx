@@ -27,8 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { GetCategoriesResponse } from "../../../../../../../../http/category/types";
-import { CreateItemBody } from "../../../../../../../../http/items/types";
+import { GetCategoriesResponse } from "@/http/category/types";
+import { CreateItemBody } from "@/http/items/types";
 import useUpdateItemForm from "./use-update-item-form";
 
 type UpdateItemFormProps = {

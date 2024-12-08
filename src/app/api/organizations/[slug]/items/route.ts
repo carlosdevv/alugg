@@ -5,6 +5,7 @@ import { getUserMembership } from "../../../../../actions/get-user-membership";
 import { getUserPermissions } from "../../../../../lib/casl/get-user-permissions";
 import prisma from "../../../../../lib/prismadb";
 
+// GET /api/organizations/:slug/items - Get all items
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -61,6 +62,7 @@ const createItemSchema = z.object({
   imageUrl: z.string().url().optional(),
 });
 
+// POST /api/organizations/:slug/items - Create a new item
 export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -156,6 +158,7 @@ const updateItemSchema = z.object({
   imageUrl: z.string().url().optional(),
 });
 
+// PUT /api/organizations/:slug/items/:id - Update an item
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -216,7 +219,7 @@ export async function PUT(
       },
     });
     return NextResponse.json({
-      message: "Item updated successfully",
+      message: "Item atualizado com sucesso.",
       data: updatedItem,
     });
   } catch (err) {

@@ -7,6 +7,8 @@ import {
   LayersIcon,
   PeopleIcon,
   ReceiptIcon,
+  ListIcon,
+  CustomerIcon,
 } from "@/components/icons/dub";
 import {
   Collapsible,
@@ -46,12 +48,18 @@ export function NavMain() {
       exact: true,
     },
     {
+      name: "Clientes",
+      icon: CustomerIcon,
+      href: `/${slug}/customers`,
+      exact: true,
+    },
+    {
       name: "Estoque",
       icon: Icons.bag,
       items: [
         {
           name: "Items",
-          icon: Icons.list,
+          icon: ListIcon,
           href: `/${slug}/items`,
         },
         {

@@ -1,10 +1,11 @@
 import { useGetCategoriesService } from "@/http/category/use-categories-service";
+import { useCreateItemService } from "@/http/items/use-items-service";
+import { formatCurrencyToNumber } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useCreateItemService } from "../../../../../../../../http/items/use-items-service";
 
 const createItemFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
@@ -15,12 +16,8 @@ const createItemFormSchema = z.object({
       invalid_type_error: "Quantidade deve ser um número",
     })
     .positive({ message: "Quantidade deve ser maior que 0" }),
-  objectPrice: z.coerce
-    .number({ required_error: "Valor do Objeto é obrigatório" })
-    .positive({ message: "Valor do Objeto deve ser maior que 0" }),
-  rentPrice: z.coerce
-    .number({ required_error: "Valor do Aluguel é obrigatório" })
-    .positive({ message: "Valor do Aluguel deve ser maior que 0" }),
+  objectPrice: z.string({ required_error: "Valor do Objeto é obrigatório" }),
+  rentPrice: z.string({ required_error: "Valor do Aluguel é obrigatório" }),
   size: z.string().optional(),
   color: z.string().optional(),
   description: z.string().optional(),
@@ -53,23 +50,24 @@ export default function useCreateItemForm() {
     { enabled: !!slug, queryKey: ["getCategories", slug] }
   );
 
-  const createItemMutation = useCreateItemService({
+  const { mutateAsync: createItemService } = useCreateItemService({
     onSuccess: () => {
       form.reset();
       router.push(`/${slug}/items`);
     },
   });
 
-  function onSubmit(data: CreateItemFormValues) {
-    createItemMutation.mutate({
+  async function onSubmit(data: CreateItemFormValues) {
+    console.log(formatCurrencyToNumber(data.rentPrice));
+    await createItemService({
       slug,
       itemToCreate: {
         description: data.description,
         imageUrl: data.imageUrl,
         status: data.itemInactive === false ? "ACTIVE" : "INACTIVE",
         amount: data.amount,
-        rentPrice: data.rentPrice,
-        objectPrice: data.objectPrice,
+        rentPrice: formatCurrencyToNumber(data.rentPrice),
+        objectPrice: formatCurrencyToNumber(data.objectPrice),
         categoryId: data.categoryId,
         name: data.name,
         itemInRenovation: data.itemInRenovation,

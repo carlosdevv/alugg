@@ -33,3 +33,15 @@ export function getInitials(name: string): string {
 
   return initials;
 }
+
+export function formatToCurrency(value: string) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 2,
+  }).format(Number(value));
+}
+
+export function formatCurrencyToNumber(value: string) {
+  return Number(value.replace("R$", "").replace(".", "").replace(",", "."));
+}

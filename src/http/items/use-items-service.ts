@@ -22,7 +22,7 @@ import {
   GetItemByIdProps,
   GetItemProps,
   GetItemsResponse,
-  Item,
+  ItemProps,
   UpdateItemByIdApiResponse,
   UpdateItemByIdProps,
 } from "./types";
@@ -78,10 +78,10 @@ export function useUpdateItemByIdService(
 }
 
 export function useCreateItemService(
-  options?: UseMutationOptions<Item, HTTPError<ErrorResponse>, CreateItemProps>
+  options?: UseMutationOptions<ItemProps, HTTPError<ErrorResponse>, CreateItemProps>
 ) {
   const queryClient = useQueryClient();
-  return useMutation<Item, HTTPError<ErrorResponse>, CreateItemProps>({
+  return useMutation<ItemProps, HTTPError<ErrorResponse>, CreateItemProps>({
     mutationFn: async (props: CreateItemProps) =>
       await createItemService(props),
     mutationKey: ["createItem"],

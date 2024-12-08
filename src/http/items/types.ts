@@ -8,12 +8,12 @@ export type GetItemByIdProps = {
 };
 
 export type GetItemsApiResponse = {
-  items: Item[];
+  items: ItemProps[];
 };
 
-export type GetItemByIdApiResponse = Item;
+export type GetItemByIdApiResponse = ItemProps;
 
-export type Item = {
+export type ItemProps = {
   id: string;
   name: string;
   description: string;
@@ -42,10 +42,10 @@ export type GetItemsResponse = GetItemsApiResponse["items"];
 export type UpdateItemByIdProps = {
   id: string;
   slug: string;
-  updatedItem: Partial<Item>;
+  updatedItem: Partial<ItemProps>;
 };
 
-export type UpdateItemByIdApiResponse = Item;
+export type UpdateItemByIdApiResponse = ItemProps;
 
 export type CreateItemProps = {
   slug: string;

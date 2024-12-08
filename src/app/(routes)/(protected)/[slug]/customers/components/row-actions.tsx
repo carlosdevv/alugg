@@ -13,19 +13,15 @@ import {
 import { appRoutes } from "@/lib/constants";
 import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import type { ItemColumn } from "./columns";
-import { DeleteInventoryItemDialog } from "./delete-dialog";
+import type { CustomerColumn } from "./columns";
+import { DeleteCustomerDialog } from "./delete-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
 };
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
-  const props = row.original as ItemColumn;
-  const { slug } = useParams() as {
-    slug?: string;
-  };
+  const props = row.original as CustomerColumn;
 
   return (
     <AlertDialog>
@@ -43,7 +39,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
               <DropdownMenuItem className="cursor-pointer" asChild>
                 <Link
                   href={{
-                    pathname: `${appRoutes.items.root}/${props.id}`,
+                    pathname: `${appRoutes.customers.root}/${props.id}`,
                   }}
                   className="flex items-center justify-between"
                 >
@@ -61,7 +57,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DeleteInventoryItemDialog itemId={props.id} slug={slug!} />
+      <DeleteCustomerDialog />
     </AlertDialog>
   );
 }

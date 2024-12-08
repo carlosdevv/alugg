@@ -9,9 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -54,7 +54,8 @@ model Organization {
   invites    Invite[]
   members    Member[]
   stockItems Item[]
-  Category   Category[]
+  category   Category[]
+  customers  Customer[]
 
   @@map("organizations")
 }
@@ -135,20 +136,22 @@ model Category {
 }
 
 model Customer {
-  id                    String     @id @default(uuid())
+  id                    String        @id @default(uuid())
   name                  String
   document              String
-  secondDocument        String?    @map("second_document")
+  secondDocument        String?       @map("second_document")
   email                 String?
   phone                 String?
-  address               Address?   @relation(fields: [addressId], references: [id])
+  address               Address?      @relation(fields: [addressId], references: [id])
   birthdate             DateTime?
-  mediaContact          String?    @map("media_contact")
+  mediaContact          String?       @map("media_contact")
   additionalInformation String?
-  createdAt             DateTime   @default(now()) @map("created_at")
-  updatedAt             DateTime   @updatedAt @map("updated_at")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
   addressId             String?
   Contract              Contract[]
+  Organization          Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String?
 
   @@unique([email])
   @@map("customers")

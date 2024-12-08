@@ -7,8 +7,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useDeleteItemService } from "@/http/items/use-items-service";
 
-export function DeleteInventoryItemDialog() {
+type DeleteInventoryItemDialogProps = {
+  itemId: string;
+  slug: string;
+};
+
+export function DeleteInventoryItemDialog({
+  itemId,
+  slug,
+}: DeleteInventoryItemDialogProps) {
+  const { mutateAsync: deleteItemService } = useDeleteItemService();
+
+  async function handleDeleteItem() {
+    await deleteItemService({
+      itemId,
+      slug,
+    });
+  }
+
   return (
     <>
       <AlertDialogContent>
@@ -20,7 +38,10 @@ export function DeleteInventoryItemDialog() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction className="bg-rose-500 hover:bg-rose-600 transition-all">
+          <AlertDialogAction
+            onClick={handleDeleteItem}
+            className="bg-rose-500 hover:bg-rose-600 transition-all text-primary"
+          >
             Remover
           </AlertDialogAction>
         </AlertDialogFooter>

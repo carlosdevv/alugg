@@ -1,7 +1,7 @@
+import { useUpdateItemByIdService } from "@/http/items/use-items-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useUpdateItemByIdService } from "../../../../../../../../http/items/use-items-service";
 
 const updateItemFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
@@ -42,9 +42,9 @@ export default function useUpdateItemForm({
     },
   });
 
-  const updateItemMutation = useUpdateItemByIdService();
+  const { mutateAsync: updateItemMutation } = useUpdateItemByIdService();
 
-  function onSubmit(data: UpdateItemFormValues) {
+  async function onSubmit(data: UpdateItemFormValues) {
     const itemToUpdate = {
       name: data.name ?? undefined,
       categoryId: data.categoryId ?? undefined,
@@ -59,7 +59,7 @@ export default function useUpdateItemForm({
       status: data.status ?? undefined,
     };
 
-    updateItemMutation.mutate({
+    await updateItemMutation({
       id,
       slug,
       updatedItem: itemToUpdate,

@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
-// GET /api/organizations/:slug/categories – get all categories
+// GET /api/organizations/:slug/customers - Get all customers
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -30,36 +30,29 @@ export async function GET(
 
     const { organization } = await getUserMembership(slug);
 
-    const allCategories = await prisma.category.findMany({
-      select: {
-        id: true,
-        name: true,
-      },
-      where: {
-        organizationId: organization.id,
-      },
-    });
+    const [customers, total] = await Promise.all([
+      prisma.customer.findMany({
+        where: {
+          organizationId: organization.id,
+        },
+      }),
+      prisma.customer.count({
+        where: {
+          organizationId: organization.id,
+        },
+      }),
+    ]);
 
-    if (allCategories.length === 0) {
-      return NextResponse.json({ category: [] }, { status: 200 });
+    if (total === 0) {
+      return NextResponse.json({ customers: [] }, { status: 200 });
     }
 
-    const categories = await Promise.all(
-      allCategories.map(async (category) => {
-        const itemCount = await prisma.item.count({
-          where: {
-            categoryId: category.id,
-          },
-        });
+    const customersResponse = {
+      data: customers,
+      total,
+    };
 
-        return {
-          ...category,
-          totalItems: itemCount,
-        };
-      })
-    );
-
-    return NextResponse.json({ categories }, { status: 200 });
+    return NextResponse.json({ customersResponse }, { status: 200 });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
@@ -73,7 +66,6 @@ const createCategorySchema = z.object({
   name: z.string(),
 });
 
-// POST /api/organizations/:slug/categories – create a new category
 export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } }

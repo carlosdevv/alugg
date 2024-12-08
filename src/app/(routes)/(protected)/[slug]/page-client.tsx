@@ -6,7 +6,6 @@ import { useGetOrganizationService } from "@/http/organizations/use-organization
 import { appRoutes } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import sessionStore from "../../../../hooks/session-context";
 
 interface HomePageClientProps {
   slug: string;
@@ -14,8 +13,6 @@ interface HomePageClientProps {
 
 export default function HomePageClient({ slug }: HomePageClientProps) {
   const router = useRouter();
-
-  const { setSlug } = sessionStore();
 
   const {
     data: organization,
@@ -30,10 +27,6 @@ export default function HomePageClient({ slug }: HomePageClientProps) {
     toast.error("Essa organização não existe.");
     router.push(appRoutes.onboarding);
     return null;
-  }
-
-  if (isSuccess) {
-    setSlug(slug);
   }
 
   return (

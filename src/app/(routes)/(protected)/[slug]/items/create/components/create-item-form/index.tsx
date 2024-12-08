@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import useCreateItemForm from "./use-create-item-form";
+import { formatToCurrency } from "@/lib/utils";
 
 export default function CreateItemForm() {
   const { form, onSubmit, categories, setModal } = useCreateItemForm();
@@ -125,7 +126,19 @@ export default function CreateItemForm() {
                     <FormItem>
                       <FormLabel>Valor do Objeto *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Informe o valor" {...field} />
+                        <Input
+                          placeholder="Informe o valor"
+                          {...field}
+                          onChange={(e) => {
+                            const formattedValue = formatToCurrency(
+                              e.currentTarget.value
+                            );
+                            console.log(e.currentTarget.value)
+                            field.onChange({
+                              target: { value: formattedValue },
+                            });
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -138,7 +151,18 @@ export default function CreateItemForm() {
                     <FormItem>
                       <FormLabel>Valor do Aluguel *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Informe o valor" {...field} />
+                        <Input
+                          placeholder="Informe o valor"
+                          {...field}
+                          onChange={(e) => {
+                            const formattedValue = formatToCurrency(
+                              e.target.value
+                            );
+                            field.onChange({
+                              target: { value: formattedValue },
+                            });
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -5,6 +5,7 @@ import { getUserMembership } from "../../../../../../actions/get-user-membership
 import { getUserPermissions } from "../../../../../../lib/casl/get-user-permissions";
 import prisma from "../../../../../../lib/prismadb";
 
+// GET /api/organizations/:slug/items/:id - Get item by ID
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -83,6 +84,7 @@ const updateItemSchema = z.object({
   imageUrl: z.string().url().optional(),
 });
 
+// PATCH /api/organizations/:slug/items/:id - Update item by ID
 export async function PATCH(
   req: NextRequest,
   { params: { id, slug } }: { params: { slug: string; id: string } }
@@ -115,7 +117,7 @@ export async function PATCH(
       return NextResponse.json(
         {
           message:
-            "You are not allowed to update an item who you aren't an owner.",
+            "Você não tem permissão para atualizar um item que você não é dono.",
         },
         { status: 403 }
       );
@@ -179,6 +181,7 @@ export async function PATCH(
   }
 }
 
+// DELETE /api/organizations/:slug/items/:id - Delete item by ID
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { slug: string; id: string } }

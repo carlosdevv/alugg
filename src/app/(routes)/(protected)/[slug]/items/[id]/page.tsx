@@ -1,10 +1,10 @@
 "use client";
 
-import { PageContent } from "../../../../../../components/page-layout";
-import { PageWrapper } from "../../../../../../components/page-layout/page-wrapper";
-import { Skeleton } from "../../../../../../components/ui/skeleton";
-import { useGetCategoriesService } from "../../../../../../http/category/use-categories-service";
-import { useGetItemByIdService } from "../../../../../../http/items/use-items-service";
+import { PageContent } from "@/components/page-layout";
+import { PageWrapper } from "@/components/page-layout/page-wrapper";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetCategoriesService } from "@/http/category/use-categories-service";
+import { useGetItemByIdService } from "@/http/items/use-items-service";
 import UpdateItemForm from "./components/update-item-form";
 
 interface UpdateItemPageProps {
@@ -23,7 +23,7 @@ export default function UpdateItemPage({
     useGetCategoriesService({ slug });
 
   return (
-    <PageContent title="Editar Item">
+    <PageContent title="Editar Item" hasBackButton>
       <PageWrapper>
         {isLoading || isCategoriesLoading ? (
           <Skeleton />
