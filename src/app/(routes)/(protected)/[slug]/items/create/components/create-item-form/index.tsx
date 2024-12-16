@@ -1,5 +1,6 @@
 "use client";
 
+import checkIfCodeExistsAction from "@/actions/check-if-code-exists";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,11 +28,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import useCreateItemForm from "./use-create-item-form";
 import { formatToCurrency } from "@/lib/utils";
+import Image from "next/image";
+import useCreateItemForm from "./use-create-item-form";
 
 export default function CreateItemForm() {
-  const { form, onSubmit, categories, setModal } = useCreateItemForm();
+  const {
+    form,
+    onSubmit,
+    categories,
+    setModal,
+    getRootProps,
+    getInputProps,
+    imagePreview,
+    handleRemoveImage,
+    isCreatingItem,
+    isUploadingImage,
+  } = useCreateItemForm();
 
   return (
     <Form {...form}>
@@ -133,7 +146,6 @@ export default function CreateItemForm() {
                             const formattedValue = formatToCurrency(
                               e.currentTarget.value
                             );
-                            console.log(e.currentTarget.value)
                             field.onChange({
                               target: { value: formattedValue },
                             });
@@ -156,7 +168,7 @@ export default function CreateItemForm() {
                           {...field}
                           onChange={(e) => {
                             const formattedValue = formatToCurrency(
-                              e.target.value
+                              e.currentTarget.value
                             );
                             field.onChange({
                               target: { value: formattedValue },
@@ -236,7 +248,24 @@ export default function CreateItemForm() {
                     <FormItem>
                       <FormLabel>Código</FormLabel>
                       <FormControl>
-                        <Input placeholder="Código do Item" {...field} />
+                        <Input
+                          placeholder="Código do Item"
+                          {...field}
+                          onBlur={async () => {
+                            form.clearErrors("code");
+                            if (field.value) {
+                              const existsCode = await checkIfCodeExistsAction(
+                                field.value
+                              );
+
+                              if (existsCode) {
+                                form.setError("code", {
+                                  message: "Código já está em uso, tente outro",
+                                });
+                              }
+                            }
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -244,10 +273,10 @@ export default function CreateItemForm() {
                 />
                 <FormField
                   control={form.control}
-                  name="itemInRenovation"
+                  name="itemInRepair"
                   render={({ field }) => (
                     <FormItem className="space-y-3">
-                      <FormLabel>Item em Reforma</FormLabel>
+                      <FormLabel>Item em Reparo</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
@@ -306,30 +335,66 @@ export default function CreateItemForm() {
             </Card>
             <Card className="overflow-hidden">
               <CardHeader>
-                <CardTitle>Imagem (em breve)</CardTitle>
+                <CardTitle>Imagem do Item</CardTitle>
                 <CardDescription>
                   Faça upload da imagem do item.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="bg-gray-200 flex justify-center items-center aspect-square rounded-md object-cover w-full h-52">
-                  <Icons.image className="size-10 text-gray-400" />
-                </div>
-                {/* <div className="grid gap-2">
-                   <Image
-                    alt="Product image"
-                    className="aspect-square w-full rounded-md object-cover"
-                    height="300"
-                    src="/placeholder.svg"
-                    width="300"
-                  /> 
-                </div> */}
+                {imagePreview ? (
+                  <div className="relative">
+                    <Image
+                      src={imagePreview}
+                      alt="Imagem do Item"
+                      className="w-full h-52 object-cover rounded-md"
+                      width={300}
+                      height={200}
+                    />
+                    <button
+                      disabled={isCreatingItem || isUploadingImage}
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full shadow-md hover:bg-red-600"
+                    >
+                      <Icons.delete className="size-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    {...getRootProps({
+                      className:
+                        "border p-5 border-dashed cursor-pointer gap-y-2 border-border rounded-lg flex flex-col items-center justify-center w-full",
+                    })}
+                  >
+                    <input
+                      {...getInputProps()}
+                      disabled={isCreatingItem || isUploadingImage}
+                    />
+                    <Icons.image className="size-10 text-gray-400" />
+                    <span className="font-medium mt-2">
+                      Clique ou arraste a imagem aqui
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      Formatos aceitos: .jpg, .png, .jpeg
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      Tamanho máximo: 10Mb
+                    </span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
         </div>
-        <Button type="submit" className="w-min mt-8">
-          <Icons.circlePlus className="size-4 mr-2" />
+        <Button
+          type="submit"
+          className="w-min mt-8"
+          disabled={isCreatingItem || isUploadingImage}
+        >
+          {isCreatingItem || isUploadingImage ? (
+            <Icons.loader className="animate-spin size-4 mr-2" />
+          ) : (
+            <Icons.circlePlus className="size-4 mr-2" />
+          )}
           Criar Item
         </Button>
       </form>

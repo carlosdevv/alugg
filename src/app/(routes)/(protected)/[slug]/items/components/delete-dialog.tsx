@@ -8,6 +8,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useDeleteItemService } from "@/http/items/use-items-service";
+import { toast } from "sonner";
 
 type DeleteInventoryItemDialogProps = {
   itemId: string;
@@ -21,9 +22,8 @@ export function DeleteInventoryItemDialog({
   const { mutateAsync: deleteItemService } = useDeleteItemService();
 
   async function handleDeleteItem() {
-    await deleteItemService({
-      itemId,
-      slug,
+    toast.promise(deleteItemService({ itemId, slug }), {
+      loading: "Removendo item...",
     });
   }
 

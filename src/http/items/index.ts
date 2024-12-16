@@ -1,19 +1,21 @@
 import { api } from "../api-client";
 import {
-  CreateItemProps,
-  GetItemByIdApiResponse,
-  GetItemByIdProps,
-  GetItemProps,
-  GetItemsApiResponse,
-  GetItemsResponse,
-  Item,
-  UpdateItemByIdApiResponse,
-  UpdateItemByIdProps,
+  type CreateItemServiceBody,
+  type CreateItemServiceResponse,
+  type DeleteItemServiceProps,
+  type GetItemByIdApiResponse,
+  type GetItemByIdServiceProps,
+  type GetItemServiceProps,
+  type GetItemsApiResponse,
+  type GetItemsServiceResponse,
+  type UpdateItemByIdApiResponse,
+  type UpdateItemByIdServiceBody,
+  type UpdateItemByIdServiceProps,
 } from "./types";
 
 export async function getItemsService({
   slug,
-}: GetItemProps): Promise<GetItemsResponse> {
+}: GetItemServiceProps): Promise<GetItemsServiceResponse> {
   const result = await api
     .get(`api/organizations/${slug}/items`)
     .json<GetItemsApiResponse>();
@@ -24,7 +26,7 @@ export async function getItemsService({
 export async function getItemByIdService({
   itemId,
   slug,
-}: GetItemByIdProps): Promise<GetItemByIdApiResponse> {
+}: GetItemByIdServiceProps): Promise<GetItemByIdApiResponse> {
   const result = await api
     .get(`api/organizations/${slug}/items/${itemId}`)
     .json<GetItemByIdApiResponse>();
@@ -32,31 +34,34 @@ export async function getItemByIdService({
   return result;
 }
 
-export async function updateItemByIdService({
-  id,
-  slug,
-  updatedItem,
-}: UpdateItemByIdProps): Promise<UpdateItemByIdApiResponse> {
+export async function updateItemByIdService(
+  { id, slug }: UpdateItemByIdServiceProps,
+  body: UpdateItemByIdServiceBody
+): Promise<UpdateItemByIdApiResponse> {
   return await api
     .patch(`api/organizations/${slug}/items/${id}`, {
-      json: updatedItem,
+      json: body,
     })
     .json<UpdateItemByIdApiResponse>();
 }
 
-export async function createItemService({
-  slug,
-  itemToCreate,
-}: CreateItemProps) {
+export async function createItemService(
+  props: { slug: string },
+  body: CreateItemServiceBody
+) {
   const item = await api
-    .post(`api/organizations/${slug}/items`, {
-      json: itemToCreate,
+    .post(`api/organizations/${props.slug}/items`, {
+      json: body,
     })
-    .json<Item>();
+    .json<CreateItemServiceResponse>();
 
   return item;
 }
 
-export async function deleteItemService({ itemId, slug }: GetItemByIdProps) {
+export async function deleteItemService({
+  itemId,
+  slug,
+}: DeleteItemServiceProps) {
   await api.delete(`api/organizations/${slug}/items/${itemId}`);
+  return;
 }

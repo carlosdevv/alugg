@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { appRoutes } from "@/lib/constants";
+import { Status } from "@prisma/client";
 import Link from "next/link";
 
 type InventoryItemDetailsProps = {
@@ -28,7 +29,8 @@ type InventoryItemDetailsProps = {
     color?: string;
     description?: string;
     code?: string;
-    itemInRenovation: boolean;
+    status: Status;
+    itemInRepair: boolean;
     itemInactive: boolean;
   };
 };
@@ -41,7 +43,7 @@ export default function InventoryItemDetails({
     <div className="flex flex-col">
       <div className="flex items-center space-x-4 mt-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href={appRoutes.inventory.root}>
+          <Link href={appRoutes.items.root}>
             <Icons.chevronLeft className="size-4" />
           </Link>
         </Button>
@@ -141,7 +143,7 @@ export default function InventoryItemDetails({
                 <Label>Item em Reforma</Label>
                 <Input
                   placeholder="Item em Reforma"
-                  value={props.itemInRenovation === true ? " Sim" : "Não"}
+                  value={props.status === Status.IN_REPAIR ? "Sim" : "Não"}
                   readOnly
                 />
               </div>

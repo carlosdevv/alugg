@@ -100,15 +100,13 @@ model Token {
 model Item {
   id               String         @id @default(cuid())
   name             String
-  code             String?
+  code             String?        @unique
   objectPrice      Float          @map("object_price")
   rentPrice        Float          @map("rent_price")
   size             String?
   color            String?
   description      String?
   amount           Int
-  //TODO: remove this field in code and schema replacing for a new status IN_REPAIR
-  itemInRenovation Boolean        @default(false) @map("item_in_renovation")
   status           Status         @default(ACTIVE)
   imageUrl         String?        @map("image_url")
   category         Category       @relation(fields: [categoryId], references: [id])
@@ -259,4 +257,5 @@ enum Status {
   PENDING
   AVALIABLE
   IN_USE
+  IN_REPAIR
 }

@@ -1,9 +1,9 @@
+import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserPermissions } from "@/lib/casl/get-user-permissions";
+import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getUserMembership } from "../../../../../actions/get-user-membership";
-import { getUserPermissions } from "../../../../../lib/casl/get-user-permissions";
-import prisma from "../../../../../lib/prismadb";
 
 // GET /api/organizations/:slug/items - Get all items
 export async function GET(
@@ -57,8 +57,7 @@ const createItemSchema = z.object({
   categoryId: z.string().min(1),
   color: z.string().optional(),
   size: z.string().optional(),
-  itemInRenovation: z.boolean().optional(),
-  status: z.enum(["ACTIVE", "PENDING", "INACTIVE"]).optional(),
+  status: z.enum(["ACTIVE", "PENDING", "INACTIVE", "IN_REPAIR"]).optional(),
   imageUrl: z.string().url().optional(),
 });
 
@@ -72,8 +71,8 @@ export async function POST(
 
     if (!userId) {
       return NextResponse.json(
-        { message: "User not authenticated" },
-        { status: 401 }
+        { message: "Usuário não encontrado." },
+        { status: 404 }
       );
     }
 
@@ -83,8 +82,8 @@ export async function POST(
 
     if (!parsed.success) {
       return NextResponse.json(
-        { message: "Bad Request: " + parsed.error.message },
-        { status: 404 }
+        { message: "Informações incorretas." + parsed.error.message },
+        { status: 400 }
       );
     }
 
@@ -98,7 +97,6 @@ export async function POST(
       code,
       color,
       size,
-      itemInRenovation,
       status,
       imageUrl,
     } = parsed.data;
@@ -127,11 +125,10 @@ export async function POST(
         },
         color,
         size,
-        itemInRenovation,
+        status,
         organization: {
           connect: { id: organization.id },
         },
-        status,
         imageUrl,
       },
     });
@@ -153,8 +150,7 @@ const updateItemSchema = z.object({
   categoryId: z.string().optional(),
   color: z.string().optional(),
   size: z.string().optional(),
-  itemInRenovation: z.boolean().optional(),
-  status: z.enum(["ACTIVE", "PENDING", "INACTIVE"]).optional(),
+  status: z.enum(["ACTIVE", "PENDING", "INACTIVE", "IN_REPAIR"]).optional(),
   imageUrl: z.string().url().optional(),
 });
 
@@ -194,7 +190,6 @@ export async function PUT(
       code,
       color,
       size,
-      itemInRenovation,
       status,
       imageUrl,
     } = parsed.data;
@@ -213,7 +208,6 @@ export async function PUT(
         },
         color,
         size,
-        itemInRenovation,
         status,
         imageUrl,
       },

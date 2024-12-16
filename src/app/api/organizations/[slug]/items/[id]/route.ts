@@ -1,9 +1,9 @@
+import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserPermissions } from "@/lib/casl/get-user-permissions";
+import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getUserMembership } from "../../../../../../actions/get-user-membership";
-import { getUserPermissions } from "../../../../../../lib/casl/get-user-permissions";
-import prisma from "../../../../../../lib/prismadb";
 
 // GET /api/organizations/:slug/items/:id - Get item by ID
 export async function GET(
@@ -17,7 +17,7 @@ export async function GET(
 
     if (!userId) {
       return NextResponse.json(
-        { message: "User not autheticated" },
+        { message: "Usuário não autenticado." },
         { status: 401 }
       );
     }
@@ -46,13 +46,17 @@ export async function GET(
     });
 
     if (!item) {
-      return NextResponse.json({ message: "Item not found." }, { status: 404 });
+      return NextResponse.json(
+        { message: "Item não encontrado." },
+        { status: 404 }
+      );
     }
 
     if (item.organization.ownerId != userId) {
       return NextResponse.json(
         {
-          message: "You are not allowed to see items that you are not a owner.",
+          message:
+            "Você não tem permissão para ver um item que você não é dono.",
         },
         { status: 403 }
       );
@@ -79,8 +83,7 @@ const updateItemSchema = z.object({
   organizationId: z.string().optional(),
   color: z.string().optional(),
   size: z.string().optional(),
-  itemInRenovation: z.boolean().optional(),
-  status: z.enum(["ACTIVE", "PENDING", "INACTIVE"]).optional(),
+  status: z.enum(["ACTIVE", "PENDING", "INACTIVE", "IN_REPAIR"]).optional(),
   imageUrl: z.string().url().optional(),
 });
 
@@ -94,7 +97,7 @@ export async function PATCH(
 
     if (!userId) {
       return NextResponse.json(
-        { message: "User not autheticated" },
+        { message: "Usuário não autenticado." },
         { status: 401 }
       );
     }
@@ -108,7 +111,10 @@ export async function PATCH(
     });
 
     if (!item) {
-      return NextResponse.json({ message: "Item not found." }, { status: 404 });
+      return NextResponse.json(
+        { message: "Item não encontrado." },
+        { status: 404 }
+      );
     }
 
     const { cannot } = getUserPermissions(userId, membership.role);
@@ -143,7 +149,6 @@ export async function PATCH(
       color,
       code,
       size,
-      itemInRenovation,
       status,
       imageUrl,
     } = parsed.data;
@@ -161,7 +166,6 @@ export async function PATCH(
         color,
         code,
         size,
-        itemInRenovation,
         status,
         imageUrl,
         ...(categoryId && { category: { connect: { id: categoryId } } }), // Add category only if categoryId exists
@@ -191,7 +195,7 @@ export async function DELETE(
 
     if (!userId) {
       return NextResponse.json(
-        { message: "User not autheticated" },
+        { message: "Usuário não autenticado." },
         { status: 401 }
       );
     }
@@ -205,14 +209,17 @@ export async function DELETE(
     });
 
     if (!item) {
-      return NextResponse.json({ message: "Item not found." }, { status: 404 });
+      return NextResponse.json(
+        { message: "Item não encontrado." },
+        { status: 404 }
+      );
     }
 
     if (item.organizationId != organization.id) {
       return NextResponse.json(
         {
           message:
-            "You are not allowed to delete an item who you aren't an owner.",
+            "Você não tem permissão para deletar um item que você não é dono.",
         },
         { status: 403 }
       );

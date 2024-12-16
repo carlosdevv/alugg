@@ -16,20 +16,21 @@ import {
 } from ".";
 import { ErrorResponse } from "../types";
 import {
-  CreateItemProps,
-  DeleteItemProps,
+  DeleteItemServiceProps,
   GetItemByIdApiResponse,
-  GetItemByIdProps,
-  GetItemProps,
-  GetItemsResponse,
-  ItemProps,
+  GetItemByIdServiceProps,
+  GetItemServiceProps,
+  GetItemsServiceResponse,
   UpdateItemByIdApiResponse,
-  UpdateItemByIdProps,
+  UpdateItemByIdServiceProps,
+  type CreateItemServiceBody,
+  type CreateItemServiceResponse,
+  type UpdateItemByIdServiceBody,
 } from "./types";
 
 export function useGetItemsService(
-  props: GetItemProps,
-  options?: UseQueryOptions<GetItemsResponse, HTTPError<ErrorResponse>>
+  props: GetItemServiceProps,
+  options?: UseQueryOptions<GetItemsServiceResponse, HTTPError<ErrorResponse>>
 ) {
   return useQuery({
     queryKey: ["getItems", props.slug],
@@ -39,7 +40,7 @@ export function useGetItemsService(
 }
 
 export function useGetItemByIdService(
-  props: GetItemByIdProps,
+  props: GetItemByIdServiceProps,
   options?: UseQueryOptions<GetItemByIdApiResponse, HTTPError<ErrorResponse>>
 ) {
   return useQuery({
@@ -51,25 +52,26 @@ export function useGetItemByIdService(
 }
 
 export function useUpdateItemByIdService(
+  props: UpdateItemByIdServiceProps,
   options?: UseMutationOptions<
     UpdateItemByIdApiResponse,
     HTTPError<ErrorResponse>,
-    UpdateItemByIdProps
+    UpdateItemByIdServiceBody
   >
 ) {
   const queryClient = useQueryClient();
   return useMutation<
     UpdateItemByIdApiResponse,
     HTTPError<ErrorResponse>,
-    UpdateItemByIdProps
+    UpdateItemByIdServiceBody
   >({
-    mutationFn: async (props: UpdateItemByIdProps) =>
-      await updateItemByIdService(props),
+    mutationFn: async (body: UpdateItemByIdServiceBody) =>
+      await updateItemByIdService(props, body),
     mutationKey: ["updateItemById"],
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       toast.success("Item atualizado com sucesso!");
       queryClient.invalidateQueries({
-        queryKey: ["getItems", variables.slug],
+        queryKey: ["getItems", props.slug],
       });
     },
 
@@ -78,17 +80,27 @@ export function useUpdateItemByIdService(
 }
 
 export function useCreateItemService(
-  options?: UseMutationOptions<ItemProps, HTTPError<ErrorResponse>, CreateItemProps>
+  props: { slug: string },
+  options?: UseMutationOptions<
+    CreateItemServiceResponse,
+    HTTPError<ErrorResponse>,
+    CreateItemServiceBody
+  >
 ) {
   const queryClient = useQueryClient();
-  return useMutation<ItemProps, HTTPError<ErrorResponse>, CreateItemProps>({
-    mutationFn: async (props: CreateItemProps) =>
-      await createItemService(props),
+
+  return useMutation<
+    CreateItemServiceResponse,
+    HTTPError<ErrorResponse>,
+    CreateItemServiceBody
+  >({
+    mutationFn: async (body: CreateItemServiceBody) =>
+      await createItemService(props, body),
     mutationKey: ["createItem"],
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       toast.success("Item criado com sucesso!");
       queryClient.invalidateQueries({
-        queryKey: ["getItems", variables.slug],
+        queryKey: ["getItems", props.slug],
       });
     },
     ...options,
@@ -96,14 +108,18 @@ export function useCreateItemService(
 }
 
 export function useDeleteItemService(
-  options?: UseMutationOptions<void, HTTPError<ErrorResponse>, DeleteItemProps>
+  options?: UseMutationOptions<
+    void,
+    HTTPError<ErrorResponse>,
+    DeleteItemServiceProps
+  >
 ) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (props) =>
       await deleteItemService({ itemId: props.itemId, slug: props.slug }),
     mutationKey: ["deleteItem"],
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       toast.success("Item deletado com sucesso!");
       queryClient.invalidateQueries({
         queryKey: ["getItems", variables.slug],

@@ -36,7 +36,6 @@ export type ItemColumn = {
   description?: string;
   amount: number;
   imageUrl?: string;
-  itemInRenovation: boolean;
   status: string;
 };
 
