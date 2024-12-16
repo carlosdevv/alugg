@@ -3,13 +3,13 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { RowActions } from "./row-actions";
 
-export type InventoryItemColumn = {
+export type CategoryColumn = {
   id: string;
   name: string;
   totalItems: number;
 };
 
-export const columns: ColumnDef<InventoryItemColumn>[] = [
+export const columns: ColumnDef<CategoryColumn>[] = [
   {
     accessorKey: "name",
     header: "Nome da Categoria",

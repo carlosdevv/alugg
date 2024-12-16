@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Row } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
-import type { InventoryItemColumn } from "./columns";
+import type { CategoryColumn } from "./columns";
 import { DeleteCategoryDialog } from "./delete-dialog";
 
 type RowActionsProps<TData> = {
@@ -20,7 +20,7 @@ type RowActionsProps<TData> = {
 };
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
-  const props = row.original as InventoryItemColumn;
+  const props = row.original as CategoryColumn;
   const categoryId = props.id;
   const [, setModal] = useQueryState("modal");
   const [, setCategoryId] = useQueryState("id");
