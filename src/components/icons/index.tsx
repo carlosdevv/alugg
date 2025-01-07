@@ -11,6 +11,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsUpDownIcon,
+  CircleAlertIcon,
   CircleHelpIcon,
   CircleIcon,
   CircleMinusIcon,
@@ -97,4 +98,5 @@ export const Icons = {
   bell: BellIcon,
   sun: SunIcon,
   moon: MoonIcon,
+  circleAlert: CircleAlertIcon,
 };

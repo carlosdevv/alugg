@@ -28,6 +28,9 @@ export default function CustomersPageClient({
     [customer]
   );
 
+  console.log("customer", customer?.data);
+  console.log("formattedCustomer", formattedCustomer);
+
   if (isLoading) {
     return (
       <div className="flex flex-col space-y-8">
@@ -39,13 +42,11 @@ export default function CustomersPageClient({
 
   return (
     <>
-      <div className="flex flex-wrap gap-y-4 items-center space-x-6 text-xs mb-4">
-        {customer?.total && (
-          <div className="bg-gray-100 dark:bg-gray-800 dark:border dark:border-gray-700 rounded-md flex space-x-2 py-1 px-2">
-            <span className="font-medium uppercase">Total</span>
-            <span className="font-light">{customer.total}</span>
-          </div>
-        )}
+      <div className="flex flex-wrap gap-y-4 items-center space-x-6 text-xs">
+        <div className="bg-gray-100 dark:bg-gray-800 dark:border dark:border-gray-700 rounded-md flex space-x-2 py-1 px-2">
+          <span className="font-medium uppercase">Total</span>
+          <span className="font-light">{customer?.total ?? 0}</span>
+        </div>
       </div>
       <DataTable columns={columns} data={formattedCustomer} />
     </>

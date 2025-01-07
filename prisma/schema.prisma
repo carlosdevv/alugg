@@ -98,24 +98,24 @@ model Token {
 }
 
 model Item {
-  id               String         @id @default(cuid())
-  name             String
-  code             String?        @unique
-  objectPrice      Float          @map("object_price")
-  rentPrice        Float          @map("rent_price")
-  size             String?
-  color            String?
-  description      String?
-  amount           Int
-  status           Status         @default(ACTIVE)
-  imageUrl         String?        @map("image_url")
-  category         Category       @relation(fields: [categoryId], references: [id])
-  categoryId       String
-  createdAt        DateTime       @default(now()) @map("created_at")
-  updatedAt        DateTime       @updatedAt @map("updated_at")
-  organization     Organization   @relation(fields: [organizationId], references: [id])
-  organizationId   String
-  history          ContractItem[]
+  id             String         @id @default(cuid())
+  name           String
+  code           String?        @unique
+  objectPrice    Float          @map("object_price")
+  rentPrice      Float          @map("rent_price")
+  size           String?
+  color          String?
+  description    String?
+  amount         Int
+  status         Status         @default(ACTIVE)
+  imageUrl       String?        @map("image_url")
+  category       Category       @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  organizationId String
+  history        ContractItem[]
 
   @@map("items")
 }
@@ -140,30 +140,22 @@ model Customer {
   secondDocument        String?       @map("second_document")
   email                 String?
   phone                 String?
-  address               Address?      @relation(fields: [addressId], references: [id])
   birthdate             DateTime?
   mediaContact          String?       @map("media_contact")
   additionalInformation String?
+  zipcode               String?
+  city                  String?
+  state                 String?
+  address               String?
+  neighborhood          String?
   createdAt             DateTime      @default(now()) @map("created_at")
   updatedAt             DateTime      @updatedAt @map("updated_at")
-  addressId             String?
   Contract              Contract[]
   Organization          Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId        String?
 
   @@unique([email])
   @@map("customers")
-}
-
-model Address {
-  id           String     @id @default(cuid())
-  street       String
-  number       Int
-  neighborhood String
-  city         String
-  state        String
-  zipcode      String
-  customer     Customer[]
 }
 
 model Contract {

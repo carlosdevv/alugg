@@ -73,3 +73,7 @@ export const itemsFileAcceptTypes = {
 };
 
 export const UPLOAD_ITEMS_MAX_FILE_SIZE_MB = 10;
+
+export function parseToNumber(value: string) {
+  return value.replace(/\D/g, "");
+}

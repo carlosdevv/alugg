@@ -47,12 +47,7 @@ export async function GET(
       return NextResponse.json({ customers: [] }, { status: 200 });
     }
 
-    const customersResponse = {
-      data: customers,
-      total,
-    };
-
-    return NextResponse.json({ customersResponse }, { status: 200 });
+    return NextResponse.json({ data: customers, total }, { status: 200 });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
@@ -62,10 +57,23 @@ export async function GET(
   }
 }
 
-const createCategorySchema = z.object({
+export const createCustomerSchema = z.object({
   name: z.string(),
+  document: z.string(),
+  secondDocument: z.string().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  birthdate: z.string().optional(),
+  mediaContact: z.string().optional(),
+  additionalInformation: z.string().optional(),
+  neighborhood: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zipcode: z.string().optional(),
+  address: z.string().optional(),
 });
 
+// POST /api/organizations/:slug/customers - Create a customer
 export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -89,7 +97,7 @@ export async function POST(
     }
 
     const body = await req.json();
-    const parsed = createCategorySchema.safeParse(body);
+    const parsed = createCustomerSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -98,31 +106,27 @@ export async function POST(
       );
     }
 
-    const { name } = parsed.data;
+    const { address: addressData, ...customerData } = parsed.data;
     const { membership, organization } = await getUserMembership(slug);
 
     const { cannot } = getUserPermissions(userId, membership.role);
 
-    if (cannot("create", "Category")) {
+    if (cannot("create", "Customer")) {
       return NextResponse.json(
-        { message: "Você não tem permissão para criar categorias." },
+        { message: "Você não tem permissão para criar um cliente." },
         { status: 403 }
       );
     }
 
-    const newCategory = await prisma.category.create({
+    const customer = await prisma.customer.create({
       data: {
-        name,
-        organization: {
-          connect: { id: organization.id },
-        },
+        ...customerData,
+        birthdate: customerData.birthdate && new Date(customerData.birthdate),
+        organizationId: organization.id,
       },
     });
 
-    return NextResponse.json(
-      { id: newCategory.id, name: newCategory.name },
-      { status: 201 }
-    );
+    return NextResponse.json({ customer: customer }, { status: 201 });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(

@@ -36,9 +36,16 @@ export const columns: ColumnDef<CustomerColumn>[] = [
     },
   },
   {
-    header: "Opções",
+    accessorKey: "actions",
+    header: () => {
+      return <div className="flex justify-end pr-2">Opções</div>;
+    },
     cell: ({ row }) => {
-      return <RowActions row={row} />;
+      return (
+        <div className="flex justify-end pr-4">
+          <RowActions row={row} />
+        </div>
+      );
     },
   },
 ];

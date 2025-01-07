@@ -1,5 +1,4 @@
 import { Icons } from "@/components/icons";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,8 +12,9 @@ import {
 import { appRoutes } from "@/lib/constants";
 import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
+import { useState } from "react";
 import type { CustomerColumn } from "./columns";
-import { DeleteCustomerDialog } from "./delete-dialog";
+import { DeleteCustomerDialog } from "./delete-customer-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
@@ -22,9 +22,12 @@ type RowActionsProps<TData> = {
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
   const props = row.original as CustomerColumn;
+  const customerId = props.id;
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   return (
-    <AlertDialog>
+    <>
       <div className="flex items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -47,17 +50,22 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
                   <Icons.horizontalEllipsis className="size-4" />
                 </Link>
               </DropdownMenuItem>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem className="flex items-center justify-between cursor-pointer text-rose-500 hover:!text-rose-400">
-                  Remover
-                  <Icons.delete className="size-4" />
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
+              <DropdownMenuItem
+                className="flex items-center justify-between cursor-pointer text-rose-500 hover:!text-rose-500"
+                onClick={() => setOpenDeleteDialog(true)}
+              >
+                Remover
+                <Icons.delete className="size-4" />
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DeleteCustomerDialog />
-    </AlertDialog>
+      <DeleteCustomerDialog
+        customerId={customerId}
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+      />
+    </>
   );
 }
