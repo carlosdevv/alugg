@@ -106,7 +106,7 @@ export async function POST(
       );
     }
 
-    const { address: addressData, ...customerData } = parsed.data;
+    const { ...customerData } = parsed.data;
     const { membership, organization } = await getUserMembership(slug);
 
     const { cannot } = getUserPermissions(userId, membership.role);
@@ -122,11 +122,13 @@ export async function POST(
       data: {
         ...customerData,
         birthdate: customerData.birthdate && new Date(customerData.birthdate),
-        organizationId: organization.id,
+        organization: {
+          connect: { id: organization.id },
+        },
       },
     });
 
-    return NextResponse.json({ customer: customer }, { status: 201 });
+    return NextResponse.json({ customer: customer });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(

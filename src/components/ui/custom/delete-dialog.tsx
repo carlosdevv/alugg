@@ -18,6 +18,7 @@ type DeleteDialogProps = {
   title?: string;
   description?: string;
   onClick: () => Promise<void>;
+  isPending?: boolean;
 };
 export default function DeleteDialog({
   open,
@@ -25,6 +26,7 @@ export default function DeleteDialog({
   title,
   description,
   onClick,
+  isPending,
 }: DeleteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -46,11 +48,21 @@ export default function DeleteDialog({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="outline" className="flex-1">
+            <Button
+              disabled={isPending}
+              type="button"
+              variant="outline"
+              className="flex-1"
+            >
               Cancelar
             </Button>
           </DialogClose>
-          <Button type="button" className="flex-1 bg-rose-600 text-white hover:bg-rose-500" onClick={onClick}>
+          <Button
+            disabled={isPending}
+            type="button"
+            className="flex-1 bg-rose-600 text-white hover:bg-rose-500"
+            onClick={onClick}
+          >
             Remover
           </Button>
         </DialogFooter>

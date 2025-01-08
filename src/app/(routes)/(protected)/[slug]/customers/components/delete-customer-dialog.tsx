@@ -1,15 +1,7 @@
-import {
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import DeleteDialog from "@/components/ui/custom/delete-dialog";
 import { useDeleteCustomerService } from "@/http/customers/use-customers-service";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 type DeleteCustomerDialogProps = {
@@ -24,7 +16,11 @@ export function DeleteCustomerDialog({
   open,
 }: DeleteCustomerDialogProps) {
   const { slug } = useParams() as { slug: string };
-  const { mutateAsync: deleteCustomerService } = useDeleteCustomerService({
+  const {
+    mutateAsync: deleteCustomerService,
+    isPending,
+    isSuccess,
+  } = useDeleteCustomerService({
     slug,
   });
 
@@ -34,6 +30,12 @@ export function DeleteCustomerDialog({
     });
   }
 
+  useEffect(() => {
+    if (isSuccess) {
+      onOpenChange(false);
+    }
+  }, [isSuccess]);
+
   return (
     <>
       <DeleteDialog
@@ -42,6 +44,7 @@ export function DeleteCustomerDialog({
         title="Tem Certeza?"
         description="Você está prestes a remover um cliente. Esta ação é irreversível."
         onClick={onDelete}
+        isPending={isPending}
       />
     </>
   );

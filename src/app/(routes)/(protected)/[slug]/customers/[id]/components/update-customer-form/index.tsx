@@ -1,5 +1,4 @@
 "use client";
-
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,8 +22,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { CustomerProps } from "@/http/customers/types";
 import { parseToNumber } from "@/lib/utils";
+import { parseDate } from "@internationalized/date";
 import { DateField, DateInput, DateSegment } from "react-aria-components";
 import useUpdateCustomerForm from "./use-update-customer-form";
+import { format } from "date-fns";
 
 type UpdateCustomerFormProps = {
   customer: CustomerProps;
@@ -154,6 +155,11 @@ export default function UpdateCustomerForm({
                         </FormLabel>
                         <FormControl>
                           <DateField
+                            defaultValue={
+                              field.value
+                                ? parseDate(format(field.value, "yyyy-MM-dd"))
+                                : null
+                            }
                             onChange={(value) => {
                               if (!value) return;
                               const formattedValue = `${value.day}/${value.month}/${value.year}`;

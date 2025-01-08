@@ -1,5 +1,3 @@
-import type { Customer } from "@prisma/client";
-
 export type CustomerProps = {
   id: string;
   name: string;
@@ -46,16 +44,7 @@ export type CreateCustomerServiceBody = {
 };
 
 export type CreateCustomerServiceResponse = {
-  customer: Customer & {
-    address: {
-      number: number;
-      street: string;
-      neighborhood: string;
-      city: string;
-      state: string;
-      zipcode: string;
-    };
-  };
+  customer: CustomerProps;
 };
 
 export type DeleteCustomerServiceBody = {

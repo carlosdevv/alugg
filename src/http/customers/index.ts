@@ -47,10 +47,10 @@ export async function createCustomerService(
 }
 
 export async function deleteCustomerService(
-  slug: { slug: string },
+  props: { slug: string },
   { customerId }: DeleteCustomerServiceBody
 ): Promise<void> {
-  await api.delete(`api/organizations/${slug}/customers/${customerId}`).json();
+  await api.delete(`api/organizations/${props.slug}/customers/${customerId}`).json();
 }
 
 export async function updateCustomerService(

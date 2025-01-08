@@ -72,6 +72,7 @@ export default function useUpdateCustomerForm({
   customer,
   id,
 }: useUpdateCustomerFormProps) {
+  const router = useRouter();
   const { slug } = useParams() as { slug: string };
 
   const form = useForm<UpdateCustomerFormValues>({
@@ -93,7 +94,9 @@ export default function useUpdateCustomerForm({
     },
   });
 
-  const [showAddressFields, setShowAddressFields] = useState(false);
+  const [showAddressFields, setShowAddressFields] = useState(
+    customer.zipcode ? true : false
+  );
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
 
   const { mutateAsync: updateCustomerService, isPending: isUpdatingCustomer } =
@@ -102,6 +105,7 @@ export default function useUpdateCustomerForm({
       {
         onSuccess: () => {
           toast.success("Cliente atualizado com sucesso");
+          router.refresh();
         },
       }
     );
@@ -133,7 +137,6 @@ export default function useUpdateCustomerForm({
   }
 
   async function onSubmit(data: UpdateCustomerFormValues) {
-    console.log("createCustomer", data);
     await updateCustomerService({
       ...data,
     });
