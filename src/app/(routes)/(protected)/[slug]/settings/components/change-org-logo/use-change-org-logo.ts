@@ -5,7 +5,8 @@ import {
   itemsFileAcceptTypes,
   UPLOAD_ITEMS_MAX_FILE_SIZE_MB,
 } from "@/lib/utils";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 
@@ -15,6 +16,7 @@ type UseChangeOrgLogoProps = {
 export default function useChangeOrgLogo({
   organization,
 }: UseChangeOrgLogoProps) {
+  const router = useRouter();
   const [image, setImage] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -22,10 +24,13 @@ export default function useChangeOrgLogo({
     organization.logo ? false : true
   );
 
-  const { mutateAsync: updateLogo, isPending: isUpdatingImage } =
-    useUpdateOrganizationService({
-      slug: organization.slug,
-    });
+  const {
+    mutateAsync: updateLogo,
+    isPending: isUpdatingImage,
+    isSuccess,
+  } = useUpdateOrganizationService({
+    slug: organization.slug,
+  });
 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
@@ -54,7 +59,7 @@ export default function useChangeOrgLogo({
       const { error: supabaseError } = await supabase.storage
         .from("organization-logos")
         .update(`${organization.slug}`, file, {
-          cacheControl: "3600",
+          cacheControl: "0",
           upsert: true,
         });
 
@@ -111,6 +116,10 @@ export default function useChangeOrgLogo({
     });
   }
 
+  useEffect(() => {
+    if (isSuccess) router.refresh();
+  }, [isSuccess]);
+
   return {
     newImageMode,
     setNewImageMode,
@@ -120,5 +129,6 @@ export default function useChangeOrgLogo({
     getRootProps,
     getInputProps,
     image,
+    onSubmit,
   };
 }

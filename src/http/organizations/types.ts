@@ -78,8 +78,9 @@ export type UpdateOrganizationServiceBody = {
   logo?: string;
 };
 
-export type UpdateOrganizationServiceResponse =
-  CreateOrganizationServiceResponse;
+export type UpdateOrganizationServiceResponse = {
+  organization: GetOrganizationResponse;
+}
 
 export type FetchExistentSlugServiceProps = {
   slug: string;

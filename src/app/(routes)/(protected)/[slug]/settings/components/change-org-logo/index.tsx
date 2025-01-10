@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/card";
 import {
   FloatingPanelBody,
+  FloatingPanelCloseButton,
   FloatingPanelContent,
   FloatingPanelFooter,
   FloatingPanelRoot,
   FloatingPanelTrigger,
-  FloatingPanelCloseButton,
 } from "@/components/ui/floating-panel";
 import {
   Tooltip,
@@ -43,6 +43,7 @@ export default function ChangeOrgLogo({
     getRootProps,
     getInputProps,
     image,
+    onSubmit,
   } = useChangeOrgLogo({ organization });
 
   return (
@@ -54,7 +55,8 @@ export default function ChangeOrgLogo({
             <Button
               size="sm"
               type="submit"
-              disabled={isUpdatingImage || isUploadingImage}
+              disabled={isUpdatingImage || isUploadingImage || !image[0]}
+              onClick={onSubmit}
             >
               {isUpdatingImage ||
                 (isUploadingImage && (
@@ -62,14 +64,6 @@ export default function ChangeOrgLogo({
                 ))}
               Salvar
             </Button>
-            // <Button
-            //   variant="ghost"
-            //   size="sm"
-            //   className="ml-auto"
-            //   onClick={() => setNewImageMode(false)}
-            // >
-            //   Exibir original
-            // </Button>
           )}
         </CardTitle>
         <CardDescription>Faça upload da imagem do item.</CardDescription>
@@ -84,34 +78,32 @@ export default function ChangeOrgLogo({
               width={300}
               height={200}
             />
-            <button
-              disabled={isUpdatingImage || isUploadingImage}
-              onClick={() => setNewImageMode(true)}
-              className="absolute top-2 right-2 bg-background text-white p-2 rounded-full shadow-md hover:bg-background/50 transition-colors"
-            >
-              <Icons.update className="size-4" />
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  disabled={isUpdatingImage || isUploadingImage}
+                  onClick={() => setNewImageMode(true)}
+                  className="absolute top-2 right-2 bg-rose-500 text-foreground p-2 rounded-full shadow-md hover:bg-rose-600 transition-colors"
+                >
+                  <Icons.delete className="size-4 text-white" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Inserir nova imagem</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  href={organization.logo}
+                  target="_blank"
+                  className="absolute top-2 right-12 bg-background text-foreground p-2 rounded-full shadow-md hover:bg-background/50 transition-colors"
+                >
+                  <Icons.externalLink className="size-4" />
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>Visualizar imagem completa</TooltipContent>
+            </Tooltip>
           </div>
         )}
-
-        {/* {imagePreview && newImageMode && (
-          <div className="relative">
-            <Image
-              src={imagePreview}
-              alt="Imagem do Item"
-              className="w-full h-40 object-cover rounded-md"
-              width={1920}
-              height={1080}
-            />
-            <button
-              disabled={isUpdatingImage || isUploadingImage}
-              onClick={handleRemoveImage}
-              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full shadow-md hover:bg-red-600"
-            >
-              <Icons.delete className="size-4" />
-            </button>
-          </div>
-        )} */}
 
         {newImageMode && (
           <div className="w-full h-auto relative">
@@ -142,7 +134,7 @@ export default function ChangeOrgLogo({
                     </FloatingPanelContent>
                   </FloatingPanelRoot>
                 </TooltipTrigger>
-                <TooltipContent>Visualizar imagem</TooltipContent>
+                <TooltipContent>Visualizar imagem completa</TooltipContent>
               </Tooltip>
             )}
             <div
@@ -156,7 +148,7 @@ export default function ChangeOrgLogo({
                 disabled={isUpdatingImage || isUploadingImage}
               />
               <Icons.image className="size-10 text-gray-400" />
-              <span className="font-medium mt-2">
+              <span className="font-medium">
                 {image[0] ? image[0].name : "Clique ou arraste a imagem aqui"}
               </span>
               {image[0] && (

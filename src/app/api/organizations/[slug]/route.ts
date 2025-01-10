@@ -85,6 +85,7 @@ const updateOrganizationSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   neighborhood: z.string().optional(),
+  logo: z.string().optional(),
 });
 
 // PATCH /api/organizations/:slug - Update an organization
