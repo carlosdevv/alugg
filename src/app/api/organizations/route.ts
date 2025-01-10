@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
         slug: true,
         ownerId: true,
         plan: true,
+        logo: true,
         members: {
           select: {
             role: true,

@@ -1,25 +1,6 @@
 import type { Role } from "@/lib/casl/roles";
 
-export type GetOrganizationsApiProps = {
-  organizations: {
-    id: string;
-    name: string;
-    slug: string;
-    logo?: string;
-    role: Role;
-    plan: "free" | "pro";
-    ownerId: string;
-  }[];
-};
-
-export type GetOrganizationsResponse =
-  GetOrganizationsApiProps["organizations"];
-
-export type GetOrganizationServiceProps = {
-  slug: string;
-};
-
-export type GetOrganizationResponse = {
+export type OrganizationProps = {
   id: string;
   name: string;
   fantasyName?: string;
@@ -38,6 +19,19 @@ export type GetOrganizationResponse = {
   plan: "free" | "pro";
   ownerId: string;
 };
+
+export type GetOrganizationsApiProps = {
+  organizations: OrganizationProps[];
+};
+
+export type GetOrganizationsResponse =
+  GetOrganizationsApiProps["organizations"];
+
+export type GetOrganizationServiceProps = {
+  slug: string;
+};
+
+export type GetOrganizationResponse = OrganizationProps;
 
 export type GetOrganizationApiProps = {
   organization: {
@@ -80,7 +74,7 @@ export type UpdateOrganizationServiceBody = {
 
 export type UpdateOrganizationServiceResponse = {
   organization: GetOrganizationResponse;
-}
+};
 
 export type FetchExistentSlugServiceProps = {
   slug: string;
