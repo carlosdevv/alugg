@@ -36,8 +36,8 @@ export default function ChangeOrgSlugForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="h-full">
+        <Card className="h-full flex flex-col">
           <CardHeader>
             <CardTitle>Slug da organização</CardTitle>
             <CardDescription>Esse é o slug da sua organização</CardDescription>
@@ -73,7 +73,7 @@ export default function ChangeOrgSlugForm({
               )}
             />
           </CardContent>
-          <CardFooter className="bg-gray-50 dark:bg-zinc-900 flex items-center p-4 justify-between w-full rounded-b-xl">
+          <CardFooter className="bg-gray-50 dark:bg-zinc-900 flex items-center p-4 justify-between w-full rounded-b-xl space-x-4 mt-auto">
             <p className="text-sm text-muted-foreground pl-2">
               Apenas letras minúsculas, números e hífens são permitidos. Máximo
               de 48 caracteres.

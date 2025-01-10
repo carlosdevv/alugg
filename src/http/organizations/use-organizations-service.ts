@@ -81,6 +81,7 @@ export function useCreateOrganizationService(
 }
 
 export function useUpdateOrganizationService(
+  props: { slug: string },
   options?: UseMutationOptions<
     UpdateOrganizationServiceResponse,
     HTTPError<ErrorResponse>,
@@ -92,11 +93,11 @@ export function useUpdateOrganizationService(
   return useMutation({
     mutationKey: ["updateOrganization"],
     mutationFn: async (body: UpdateOrganizationServiceBody) =>
-      await updateOrganizationService(body),
-    onSuccess: (data) => {
+      await updateOrganizationService(props, body),
+    onSuccess: () => {
       toast.success("Organização atualizada com sucesso!");
       queryClient.invalidateQueries({
-        queryKey: ["getOrganization", data.slug],
+        queryKey: ["getOrganization", props.slug],
       });
       queryClient.invalidateQueries({
         queryKey: ["getOrganizations"],

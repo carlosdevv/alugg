@@ -23,7 +23,7 @@ export default function SignInForm() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center relative">
+      {/* <div className="flex items-center relative">
         <div className="w-full">
           <Button variant="outline" disabled className="w-full">
             <Image src={googleImg} alt="Google Logo" className="size-4 mr-2" />
@@ -38,7 +38,7 @@ export default function SignInForm() {
         <div className="relative flex justify-center text-sm">
           <span className="px-2 text-sm bg-background text-foreground">ou</span>
         </div>
-      </div>
+      </div> */}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

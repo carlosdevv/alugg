@@ -1,7 +1,6 @@
 import { consultaCep } from "@/http/consulta-cep";
 import { useCreateCustomerService } from "@/http/customers/use-customers-service";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -111,7 +110,6 @@ export default function useCreateCustomerForm() {
   }
 
   async function onSubmit(data: CreateCustomerFormValues) {
-    console.log("createCustomer", data);
     await createCustomerService({
       ...data,
     });

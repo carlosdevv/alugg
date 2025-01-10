@@ -21,6 +21,7 @@ import {
   CrownIcon,
   EllipsisIcon,
   EllipsisVertical,
+  ExternalLinkIcon,
   EyeIcon,
   EyeOffIcon,
   Home,
@@ -99,4 +100,5 @@ export const Icons = {
   sun: SunIcon,
   moon: MoonIcon,
   circleAlert: CircleAlertIcon,
+  externalLink: ExternalLinkIcon,
 };

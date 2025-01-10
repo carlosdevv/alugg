@@ -1,6 +1,7 @@
 "use client";
 
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
@@ -21,8 +22,10 @@ const AppProviders = ({ children }: Props) => {
   return (
     <QueryClientProvider client={queryClient}>
       <NuqsAdapter>
-        <Toaster />
-        {children}
+        <TooltipProvider>
+          <Toaster />
+          {children}
+        </TooltipProvider>
       </NuqsAdapter>
     </QueryClientProvider>
   );

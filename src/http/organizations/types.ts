@@ -22,6 +22,16 @@ export type GetOrganizationServiceProps = {
 export type GetOrganizationResponse = {
   id: string;
   name: string;
+  fantasyName?: string;
+  socialName?: string;
+  cnpj?: string;
+  phone?: string;
+  email?: string;
+  zipcode?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  neighborhood?: string;
   slug: string;
   logo?: string;
   role: Role;
@@ -53,9 +63,19 @@ export type CreateOrganizationServiceResponse = {
 };
 
 export type UpdateOrganizationServiceBody = {
-  slug: string;
   newSlug?: string;
   name?: string;
+  socialName?: string;
+  fantasyName?: string;
+  cnpj?: string;
+  phone?: string;
+  email?: string;
+  zipcode?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  neighborhood?: string;
+  logo?: string;
 };
 
 export type UpdateOrganizationServiceResponse =

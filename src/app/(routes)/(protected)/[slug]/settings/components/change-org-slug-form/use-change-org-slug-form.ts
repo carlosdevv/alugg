@@ -52,18 +52,21 @@ export default function useChangeOrgSlugForm({
   }, [slug]);
 
   const { mutateAsync: updateOrganization, isPending } =
-    useUpdateOrganizationService({
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
-          queryKey: ["getOrganizations"],
-        });
-        toast.success("Organização atualizada com sucesso!");
+    useUpdateOrganizationService(
+      { slug: organization.slug },
+      {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: ["getOrganizations"],
+          });
+          toast.success("Organização atualizada com sucesso!");
 
-        if (data.slug !== organization.slug) {
-          router.push(`/${data.slug}/settings`);
-        }
-      },
-    });
+          if (data.slug !== organization.slug) {
+            router.push(`/${data.slug}/settings`);
+          }
+        },
+      }
+    );
 
   const { data: validSlug, isLoading: checkingSlug } =
     useFetchExistentSlugService(
@@ -77,7 +80,6 @@ export default function useChangeOrgSlugForm({
   async function onSubmit(data: ChangeOrgSlugValues) {
     if (validSlug && !validSlug.hasOrganization) {
       await updateOrganization({
-        slug: organization.slug,
         newSlug: data.newSlug,
       });
     }
