@@ -5,3 +5,4 @@ export * from "./people";
 export * from "./receipt";
 export * from "./list";
 export * from "./customer";
+export * from "./contract";

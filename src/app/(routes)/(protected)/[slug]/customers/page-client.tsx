@@ -28,9 +28,6 @@ export default function CustomersPageClient({
     [customer]
   );
 
-  console.log("customer", customer?.data);
-  console.log("formattedCustomer", formattedCustomer);
-
   if (isLoading) {
     return (
       <div className="flex flex-col space-y-8">

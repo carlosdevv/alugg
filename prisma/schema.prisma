@@ -60,6 +60,7 @@ model Organization {
   stockItems   Item[]
   category     Category[]
   customers    Customer[]
+  contracts    Contract[]
 
   @@map("organizations")
 }
@@ -163,23 +164,25 @@ model Customer {
 }
 
 model Contract {
-  id          String         @id @default(uuid())
-  code        Int            @default(autoincrement())
-  name        String
-  eventDate   DateTime       @map("event_date")
-  startDate   DateTime       @map("start_date")
-  endDate     DateTime       @map("end_date")
-  totalValue  Float          @map("total_value")
-  customer    Customer       @relation(fields: [customerId], references: [id])
-  status      ContractStatus
-  rentedItems ContractItem[]
-  payment     PAYMENT[]
-  createdAt   DateTime       @map("created_at")
-  updatedAt   DateTime       @updatedAt @map("updated_at")
-  createdBy   User           @relation(fields: [userId], references: [id])
-  documents   Document[]
-  userId      String
-  customerId  String
+  id             String         @id @default(uuid())
+  code           Int            @default(autoincrement())
+  name           String
+  eventDate      DateTime       @map("event_date")
+  startDate      DateTime       @map("start_date")
+  endDate        DateTime       @map("end_date")
+  totalValue     Float          @map("total_value")
+  customer       Customer       @relation(fields: [customerId], references: [id])
+  status         ContractStatus
+  rentedItems    ContractItem[]
+  payment        PAYMENT[]
+  createdAt      DateTime       @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  createdBy      User           @relation(fields: [userId], references: [id])
+  documents      Document[]
+  userId         String
+  customerId     String
+  Organization   Organization?  @relation(fields: [organizationId], references: [id])
+  organizationId String?
 
   @@map("contracts")
 }

@@ -2,13 +2,14 @@
 
 import { Icons, type IconType } from "@/components/icons";
 import {
+  ContractIcon,
+  CustomerIcon,
   GearIcon,
   HomeIcon,
   LayersIcon,
+  ListIcon,
   PeopleIcon,
   ReceiptIcon,
-  ListIcon,
-  CustomerIcon,
 } from "@/components/icons/dub";
 import {
   Collapsible,
@@ -45,6 +46,12 @@ export function NavMain() {
       name: "Início",
       icon: HomeIcon,
       href: `/${slug}`,
+      exact: true,
+    },
+    {
+      name: "Contratos",
+      icon: ContractIcon,
+      href: `/${slug}/contracts`,
       exact: true,
     },
     {
