@@ -71,9 +71,9 @@ export function DataTable<TData, TValue>({
           className="max-w-60"
         />
         <Button size="sm" asChild>
-          <Link href={appRoutes.customers.create}>
+          <Link href={appRoutes.contracts.create}>
             <Icons.circlePlus className="size-4 mr-2" />
-            Adicionar Cliente
+            Novo Contrato
           </Link>
         </Button>
       </div>

@@ -16,5 +16,9 @@ export const appRoutes = {
   customers: {
     root: "customers",
     create: "customers/create",
-  }
+  },
+  contracts: {
+    root: "contracts",
+    create: "contracts/create",
+  },
 };
