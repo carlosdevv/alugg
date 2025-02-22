@@ -112,7 +112,7 @@ model Item {
   color          String?
   description    String?
   amount         Int
-  status         Status         @default(ACTIVE)
+  status         ItemStatus     @default(ACTIVE)
   imageUrl       String?        @map("image_url")
   category       Category       @relation(fields: [categoryId], references: [id])
   categoryId     String
@@ -250,7 +250,7 @@ enum ContractStatus {
   COLLECTED
 }
 
-enum Status {
+enum ItemStatus {
   ACTIVE
   INACTIVE
   PENDING

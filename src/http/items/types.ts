@@ -1,4 +1,4 @@
-import type { Status } from "@prisma/client";
+import type { ItemStatus } from "@prisma/client";
 
 export type GetItemServiceProps = {
   slug: string;
@@ -31,7 +31,7 @@ export type ItemProps = {
   rentPrice: number;
   imageUrl: string;
   amount: number;
-  status: Status;
+  status: ItemStatus;
   objectPrice: number;
   code: string;
   size: string;
@@ -56,7 +56,7 @@ export type CreateItemServiceBody = {
   description: string | undefined;
   imageUrl: string | undefined;
   amount: number;
-  status: Status;
+  status: ItemStatus;
   objectPrice: number;
   code: string | undefined;
   size: string | undefined;

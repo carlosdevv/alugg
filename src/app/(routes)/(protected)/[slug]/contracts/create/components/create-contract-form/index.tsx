@@ -9,7 +9,8 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-import { StepOne } from "./step-one";
+import { StepOne } from "../step-one";
+import { StepTwo } from "../step-two";
 import useCreateContractForm from "./use-create-contract-form";
 
 const steps = [
@@ -41,7 +42,10 @@ export default function CreateContractForm() {
         >
           {steps.map(({ step, title }) => (
             <StepperItem key={step} step={step} className="flex-1">
-              <StepperTrigger className="w-full flex-col items-start gap-2">
+              <StepperTrigger
+                type="button"
+                className="w-full flex-col items-start gap-2"
+              >
                 <StepperIndicator asChild className="h-1 w-full bg-border">
                   <span className="sr-only">{step}</span>
                 </StepperIndicator>
@@ -54,6 +58,7 @@ export default function CreateContractForm() {
         </Stepper>
         <div className="flex flex-col py-6">
           {currentStep === 1 && <StepOne />}
+          {currentStep === 2 && <StepTwo />}
         </div>
         <div className="flex space-x-4">
           <Button

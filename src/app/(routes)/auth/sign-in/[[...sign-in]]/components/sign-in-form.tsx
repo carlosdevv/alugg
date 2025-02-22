@@ -1,20 +1,18 @@
 "use client";
 
-import googleImg from "@/assets/google-icon.svg";
 import { Icons } from "@/components/icons";
-import EmailInput from "@/components/inputs/email-input";
-import PasswordInput from "@/components/inputs/password-input";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
+import EmailInput from "@/components/ui/inputs/email-input";
+import PasswordInput from "@/components/ui/inputs/password-input";
 import { appRoutes } from "@/lib/constants";
-import Image from "next/image";
 import Link from "next/link";
 import useSignInForm from "./use-sign-in-form";
 

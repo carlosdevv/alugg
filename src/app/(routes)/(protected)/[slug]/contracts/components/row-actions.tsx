@@ -13,7 +13,7 @@ import { appRoutes } from "@/lib/constants";
 import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
 import { useState } from "react";
-import type { CustomerColumn } from "./columns";
+import type { ContractColumn } from "./columns";
 import { DeleteCustomerDialog } from "./delete-customer-dialog";
 
 type RowActionsProps<TData> = {
@@ -21,7 +21,7 @@ type RowActionsProps<TData> = {
 };
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
-  const props = row.original as CustomerColumn;
+  const props = row.original as ContractColumn;
   const customerId = props.id;
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);

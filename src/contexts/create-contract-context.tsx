@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { compareDesc } from "date-fns";
 import { parseAsInteger, useQueryState, type Options } from "nuqs";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
@@ -21,6 +21,8 @@ type CreateContractContextProps = {
   ) => Promise<URLSearchParams>;
   form: UseFormReturn<CreateContractFormValues>;
   onSubmit: (data: CreateContractFormValues) => void;
+  selectedItems: Map<string, number>;
+  setSelectedItems: (items: Map<string, number>) => void;
 };
 
 const createContractFormSchema = z
@@ -70,13 +72,24 @@ export function CreateContractProvider({
     defaultValue: 1,
   });
 
+  const [selectedItems, setSelectedItems] = useState<Map<string, number>>(
+    new Map()
+  );
+
   async function onSubmit(data: CreateContractFormValues) {
     console.log(data);
   }
 
   return (
     <CreateContractContext.Provider
-      value={{ currentStep, setCurrentStep, form, onSubmit }}
+      value={{
+        currentStep,
+        setCurrentStep,
+        form,
+        onSubmit,
+        selectedItems,
+        setSelectedItems,
+      }}
     >
       {children}
     </CreateContractContext.Provider>

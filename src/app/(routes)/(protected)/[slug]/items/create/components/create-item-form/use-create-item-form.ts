@@ -7,7 +7,7 @@ import {
   UPLOAD_ITEMS_MAX_FILE_SIZE_MB,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Status } from "@prisma/client";
+import { ItemStatus } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
@@ -130,15 +130,18 @@ export default function useCreateItemForm() {
       return;
     }
 
-    setIsUploadingImage(true);
-    const imageUrl = await uploadImageAndGetUrl(image[0], data.name);
-    setIsUploadingImage(false);
+    let imageUrl;
+    if (image.length > 0) {
+      setIsUploadingImage(true);
+      imageUrl = await uploadImageAndGetUrl(image[0], data.name);
+      setIsUploadingImage(false);
+    }
 
     const status = data.itemInRepair
-      ? Status.IN_REPAIR
+      ? ItemStatus.IN_REPAIR
       : data.itemInactive
-      ? Status.INACTIVE
-      : Status.ACTIVE;
+      ? ItemStatus.INACTIVE
+      : ItemStatus.ACTIVE;
 
     await createItemService({
       description: data.description,

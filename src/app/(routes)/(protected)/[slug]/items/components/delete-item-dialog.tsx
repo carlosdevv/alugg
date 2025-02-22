@@ -32,7 +32,7 @@ export function DeleteInventoryItemDialog({
     if (isSuccess) {
       onOpenChange(false);
     }
-  }, [isSuccess]);
+  }, [isSuccess, onOpenChange]);
 
   return (
     <>

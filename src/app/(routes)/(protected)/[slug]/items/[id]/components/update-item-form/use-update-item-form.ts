@@ -8,7 +8,7 @@ import {
   UPLOAD_ITEMS_MAX_FILE_SIZE_MB,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Status } from "@prisma/client";
+import { ItemStatus } from "@prisma/client";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
@@ -50,8 +50,8 @@ export default function useUpdateItemForm({
       ...item,
       objectPrice: formatToCurrency(item.objectPrice.toString()),
       rentPrice: formatToCurrency(item.rentPrice.toString()),
-      itemInRepair: item.status === Status.IN_REPAIR,
-      itemInactive: item.status === Status.INACTIVE,
+      itemInRepair: item.status === ItemStatus.IN_REPAIR,
+      itemInactive: item.status === ItemStatus.INACTIVE,
     },
   });
 
@@ -159,7 +159,7 @@ export default function useUpdateItemForm({
       color: data.color ?? undefined,
       description: data.description ?? undefined,
       code: data.code ?? undefined,
-      status: data.itemInRepair ? Status.IN_REPAIR : item.status,
+      status: data.itemInRepair ? ItemStatus.IN_REPAIR : item.status,
       imageUrl,
     };
 

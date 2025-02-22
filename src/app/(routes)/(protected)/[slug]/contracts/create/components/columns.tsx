@@ -2,7 +2,7 @@
 
 import { Icons } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   FloatingPanelBody,
   FloatingPanelCloseButton,
@@ -11,36 +11,34 @@ import {
   FloatingPanelRoot,
   FloatingPanelTrigger,
 } from "@/components/ui/floating-panel";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
+import type { ItemStatus } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { RowActions } from "./row-actions";
-import type { ItemStatus } from "@prisma/client";
 
-export type ItemColumn = {
+export type CreateContractColumn = {
   id: string;
-  name: string;
-  category: {
-    name: string;
-  };
-  code?: string;
-  objectPrice: number;
-  rentPrice: number;
-  size?: string;
-  color?: string;
-  description?: string;
-  amount: number;
   imageUrl?: string;
+  name: string;
+  amount: number;
   status: ItemStatus;
+  code?: string;
 };
 
-export const columns: ColumnDef<ItemColumn>[] = [
+export const columns: ColumnDef<CreateContractColumn>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "imageUrl",
     header: "Imagem",
@@ -97,16 +95,6 @@ export const columns: ColumnDef<ItemColumn>[] = [
     },
   },
   {
-    accessorKey: "category",
-    header: "Categoria",
-    cell: ({ row }) => {
-      const category = row.getValue("category") as { name: string };
-      return (
-        <div className="truncate max-w-60 font-medium">{category?.name}</div>
-      );
-    },
-  },
-  {
     accessorKey: "name",
     header: "Nome",
     cell: ({ row }) => {
@@ -122,32 +110,6 @@ export const columns: ColumnDef<ItemColumn>[] = [
     header: "Quantidade",
   },
   {
-    accessorKey: "objectPrice",
-    header: "Preço do Objeto",
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("objectPrice"));
-      const formatted = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(amount);
-
-      return <div className="font-medium">{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "rentPrice",
-    header: "Preço de Aluguel",
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("rentPrice"));
-      const formatted = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(amount);
-
-      return <div className="font-medium">{formatted}</div>;
-    },
-  },
-  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
@@ -158,7 +120,7 @@ export const columns: ColumnDef<ItemColumn>[] = [
             status
               ? "bg-emerald-400 hover:bg-emerald-500"
               : "bg-rose-500 hover:bg-rose-600",
-            "font-medium text-primary"
+            "font-medium"
           )}
         >
           {status ? "ATIVO" : "INATIVO"}
@@ -167,54 +129,22 @@ export const columns: ColumnDef<ItemColumn>[] = [
     },
   },
   {
-    accessorKey: "size",
-    header: "Tamanho",
+    accessorKey: "disponibility",
+    header: "Disponibilidade",
     cell: ({ row }) => {
-      const size: string = row.getValue("size") || "-";
-      return <div className="font-medium">{size}</div>;
-    },
-  },
-  {
-    accessorKey: "color",
-    header: "Cor",
-    cell: ({ row }) => {
-      const color: string = row.getValue("color") || "-";
-      return <div className="font-medium">{color}</div>;
-    },
-  },
-  {
-    accessorKey: "description",
-    header: "Descrição",
-    cell: ({ row }) => {
-      const description: string = row.getValue("description") || "-";
       return (
-        <>
-          {description === "-" ? (
-            <div>-</div>
-          ) : (
-            <HoverCard>
-              <HoverCardTrigger asChild>
-                <Button variant="link" className="p-0">
-                  Ver descrição
-                </Button>
-              </HoverCardTrigger>
-              <HoverCardContent>
-                <div className="flex flex-col space-y-2">
-                  <h1 className="font-medium">Descrição</h1>
-                  {description}
-                </div>
-              </HoverCardContent>
-            </HoverCard>
-          )}
-        </>
+        <Badge className="bg-emerald-400 hover:bg-emerald-500">
+          DISPONIVEL
+        </Badge>
       );
     },
   },
-
   {
-    header: "Opções",
-    cell: ({ row }) => {
-      return <RowActions row={row} />;
-    },
+    accessorKey: "history",
+    header: "Histórico",
+  },
+  {
+    accessorKey: "events",
+    header: "Eventos",
   },
 ];
