@@ -10,21 +10,22 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 import { StepOne } from "../step-one";
+import { StepThree } from "../step-three";
 import { StepTwo } from "../step-two";
 import useCreateContractForm from "./use-create-contract-form";
 
 const steps = [
   {
     step: 1,
-    title: "Informações básicas",
+    title: "Informações Básicas",
   },
   {
     step: 2,
-    title: "Itens do contrato",
+    title: "Itens do Contrato",
   },
   {
     step: 3,
-    title: "Step Three",
+    title: "Finalizar Contrato",
   },
 ];
 
@@ -59,6 +60,7 @@ export default function CreateContractForm() {
         <div className="flex flex-col py-6">
           {currentStep === 1 && <StepOne />}
           {currentStep === 2 && <StepTwo />}
+          {currentStep === 3 && <StepThree />}
         </div>
         <div className="flex space-x-4">
           <Button

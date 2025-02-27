@@ -1,13 +1,14 @@
 import { Icons } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateContractContext } from "@/contexts/create-contract-context";
 import { useGetItemsService } from "@/http/items/use-items-service";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { Button } from "@/components/ui/button";
 
 export function StepTwo() {
   const { slug } = useParams() as { slug: string };
@@ -22,12 +23,24 @@ export function StepTwo() {
         status: item.status,
         imageUrl: item.imageUrl,
         code: item.code,
+        price: item.rentPrice,
       }))
     : [];
 
   const handleQuantityChange = (itemId: string, quantity: number) => {
     const item = items?.find((i) => i.id === itemId);
-    if (!item || quantity > item.amount || quantity < 1) return;
+
+    if (!item || quantity < 1) {
+      toast.error("Não é possível adicionar menos que 1 item.");
+      return;
+    }
+
+    if (quantity > item.amount) {
+      toast.error(
+        "Não é possível adicionar mais itens que o estoque disponível."
+      );
+      return;
+    }
 
     const newSelectedItems = new Map(selectedItems);
     newSelectedItems.set(itemId, quantity);
@@ -43,7 +56,7 @@ export function StepTwo() {
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col space-y-2">
-        <Label>Itens Selecionados</Label>
+        <Label>Itens Selecionados:</Label>
         <div className="h-full max-h-48 overflow-y-auto space-y-2">
           {Array.from(selectedItems).map(([itemId, quantity]) => {
             const item = items?.find((i) => i.id === itemId);
@@ -54,18 +67,48 @@ export function StepTwo() {
                 key={itemId}
                 className="flex items-center justify-between p-2 border rounded-md"
               >
-                <span className="font-medium">{item.name}</span>
+                <div className="flex flex-col">
+                  <span className="font-medium">{item.name}</span>
+                  <span className="text-sm text-muted-foreground">
+                    R$ {item.rentPrice.toFixed(2)}
+                  </span>
+                </div>
                 <div className="flex items-center gap-x-2">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={item.amount}
-                    value={quantity}
-                    onChange={(e) =>
-                      handleQuantityChange(itemId, parseInt(e.target.value))
-                    }
-                    className="w-20"
-                  />
+                  <div className="flex items-center gap-x-2">
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="size-8"
+                      onClick={() => handleQuantityChange(itemId, quantity - 1)}
+                    >
+                      <Icons.circleMinus className="size-4" />
+                    </Button>
+                    <Input
+                      max={item.amount}
+                      value={quantity}
+                      onChange={(e) => {
+                        const formattedValue = e.target.value.replace(
+                          /\D/g,
+                          ""
+                        );
+                        if (formattedValue === "") {
+                          handleQuantityChange(itemId, 0);
+                          return;
+                        }
+
+                        handleQuantityChange(itemId, parseInt(formattedValue));
+                      }}
+                      className="w-14"
+                    />
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="size-8"
+                      onClick={() => handleQuantityChange(itemId, quantity + 1)}
+                    >
+                      <Icons.circlePlus className="size-4" />
+                    </Button>
+                  </div>
                   <Badge variant="secondary">Disponível: {item.amount}</Badge>
                   <Button
                     size="icon"

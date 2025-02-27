@@ -24,6 +24,7 @@ export type CreateContractColumn = {
   amount: number;
   status: ItemStatus;
   code?: string;
+  price: number;
 };
 
 export const columns: ColumnDef<CreateContractColumn>[] = [
@@ -108,6 +109,19 @@ export const columns: ColumnDef<CreateContractColumn>[] = [
   {
     accessorKey: "amount",
     header: "Quantidade",
+  },
+  {
+    accessorKey: "price",
+    header: "Preço de Aluguel",
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("price"));
+      const formatted = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(amount);
+
+      return <div className="font-medium">{formatted}</div>;
+    },
   },
   {
     accessorKey: "status",
