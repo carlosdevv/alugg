@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCreateContractContext } from "@/contexts/create-contract-context";
 import { useGetItemsService } from "@/http/items/use-items-service";
 import { useParams } from "next/navigation";
@@ -13,7 +14,7 @@ import { DataTable } from "./data-table";
 export function StepTwo() {
   const { slug } = useParams() as { slug: string };
   const { form, selectedItems, setSelectedItems } = useCreateContractContext();
-  const { data: items } = useGetItemsService({ slug });
+  const { data: items, isLoading } = useGetItemsService({ slug });
 
   const formattedData = items
     ? items.map((item) => ({
@@ -56,7 +57,7 @@ export function StepTwo() {
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col space-y-2">
-        <Label>Itens Selecionados:</Label>
+        {selectedItems.size > 0 && <Label>Itens Selecionados:</Label>}
         <div className="h-full max-h-48 overflow-y-auto space-y-2">
           {Array.from(selectedItems).map(([itemId, quantity]) => {
             const item = items?.find((i) => i.id === itemId);
@@ -124,12 +125,25 @@ export function StepTwo() {
           })}
         </div>
       </div>
-      <DataTable
-        columns={columns}
-        data={formattedData}
-        selectedItems={selectedItems}
-        onSelectedItemsChange={setSelectedItems}
-      />
+      {isLoading ? (
+        <div className="flex flex-col gap-y-2">
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-x-4">
+              <Skeleton className="w-24 h-8 rounded" />
+              <Skeleton className="w-24 h-8 rounded" />
+            </div>
+            <Skeleton className="w-24 h-8 rounded" />
+          </div>
+          <Skeleton className="h-40 w-full rounded" />
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={formattedData}
+          selectedItems={selectedItems}
+          onSelectedItemsChange={setSelectedItems}
+        />
+      )}
     </div>
   );
 }

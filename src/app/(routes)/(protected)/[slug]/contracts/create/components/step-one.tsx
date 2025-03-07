@@ -35,7 +35,7 @@ import { useGetCustomersService } from "@/http/customers/use-customers-service";
 import { appRoutes } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { parseDate } from "@internationalized/date";
-import { compareDesc, format } from "date-fns";
+import { compareDesc } from "date-fns";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -89,7 +89,9 @@ export function StepOne() {
                       }}
                       defaultValue={
                         field.value
-                          ? parseDate(format(field.value, "yyyy-MM-dd"))
+                          ? parseDate(
+                              field.value.split("/").reverse().join("-")
+                            )
                           : null
                       }
                     >
@@ -140,9 +142,15 @@ export function StepOne() {
                         field.onChange(formattedDate);
 
                         if (
+                          form.watch("eventDate") &&
                           compareDesc(
-                            new Date(formattedDate),
-                            new Date(form.watch("eventDate"))
+                            new Date(value.year, value.month - 1, value.day),
+                            new Date(
+                              parseInt(form.watch("eventDate").split("/")[2]),
+                              parseInt(form.watch("eventDate").split("/")[1]) -
+                                1,
+                              parseInt(form.watch("eventDate").split("/")[0])
+                            )
                           ) === -1
                         ) {
                           form.setError("withdrawalDate", {
@@ -154,7 +162,9 @@ export function StepOne() {
                       }}
                       defaultValue={
                         field.value
-                          ? parseDate(format(field.value, "yyyy-MM-dd"))
+                          ? parseDate(
+                              field.value.split("/").reverse().join("-")
+                            )
                           : null
                       }
                     >
@@ -205,9 +215,15 @@ export function StepOne() {
                         field.onChange(formattedDate);
 
                         if (
+                          form.watch("eventDate") &&
                           compareDesc(
-                            new Date(formattedDate),
-                            new Date(form.watch("eventDate"))
+                            new Date(value.year, value.month - 1, value.day),
+                            new Date(
+                              parseInt(form.watch("eventDate").split("/")[2]),
+                              parseInt(form.watch("eventDate").split("/")[1]) -
+                                1,
+                              parseInt(form.watch("eventDate").split("/")[0])
+                            )
                           ) === 1
                         ) {
                           form.setError("returnDate", {
@@ -219,7 +235,9 @@ export function StepOne() {
                       }}
                       defaultValue={
                         field.value
-                          ? parseDate(format(field.value, "yyyy-MM-dd"))
+                          ? parseDate(
+                              field.value.split("/").reverse().join("-")
+                            )
                           : null
                       }
                     >

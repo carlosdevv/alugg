@@ -33,6 +33,23 @@ const createContractFormSchema = z
       required_error: "Data de retirada é obrigatória",
     }),
     returnDate: z.string({ required_error: "Data de devolução é obrigatória" }),
+    paymentMethod: z.array(
+      z.object({
+        method: z.string({
+          required_error: "Método de pagamento é obrigatório",
+        }),
+        value: z.number(),
+        cardInstallments: z.number({
+          required_error: "Parcelas são obrigatórias",
+        }),
+        paymentDate: z.string({
+          required_error: "Data de pagamento é obrigatória",
+        }),
+        isPaid: z.boolean({
+          required_error: "Status de pagamento é obrigatório",
+        }),
+      })
+    ),
   })
   .superRefine((data, ctx) => {
     if (

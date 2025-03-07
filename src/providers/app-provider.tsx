@@ -1,5 +1,6 @@
 "use client";
 
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -22,10 +23,12 @@ const AppProviders = ({ children }: Props) => {
   return (
     <QueryClientProvider client={queryClient}>
       <NuqsAdapter>
-        <TooltipProvider>
-          <Toaster />
-          {children}
-        </TooltipProvider>
+        <SidebarProvider>
+          <TooltipProvider>
+            <Toaster />
+            {children}
+          </TooltipProvider>
+        </SidebarProvider>
       </NuqsAdapter>
     </QueryClientProvider>
   );

@@ -34,28 +34,6 @@ export function getInitials(name: string): string {
   return initials;
 }
 
-export function formatToCurrency(value: string) {
-  const numericValue = value.replace(/[^\d]/g, "");
-
-  if (!numericValue) {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      maximumFractionDigits: 2,
-    }).format(0);
-  }
-
-  const valueAsNumber = parseFloat(numericValue) / 100;
-
-  const formattedValue = new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: 2,
-  }).format(valueAsNumber);
-
-  return formattedValue;
-}
-
 export function currencyToNumber(value: string): number {
   // Remove o símbolo de moeda e outros caracteres não numéricos, exceto vírgulas e pontos
   const numericValue = value.replace(/[^\d,-]/g, "").replace(",", ".");
@@ -83,3 +61,95 @@ export function parseToCnpj(value: string) {
     .replace(/\D/g, "")
     .replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
 }
+
+// Função para converter string para número
+export const parseValue = (value: string): number => {
+  return parseFloat(value.replace(",", ".")) || 0;
+};
+
+// Função utilitária para validar e formatar inputs de moeda
+export const handleCurrencyInputChange = (
+  e: React.ChangeEvent<HTMLInputElement>,
+  onValueChange: (value: number) => void,
+  maxValue: number = 10000000
+) => {
+  // Obtém o valor atual do input e a posição do cursor
+  let value = e.target.value;
+  const cursorPosition = e.target.selectionStart || 0;
+
+  // Permite apenas números e vírgula
+  const cleanValue = value.replace(/[^\d,]/g, "");
+
+  // Se o valor foi alterado pela validação, ajusta a posição do cursor
+  if (cleanValue !== value) {
+    value = cleanValue;
+    // Ajusta a posição do cursor se caracteres foram removidos
+    setTimeout(() => {
+      e.target.setSelectionRange(cursorPosition, cursorPosition);
+    }, 0);
+  }
+
+  // Garante que só tenha uma vírgula
+  const commaCount = (value.match(/,/g) || []).length;
+  if (commaCount > 1) {
+    const parts = value.split(",");
+    value = parts[0] + "," + parts.slice(1).join("");
+  }
+
+  // Limita a duas casas decimais após a vírgula
+  if (value.includes(",")) {
+    const [whole, decimal] = value.split(",");
+    if (decimal && decimal.length > 2) {
+      value = whole + "," + decimal.slice(0, 2);
+    }
+  }
+
+  // Converte para número para validação
+  let numValue = 0;
+  if (value) {
+    // Se o valor termina com vírgula, adiciona zero para conversão
+    const valueForParsing = value.endsWith(",") ? value + "0" : value;
+    numValue = parseFloat(valueForParsing.replace(",", ".")) || 0;
+  }
+
+  // Limita o valor ao máximo definido
+  if (numValue > maxValue) {
+    numValue = maxValue;
+    value = maxValue.toString();
+  }
+
+  // Atualiza o valor através do callback
+  onValueChange(numValue);
+
+  // Atualiza o input com o valor digitado
+  e.target.value = value;
+
+  // Restaura a posição do cursor após a atualização do valor
+  setTimeout(() => {
+    // Calcula a nova posição do cursor
+    const newPosition = Math.min(value.length, cursorPosition);
+    e.target.setSelectionRange(newPosition, newPosition);
+  }, 0);
+};
+
+// Função para formatar um valor para exibição como moeda
+export const formatToCurrency = (value: string | number): string => {
+  if (!value) {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 2,
+    }).format(0);
+  }
+
+  const numValue =
+    typeof value === "string"
+      ? parseFloat(value.replace(",", ".")) || 0
+      : value;
+
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 2,
+  }).format(numValue);
+};
