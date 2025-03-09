@@ -8,8 +8,8 @@ import { useCreateContractContext } from "@/contexts/create-contract-context";
 import { useGetItemsService } from "@/http/items/use-items-service";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { columns } from "./columns";
-import { DataTable } from "./data-table";
+import { columns } from "../columns";
+import { DataTable } from "../data-table";
 
 export function StepTwo() {
   const { slug } = useParams() as { slug: string };

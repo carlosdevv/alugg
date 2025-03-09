@@ -1,20 +1,29 @@
 import type { Role } from "@/lib/casl/roles";
 
-export type GetMembersServiceApiProps = {
-  members: {
-    id: string;
-    name: string;
-    email: string;
-    role: Role;
-    userId: string;
-    isOwner: boolean;
-  }[];
+export type MemberProps = {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  userId: string;
+  isOwner: boolean;
 };
 
-export type GetMembersServiceResponse = GetMembersServiceApiProps["members"];
+export type GetMembersServiceApiProps = {
+  members: MemberProps[];
+};
+
+export type GetMembersServiceResponse = MemberProps[];
 
 export type GetMembersServiceProps = {
   slug: string;
+};
+
+export type GetMemberByIdServiceResponse = MemberProps;
+
+export type GetMemberByIdServiceProps = {
+  slug: string;
+  memberId: string;
 };
 
 export type UpdateMemberRoleServiceBody = {

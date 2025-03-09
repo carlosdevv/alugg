@@ -1,0 +1,72 @@
+enum ContractStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+  COLLECTED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  BANK_TRANSFER
+  VOUCHER
+  CASH
+  OTHER
+}
+
+model Contract {
+  id         String         @id @default(uuid())
+  code       Int            @default(autoincrement())
+  name       String
+  eventDate  DateTime       @map("event_date")
+  startDate  DateTime       @map("start_date")
+  endDate    DateTime       @map("end_date")
+  totalValue Float          @map("total_value")
+  customer   Customer       @relation(fields: [customerId], references: [id])
+  status     ContractStatus @default(OPEN)
+  createdAt  DateTime       @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+  createdBy  User           @relation(fields: [userId], references: [id])
+  userId     String
+  customerId String
+
+  rentedItems    ContractItem[]
+  payments       Payment[]
+  documents      Document[]
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
+  organizationId String?
+
+  @@map("contracts")
+}
+
+model ContractItem {
+  id              String  @id @default(uuid())
+  itemId          String
+  quantity        Int
+  price           Float
+  discount        Float?
+  isFixedDiscount Boolean
+  isCourtesy      Boolean
+
+  contract   Contract? @relation(fields: [contractId], references: [id])
+  contractId String?
+  item       Item      @relation(fields: [itemId], references: [id])
+
+  @@map("contract_items")
+}
+
+model Payment {
+  id                 String        @id @default(uuid())
+  value              Float
+  date               DateTime      @map("date")
+  isPaid             Boolean
+  method             PaymentMethod
+  creditParcelAmount Int           @map("credit_parcel_amount")
+  createdAt          DateTime      @default(now()) @map("created_at")
+
+  contract   Contract? @relation(fields: [contractId], references: [id])
+  contractId String?
+
+  @@map("payments")
+}

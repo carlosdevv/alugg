@@ -1,6 +1,8 @@
 import { api } from "../api-client";
 import type {
   DeleteMemberServiceBody,
+  GetMemberByIdServiceProps,
+  GetMemberByIdServiceResponse,
   GetMembersServiceApiProps,
   GetMembersServiceProps,
   GetMembersServiceResponse,
@@ -16,6 +18,17 @@ export async function getMembersService({
     .json<GetMembersServiceApiProps>();
 
   return result.members;
+}
+
+export async function getMemberByIdService({
+  slug,
+  memberId,
+}: GetMemberByIdServiceProps): Promise<GetMemberByIdServiceResponse> {
+  const result = await api
+    .get(`api/organizations/${slug}/members/${memberId}`)
+    .json<GetMemberByIdServiceResponse>();
+
+  return result;
 }
 
 export async function updateMemberRoleService({

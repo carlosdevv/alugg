@@ -1,0 +1,27 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+  EMAIL_VALIDATION
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  type      TokenType
+  code      String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  email     String?
+
+  @@map("tokens")
+}
+
+

@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import InputPhone from "@/components/ui/custom/phone-input";
 import {
   Form,
   FormControl,
@@ -20,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import InputPhone from "@/components/ui/inputs/phone-input";
 import type { GetOrganizationResponse } from "@/http/organizations/types";
 import { parseToCnpj, parseToNumber } from "@/lib/utils";
 import useUpdateOrgDataForm from "./use-update-org-data-form";

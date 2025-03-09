@@ -144,3 +144,68 @@ export async function DELETE(
     );
   }
 }
+
+// GET /api/organizations/:slug/members/:memberId - Get a member by ID
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { slug: string; memberId: string } }
+) {
+  try {
+    const { userId } = auth();
+    const { slug, memberId } = params;
+
+    if (!userId) {
+      return NextResponse.json(
+        { message: "Usuário não encontrado." },
+        { status: 404 }
+      );
+    }
+
+    if (!slug) {
+      return NextResponse.json(
+        { message: "É necessário informar o ID da Organização." },
+        { status: 400 }
+      );
+    }
+
+    if (!memberId) {
+      return NextResponse.json(
+        { message: "É necessário informar o ID do Membro." },
+        { status: 400 }
+      );
+    }
+
+    const { organization, membership } = await getUserMembership(slug);
+
+    const { cannot } = getUserPermissions(userId, membership.role);
+
+    if (cannot("get", "User")) {
+      return NextResponse.json(
+        { message: "Você não tem permissão para visualizar membros." },
+        { status: 401 }
+      );
+    }
+
+    const member = await prisma.member.findUnique({
+      where: {
+        id: memberId,
+        organizationId: organization.id,
+      },
+    });
+
+    if (!member) {
+      return NextResponse.json(
+        { message: "Membro não encontrado." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(member, { status: 200 });
+  } catch (error) {
+    console.error("ERR:", error);
+    return NextResponse.json(
+      { message: "Ocorreu um erro, tente novamente mais tarde." },
+      { status: 500 }
+    );
+  }
+}

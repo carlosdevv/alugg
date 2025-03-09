@@ -19,6 +19,7 @@ import {
   Clock1Icon,
   CogIcon,
   CrownIcon,
+  DownloadIcon,
   EllipsisIcon,
   EllipsisVertical,
   ExternalLinkIcon,
@@ -101,4 +102,5 @@ export const Icons = {
   moon: MoonIcon,
   circleAlert: CircleAlertIcon,
   externalLink: ExternalLinkIcon,
+  download: DownloadIcon,
 };

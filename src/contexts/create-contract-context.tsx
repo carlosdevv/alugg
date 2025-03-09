@@ -23,9 +23,11 @@ type CreateContractContextProps = {
   onSubmit: (data: CreateContractFormValues) => void;
   selectedItems: Map<string, number>;
   setSelectedItems: (items: Map<string, number>) => void;
+  totalValue: number;
+  setTotalValue: (value: number) => void;
 };
 
-const createContractFormSchema = z
+export const createContractFormSchema = z
   .object({
     customerId: z.string({ required_error: "Cliente é obrigatório" }),
     eventDate: z.string({ required_error: "Data do evento é obrigatória" }),
@@ -33,6 +35,10 @@ const createContractFormSchema = z
       required_error: "Data de retirada é obrigatória",
     }),
     returnDate: z.string({ required_error: "Data de devolução é obrigatória" }),
+    memberId: z.string({ required_error: "Membro é obrigatório" }),
+    contractDate: z.string({
+      required_error: "Data de contrato é obrigatória",
+    }),
     paymentMethod: z.array(
       z.object({
         method: z.string({
@@ -74,7 +80,7 @@ const createContractFormSchema = z
     }
   });
 
-type CreateContractFormValues = z.infer<typeof createContractFormSchema>;
+export type CreateContractFormValues = z.infer<typeof createContractFormSchema>;
 
 export function CreateContractProvider({
   children,
@@ -93,6 +99,8 @@ export function CreateContractProvider({
     new Map()
   );
 
+  const [totalValue, setTotalValue] = useState(0);
+
   async function onSubmit(data: CreateContractFormValues) {
     console.log(data);
   }
@@ -106,6 +114,8 @@ export function CreateContractProvider({
         onSubmit,
         selectedItems,
         setSelectedItems,
+        totalValue,
+        setTotalValue,
       }}
     >
       {children}

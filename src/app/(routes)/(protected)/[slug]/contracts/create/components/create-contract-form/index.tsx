@@ -1,5 +1,6 @@
 "use client";
 
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import {
@@ -9,9 +10,10 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-import { StepOne } from "../step-one";
-import { StepThree } from "../step-three";
-import { StepTwo } from "../step-two";
+import { StepFour } from "./step-four";
+import { StepOne } from "./step-one";
+import { StepThree } from "./step-three";
+import { StepTwo } from "./step-two";
 import useCreateContractForm from "./use-create-contract-form";
 
 const steps = [
@@ -25,12 +27,16 @@ const steps = [
   },
   {
     step: 3,
+    title: "Resumo e Pagamento",
+  },
+  {
+    step: 4,
     title: "Finalizar Contrato",
   },
 ];
 
 export default function CreateContractForm() {
-  const { form, onSubmit, currentStep, setCurrentStep } =
+  const { form, onSubmit, currentStep, setCurrentStep, handleNextStep } =
     useCreateContractForm();
 
   return (
@@ -61,6 +67,7 @@ export default function CreateContractForm() {
           {currentStep === 1 && <StepOne />}
           {currentStep === 2 && <StepTwo />}
           {currentStep === 3 && <StepThree />}
+          {currentStep === 4 && <StepFour />}
         </div>
         <div className="flex space-x-4">
           <Button
@@ -74,10 +81,16 @@ export default function CreateContractForm() {
           <Button
             variant="outline"
             className="w-min"
-            onClick={() => setCurrentStep((prev) => prev + 1)}
+            onClick={handleNextStep}
             disabled={currentStep > steps.length}
           >
-            Avançar
+            {currentStep === steps.length ? (
+              <span className="flex items-center gap-2">
+                Finalizar <Icons.check className="size-4" />
+              </span>
+            ) : (
+              "Avançar"
+            )}
           </Button>
         </div>
       </form>

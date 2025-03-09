@@ -45,19 +45,23 @@ import {
 
 const paymentMethods = [
   {
-    id: "pix",
+    id: "PIX",
     name: "Pix",
   },
   {
-    id: "card",
-    name: "Cartão de Crédito/Débito",
+    id: "CREDIT_CARD",
+    name: "Cartão de Crédito",
   },
   {
-    id: "billet",
-    name: "Boleto",
+    id: "DEBIT_CARD",
+    name: "Cartão de Débito",
   },
   {
-    id: "money",
+    id: "BANK_TRANSFER",
+    name: "Transferência Bancária",
+  },
+  {
+    id: "CASH",
     name: "Dinheiro",
   },
 ];
@@ -369,7 +373,7 @@ export function StepThree() {
                 <div
                   className={cn(
                     "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4 border rounded-md",
-                    form.watch(`paymentMethod.${index}.method`) === "card" &&
+                    form.watch(`paymentMethod.${index}.method`) === "CREDIT_CARD" &&
                       "md:grid-cols-[1fr_1fr_1fr_0.4fr_0.4fr]"
                   )}
                 >
@@ -418,11 +422,6 @@ export function StepThree() {
                               className="peer ps-9"
                               placeholder="0,00"
                               {...field}
-                              value={
-                                field.value === 0
-                                  ? ""
-                                  : field.value.toString().replace(".", ",")
-                              }
                               onChange={(e) => {
                                 handleCurrencyInputChange(e, (value) => {
                                   field.onChange(value);
@@ -500,7 +499,7 @@ export function StepThree() {
                     )}
                   />
 
-                  {form.watch("paymentMethod")[index].method === "card" && (
+                  {form.watch("paymentMethod")[index].method === "CREDIT_CARD" && (
                     <FormField
                       control={form.control}
                       name={`paymentMethod.${index}.cardInstallments`}
