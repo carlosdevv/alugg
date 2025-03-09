@@ -23,7 +23,7 @@ interface ContractPDFViewerProps {
 
 export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
   const { slug } = useParams() as { slug: string };
-  const { form, selectedItems, totalValue } = useCreateContractContext();
+  const { form, totalValue } = useCreateContractContext();
   const [isClient, setIsClient] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
@@ -38,14 +38,25 @@ export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
     memberId: form.watch("memberId"),
   });
 
-  // Filtrar os itens selecionados
-  const selectedItemsData =
-    items
-      ?.filter((item) => selectedItems.has(item.id))
-      .map((item) => ({
-        ...item,
-        quantity: selectedItems.get(item.id) || 0,
-      })) || [];
+  // Obter os itens do formulário em vez de usar selectedItems
+  const formItems = form.watch("items") || [];
+
+  // Mapear os itens do formulário com os dados completos dos itens
+  const selectedItemsData = formItems
+    .map((formItem) => {
+      const itemData = items?.find((item) => item.id === formItem.itemId);
+      if (!itemData || !itemData.name) return null; // Garantir que itemData e name existam
+
+      return {
+        ...itemData,
+        quantity: formItem.quantity,
+        isBonus: formItem.isBonus,
+        baseValue: formItem.baseValue,
+        discount: formItem.discount,
+        finalValue: formItem.finalValue,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 
   useEffect(() => {
     setIsClient(true);
@@ -95,6 +106,7 @@ export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
                 customer={customer}
                 items={selectedItemsData}
                 totalValue={totalValue}
+                seller={seller}
                 formValues={formValues}
               />
             </PDFViewer>

@@ -72,11 +72,6 @@ export function StepThree() {
     useCreateContractContext();
   const { data: items } = useGetItemsService({ slug });
   const [totalValueState, setTotalValueState] = useState(0);
-  const [itemValues, setItemValues] = useState<Record<string, number>>({});
-  const [bonusItems, setBonusItems] = useState<Record<string, boolean>>({});
-  const [discounts, setDiscounts] = useState<
-    Record<string, { value: number; mode: "currency" | "percent" }>
-  >({});
 
   const formatBrazilianDate = (dateString: string) => {
     if (!dateString) return "";
@@ -88,16 +83,60 @@ export function StepThree() {
     });
   };
 
+  // Inicializar os itens no formulário
+  useEffect(() => {
+    if (items && selectedItems.size > 0 && !form.getValues("items")) {
+      const formItems = Array.from(selectedItems)
+        .map(([itemId, quantity]) => {
+          const item = items.find((i) => i.id === itemId);
+          if (!item) return null;
+
+          const baseValue = item.rentPrice * quantity;
+
+          return {
+            itemId,
+            quantity,
+            isBonus: false,
+            baseValue,
+            discount: {
+              value: 0,
+              mode: "currency" as const,
+            },
+            finalValue: baseValue,
+          };
+        })
+        .filter(Boolean) as {
+        itemId: string;
+        quantity: number;
+        isBonus: boolean;
+        baseValue: number;
+        discount: {
+          value: number;
+          mode: "currency" | "percent";
+        };
+        finalValue: number;
+      }[];
+
+      form.setValue("items", formItems);
+    }
+  }, [items, selectedItems, form]);
+
   // Função para adicionar novo método de pagamento
   const addPaymentMethod = () => {
     const currentPaymentMethods = form.getValues("paymentMethod") || [];
+    const totalPaid = currentPaymentMethods.reduce(
+      (sum, method) => sum + (method.value || 0),
+      0
+    );
+    const remainingValue = Math.max(0, totalValueState - totalPaid);
+
     form.setValue("paymentMethod", [
       ...currentPaymentMethods,
       {
         method: "",
-        value: 0,
+        value: remainingValue,
         cardInstallments: 1,
-        paymentDate: "",
+        paymentDate: format(new Date(), "dd/MM/yyyy"),
         isPaid: false,
       },
     ]);
@@ -111,22 +150,20 @@ export function StepThree() {
     form.setValue("paymentMethod", updatedMethods);
   };
 
-  // Função para aplicar desconto
+  // Função para aplicar desconto e atualizar o valor do item
   const applyDiscount = (
-    itemId: string,
+    index: number,
     value: number,
     mode: "currency" | "percent"
   ) => {
-    const item = items?.find((i) => i.id === itemId);
-    const quantity = selectedItems.get(itemId) || 0;
+    const formItems = form.getValues("items") || [];
+    const item = formItems[index];
 
     if (!item) return;
 
-    const baseValue = itemValues[itemId] || item.rentPrice * quantity;
-
     // Validar desconto em valor para não exceder o valor do item
-    if (mode === "currency" && value > baseValue) {
-      value = baseValue;
+    if (mode === "currency" && value > item.baseValue) {
+      value = item.baseValue;
     }
 
     // Validar desconto percentual para não exceder 100%
@@ -134,10 +171,62 @@ export function StepThree() {
       value = 100;
     }
 
-    setDiscounts({
-      ...discounts,
-      [itemId]: { value, mode },
-    });
+    // Calcular o valor final após o desconto
+    let finalValue = item.baseValue;
+    if (mode === "percent") {
+      finalValue = item.baseValue * (1 - value / 100);
+    } else {
+      finalValue = Math.max(0, item.baseValue - value);
+    }
+
+    // Atualizar o item no formulário
+    const updatedItems = [...formItems];
+    updatedItems[index] = {
+      ...item,
+      discount: { value, mode },
+      finalValue: item.isBonus ? 0 : finalValue,
+    };
+
+    form.setValue("items", updatedItems);
+  };
+
+  // Função para atualizar o valor base do item
+  const updateItemBaseValue = (index: number, unitValue: number) => {
+    const formItems = form.getValues("items") || [];
+    const item = formItems[index];
+
+    if (!item) return;
+
+    const baseValue = unitValue * item.quantity;
+
+    // Atualizar o item no formulário
+    const updatedItems = [...formItems];
+    updatedItems[index] = {
+      ...item,
+      baseValue,
+      finalValue: item.isBonus ? 0 : baseValue,
+      discount: { value: 0, mode: "currency" as const }, // Resetar desconto quando o valor base é alterado manualmente
+    };
+
+    form.setValue("items", updatedItems);
+  };
+
+  // Função para atualizar o status de bônus do item
+  const updateItemBonusStatus = (index: number, isBonus: boolean) => {
+    const formItems = form.getValues("items") || [];
+    const item = formItems[index];
+
+    if (!item) return;
+
+    // Atualizar o item no formulário
+    const updatedItems = [...formItems];
+    updatedItems[index] = {
+      ...item,
+      isBonus,
+      finalValue: isBonus ? 0 : item.finalValue,
+    };
+
+    form.setValue("items", updatedItems);
   };
 
   // Inicializar com um método de pagamento se não houver nenhum
@@ -147,40 +236,26 @@ export function StepThree() {
       form.setValue("paymentMethod", [
         {
           method: "",
-          value: 0,
+          value: totalValueState,
           cardInstallments: 1,
-          paymentDate: "",
+          paymentDate: format(new Date(), "dd/MM/yyyy"),
           isPaid: false,
         },
       ]);
     }
-  }, [form]);
+  }, [form, totalValueState]);
 
   // Calcular o valor total dos itens
   useEffect(() => {
-    let total = 0;
-    Array.from(selectedItems).forEach(([itemId, quantity]) => {
-      const item = items?.find((i) => i.id === itemId);
-      if (item && !bonusItems[itemId]) {
-        const baseValue = itemValues[itemId] || item.rentPrice * quantity;
-        let finalValue = baseValue;
+    const formItems = form.getValues("items") || [];
+    const total = formItems.reduce(
+      (sum, item) => sum + (item.isBonus ? 0 : item.finalValue),
+      0
+    );
 
-        // Aplicar desconto se existir
-        if (discounts[itemId]) {
-          const { value, mode } = discounts[itemId];
-          if (mode === "percent") {
-            finalValue = baseValue * (1 - value / 100);
-          } else if (mode === "currency") {
-            finalValue = Math.max(0, baseValue - value);
-          }
-        }
-
-        total += finalValue;
-      }
-    });
     setTotalValueState(total);
     setTotalValue(total); // Atualiza o valor total no contexto
-  }, [itemValues, selectedItems, items, bonusItems, discounts, setTotalValue]);
+  }, [form.watch("items"), setTotalValue]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.45fr] gap-4">
@@ -255,27 +330,13 @@ export function StepThree() {
 
             {/* body */}
             <div className="h-full max-h-80 overflow-y-auto space-y-4">
-              {Array.from(selectedItems).map(([itemId, quantity]) => {
-                const item = items?.find((i) => i.id === itemId);
+              {form.watch("items")?.map((formItem, index) => {
+                const item = items?.find((i) => i.id === formItem.itemId);
                 if (!item) return null;
-
-                const baseValue =
-                  itemValues[itemId] || item.rentPrice * quantity;
-                const discount = discounts[itemId] || {
-                  value: 0,
-                  mode: "currency",
-                };
-                let finalValue = baseValue;
-
-                if (discount.mode === "percent") {
-                  finalValue = baseValue * (1 - discount.value / 100);
-                } else {
-                  finalValue = Math.max(0, baseValue - discount.value);
-                }
 
                 return (
                   <div
-                    key={itemId}
+                    key={formItem.itemId}
                     className="grid grid-cols-2 sm:grid-cols-6 items-center gap-x-4 gap-y-2 py-2 border-b border-border"
                   >
                     <span className="col-span-1 sm:col-span-1 font-medium text-xs truncate">
@@ -285,27 +346,29 @@ export function StepThree() {
                       {item.code ?? "N/A"}
                     </span>
                     <span className="col-span-1 sm:col-span-1 font-medium text-xs">
-                      {quantity}
+                      {formItem.quantity}
                     </span>
                     <div className="hidden sm:flex sm:col-span-1 justify-center">
                       <Checkbox
-                        checked={bonusItems[itemId] || false}
+                        checked={formItem.isBonus}
                         onCheckedChange={(checked) => {
-                          const newBonusItems = { ...bonusItems };
-                          newBonusItems[itemId] = !!checked;
-                          setBonusItems(newBonusItems);
+                          updateItemBonusStatus(index, !!checked);
                         }}
                       />
                     </div>
                     <div className="col-span-1 sm:col-span-1 relative flex rounded-md shadow-xs justify-center">
                       <CurrencyPercentInput
                         className="rounded shadow-none"
-                        defaultMode={discount.mode}
-                        defaultValue={discount.value}
+                        defaultMode={formItem.discount.mode}
+                        defaultValue={formItem.discount.value}
                         onValueChange={(value, mode) => {
-                          applyDiscount(itemId, value, mode || discount.mode);
+                          applyDiscount(
+                            index,
+                            value,
+                            mode || formItem.discount.mode
+                          );
                         }}
-                        maxCurrencyValue={baseValue}
+                        maxCurrencyValue={formItem.baseValue}
                       />
                     </div>
                     <div className="col-span-1 sm:col-span-1 relative flex rounded-md shadow-xs justify-end">
@@ -313,14 +376,12 @@ export function StepThree() {
                         <Input
                           className="peer ps-9"
                           placeholder="0,00"
-                          defaultValue={item.rentPrice
-                            .toString()
+                          value={(formItem.finalValue / formItem.quantity)
+                            .toFixed(2)
                             .replace(".", ",")}
                           onChange={(e) => {
                             handleCurrencyInputChange(e, (value) => {
-                              const newItemValues = { ...itemValues };
-                              newItemValues[itemId] = value * quantity;
-                              setItemValues(newItemValues);
+                              updateItemBaseValue(index, value);
                             });
                           }}
                         />
@@ -373,8 +434,8 @@ export function StepThree() {
                 <div
                   className={cn(
                     "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4 border rounded-md",
-                    form.watch(`paymentMethod.${index}.method`) === "CREDIT_CARD" &&
-                      "md:grid-cols-[1fr_1fr_1fr_0.4fr_0.4fr]"
+                    form.watch(`paymentMethod.${index}.method`) ===
+                      "CREDIT_CARD" && "md:grid-cols-[1fr_1fr_1fr_0.4fr_0.4fr]"
                   )}
                 >
                   <FormField
@@ -421,7 +482,7 @@ export function StepThree() {
                             <Input
                               className="peer ps-9"
                               placeholder="0,00"
-                              {...field}
+                              value={field.value.toFixed(2).replace(".", ",")}
                               onChange={(e) => {
                                 handleCurrencyInputChange(e, (value) => {
                                   field.onChange(value);
@@ -499,7 +560,8 @@ export function StepThree() {
                     )}
                   />
 
-                  {form.watch("paymentMethod")[index].method === "CREDIT_CARD" && (
+                  {form.watch("paymentMethod")[index].method ===
+                    "CREDIT_CARD" && (
                     <FormField
                       control={form.control}
                       name={`paymentMethod.${index}.cardInstallments`}

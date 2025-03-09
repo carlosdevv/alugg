@@ -39,6 +39,20 @@ export const createContractFormSchema = z
     contractDate: z.string({
       required_error: "Data de contrato é obrigatória",
     }),
+    additionalInformation: z.string().optional(),
+    items: z.array(
+      z.object({
+        itemId: z.string(),
+        quantity: z.number(),
+        isBonus: z.boolean().default(false),
+        baseValue: z.number(),
+        discount: z.object({
+          value: z.number().default(0),
+          mode: z.enum(["currency", "percent"]).default("currency"),
+        }),
+        finalValue: z.number(),
+      })
+    ),
     paymentMethod: z.array(
       z.object({
         method: z.string({

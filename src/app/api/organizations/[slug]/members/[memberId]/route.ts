@@ -191,6 +191,15 @@ export async function GET(
         id: memberId,
         organizationId: organization.id,
       },
+      select: {
+        id: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
 
     if (!member) {
@@ -200,7 +209,14 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(member, { status: 200 });
+    return NextResponse.json(
+      {
+        memberId: member.id,
+        name: member.user.name,
+        userId: member.user.id,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("ERR:", error);
     return NextResponse.json(

@@ -3,7 +3,6 @@ import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
-import { z } from "zod";
 import { createCustomerSchema } from "../route";
 
 // GET /api/organizations/:slug/customers/:customerId - Get customer by ID

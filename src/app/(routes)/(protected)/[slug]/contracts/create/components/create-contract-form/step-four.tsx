@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateContractContext } from "@/contexts/create-contract-context";
 import { useGetMembersService } from "@/http/members/use-members-service";
 import { parseDate } from "@internationalized/date";
@@ -129,6 +130,20 @@ export function StepFour() {
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="additionalInformation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Informações Adicionais</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Informações adicionais" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <div className="flex items-center gap-x-4">
           <Button type="button" onClick={() => setIsPdfOpen(true)}>

@@ -1,7 +1,6 @@
 import type { CreateContractFormValues } from "@/contexts/create-contract-context";
 import type { CustomerProps } from "@/http/customers/types";
 import type { ItemProps } from "@/http/items/types";
-import type { MemberProps } from "@/http/members/types";
 import type { OrganizationProps } from "@/http/organizations/types";
 import { formatToCurrency } from "@/lib/utils";
 import {
@@ -16,10 +15,23 @@ import {
 interface ContractPDFProps {
   organization?: OrganizationProps;
   customer?: CustomerProps;
-  items?: (ItemProps & { quantity: number })[];
+  items?: (ItemProps & {
+    quantity: number;
+    isBonus?: boolean;
+    baseValue?: number;
+    discount?: {
+      value: number;
+      mode: "currency" | "percent";
+    };
+    finalValue?: number;
+  })[];
   totalValue: number;
   formValues: CreateContractFormValues;
-  seller?: MemberProps;
+  seller?: {
+    memberId: string;
+    name: string;
+    userId: string;
+  };
 }
 
 // Definir estilos para o PDF
@@ -99,12 +111,15 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   itemCol: {
-    width: "40%",
+    width: "35%",
   },
   codeCol: {
-    width: "15%",
+    width: "10%",
   },
   valueCol: {
+    width: "15%",
+  },
+  discountCol: {
     width: "15%",
   },
   rentCol: {
@@ -131,6 +146,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   clause: {
+    marginBottom: 5,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+  gridItem: {
+    width: "33%",
     marginBottom: 5,
   },
 });
@@ -197,7 +221,9 @@ export function ContractPDF({
           </Text>
           <Text style={styles.row}>
             <Text style={styles.label}>Atendente que fez a locação: </Text>
-            <Text style={styles.value}>{seller ? seller.name : ""}</Text>
+            <Text style={styles.value}>
+              {seller ? seller.name.toUpperCase() : ""}
+            </Text>
           </Text>
         </View>
 
@@ -207,48 +233,72 @@ export function ContractPDF({
             <Text style={styles.label}>DATA DO EVENTO: </Text>
             <Text style={styles.value}>{formValues.eventDate || ""}</Text>
           </Text>
-          <Text style={styles.row}>
-            <Text style={styles.label}>CPF: </Text>
-            <Text style={styles.value}>{customer?.document || ""}</Text>
-          </Text>
-          <Text style={styles.row}>
-            <Text style={styles.label}>RG: </Text>
-            <Text style={styles.value}>{customer?.secondDocument || ""}</Text>
-          </Text>
-          <Text style={styles.row}>
-            <Text style={styles.label}>Estado: </Text>
-            <Text style={styles.value}>{customer?.state || ""}</Text>
-          </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.row}>
-            <Text style={styles.label}>Cidade: </Text>
-            <Text style={styles.value}>{customer?.city || ""}</Text>
-          </Text>
-          <Text style={styles.row}>
-            <Text style={styles.label}>Bairro: </Text>
-            <Text style={styles.value}>{customer?.neighborhood || ""}</Text>
-          </Text>
-          <Text style={styles.row}>
-            <Text style={styles.label}>Endereço: </Text>
-            <Text style={styles.value}>{customer?.address || ""}</Text>
-          </Text>
-        </View>
+        {/* Grid de informações do cliente */}
+        <View style={styles.grid}>
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>CPF: </Text>
+              <Text style={styles.value}>{customer?.document || ""}</Text>
+            </Text>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.row}>
-            <Text style={styles.label}>CEP: </Text>
-            <Text style={styles.value}>{customer?.zipcode || ""}</Text>
-          </Text>
-          <Text style={styles.row}>
-            <Text style={styles.label}>Telefone: </Text>
-            <Text style={styles.value}>{customer?.phone || ""}</Text>
-          </Text>
-          <Text style={styles.row}>
-            <Text style={styles.label}>Email: </Text>
-            <Text style={styles.value}>{customer?.email || ""}</Text>
-          </Text>
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>RG: </Text>
+              <Text style={styles.value}>{customer?.secondDocument || ""}</Text>
+            </Text>
+          </View>
+
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>Estado: </Text>
+              <Text style={styles.value}>{customer?.state || ""}</Text>
+            </Text>
+          </View>
+
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>Cidade: </Text>
+              <Text style={styles.value}>{customer?.city || ""}</Text>
+            </Text>
+          </View>
+
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>Bairro: </Text>
+              <Text style={styles.value}>{customer?.neighborhood || ""}</Text>
+            </Text>
+          </View>
+
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>Endereço: </Text>
+              <Text style={styles.value}>{customer?.address || ""}</Text>
+            </Text>
+          </View>
+
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>CEP: </Text>
+              <Text style={styles.value}>{customer?.zipcode || ""}</Text>
+            </Text>
+          </View>
+
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>Telefone: </Text>
+              <Text style={styles.value}>{customer?.phone || ""}</Text>
+            </Text>
+          </View>
+
+          <View style={styles.gridItem}>
+            <Text style={styles.row}>
+              <Text style={styles.label}>Email: </Text>
+              <Text style={styles.value}>{customer?.email || ""}</Text>
+            </Text>
+          </View>
         </View>
 
         {/* Objeto da locação */}
@@ -261,7 +311,10 @@ export function ContractPDF({
               <Text style={[styles.tableCell, styles.valueCol]}>
                 Valor do Objeto
               </Text>
-              <Text style={[styles.tableCell, styles.rentCol]}>
+              <Text style={[styles.tableCell, styles.discountCol]}>
+                Desconto
+              </Text>
+              <Text style={[styles.tableCellLast, styles.rentCol]}>
                 Valor da locação
               </Text>
             </View>
@@ -277,8 +330,15 @@ export function ContractPDF({
                 <Text style={[styles.tableCell, styles.valueCol]}>
                   {formatToCurrency(item.objectPrice)}
                 </Text>
-                <Text style={[styles.tableCell, styles.rentCol]}>
-                  {formatToCurrency(1 * item.quantity)}
+                <Text style={[styles.tableCell, styles.discountCol]}>
+                  {item.discount?.value
+                    ? item.discount.mode === "percent"
+                      ? `${item.discount.value}%`
+                      : formatToCurrency(item.discount.value)
+                    : "R$ 0,00"}
+                </Text>
+                <Text style={[styles.tableCellLast, styles.rentCol]}>
+                  {formatToCurrency(item.finalValue || 0)}
                 </Text>
               </View>
             ))}
@@ -294,7 +354,7 @@ export function ContractPDF({
           </View>
         </View>
 
-        {/* Forma de pagamento */}
+        {/* Forma de pagamento - exibindo todos os pagamentos */}
         <View style={styles.paymentSection}>
           <Text style={styles.sectionTitle}>5 - Forma de pagamento</Text>
           {formValues.paymentMethod?.map((payment, index) => (
@@ -314,7 +374,7 @@ export function ContractPDF({
               {payment.method === "CREDIT_CARD"
                 ? `Parcela ${payment.cardInstallments}`
                 : ""}{" "}
-              {payment.paymentDate}
+              {payment.paymentDate} {payment.isPaid ? "(PAGO)" : ""}
             </Text>
           ))}
         </View>
@@ -322,6 +382,7 @@ export function ContractPDF({
         {/* Observações */}
         <View style={styles.notes}>
           <Text style={styles.sectionTitle}>Ajustes / Observações:</Text>
+          <Text>{formValues.additionalInformation?.toUpperCase() || ""}</Text>
         </View>
 
         {/* Datas */}

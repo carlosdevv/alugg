@@ -19,7 +19,11 @@ export type GetMembersServiceProps = {
   slug: string;
 };
 
-export type GetMemberByIdServiceResponse = MemberProps;
+export type GetMemberByIdServiceResponse = {
+  memberId: string;
+  name: string;
+  userId: string;
+};
 
 export type GetMemberByIdServiceProps = {
   slug: string;
