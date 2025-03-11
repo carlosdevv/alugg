@@ -36,6 +36,8 @@ model Member {
   organizationId String       @map("organization_id")
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String       @map("user_id")
+  
+  contracts      Contract[]
 
   @@unique([organizationId, userId])
   @@map("members")

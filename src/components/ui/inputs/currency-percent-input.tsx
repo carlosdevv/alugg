@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
@@ -60,45 +60,49 @@ export function CurrencyPercentInput({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    
+
     // Permite apenas números e separador decimal (vírgula ou ponto)
     value = value.replace(/[^\d,.]/g, "");
-    
+
     // Garante que só tenha um separador decimal
     const commaCount = (value.match(/,/g) || []).length;
     const dotCount = (value.match(/\./g) || []).length;
-    
+
     if (commaCount > 1 || dotCount > 1 || (commaCount >= 1 && dotCount >= 1)) {
       // Se houver mais de um separador, mantém apenas o primeiro
       const parts = value.split(/[,.]/);
       if (mode === "currency") {
-        value = parts[0] + (parts.length > 1 ? "," + parts.slice(1).join("") : "");
+        value =
+          parts[0] + (parts.length > 1 ? "," + parts.slice(1).join("") : "");
       } else {
-        value = parts[0] + (parts.length > 1 ? "." + parts.slice(1).join("") : "");
+        value =
+          parts[0] + (parts.length > 1 ? "." + parts.slice(1).join("") : "");
       }
     }
-    
+
     // Limita casas decimais
     if (value.includes(",") || value.includes(".")) {
       const separator = mode === "currency" ? "," : ".";
       const parts = value.split(separator);
-      
+
       if (parts.length > 1) {
         const decimal = parts[1];
-        if ((mode === "currency" && decimal.length > 2) || 
-            (mode === "percent" && decimal.length > 1)) {
+        if (
+          (mode === "currency" && decimal.length > 2) ||
+          (mode === "percent" && decimal.length > 1)
+        ) {
           const maxLength = mode === "currency" ? 2 : 1;
           value = parts[0] + separator + decimal.slice(0, maxLength);
         }
       }
     }
-    
+
     // Limita valores máximos
     const numValue = parseValue(value);
     if (mode === "percent" && numValue > 100) {
       value = "100";
     }
-    
+
     setDisplayValue(value);
     onValueChange?.(parseValue(value), mode);
     validateValue(parseValue(value));
@@ -107,23 +111,24 @@ export function CurrencyPercentInput({
   const toggleMode = () => {
     const newMode = mode === "currency" ? "percent" : "currency";
     setMode(newMode);
-    
+
     if (displayValue) {
       const value = parseValue(displayValue);
-      
+
       // Limita o valor a 100 ao mudar para modo porcentagem
       const limitedValue = newMode === "percent" && value > 100 ? 100 : value;
-      
+
       // Formata o valor de acordo com o novo modo
-      const formattedValue = newMode === "currency" 
-        ? limitedValue.toString().replace(".", ",") 
-        : limitedValue.toString();
-      
+      const formattedValue =
+        newMode === "currency"
+          ? limitedValue.toString().replace(".", ",")
+          : limitedValue.toString();
+
       setDisplayValue(formattedValue);
       onValueChange?.(limitedValue, newMode);
       validateValue(limitedValue);
     }
-    
+
     setTimeout(() => inputRef.current?.focus(), 0);
   };
 

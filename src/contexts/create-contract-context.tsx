@@ -1,4 +1,6 @@
+import { useCreateContractService } from "@/http/contracts/use-contracts-service";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PaymentMethod } from "@prisma/client";
 import { compareDesc } from "date-fns";
 import { parseAsInteger, useQueryState, type Options } from "nuqs";
 import { createContext, useContext, useState } from "react";
@@ -25,6 +27,7 @@ type CreateContractContextProps = {
   setSelectedItems: (items: Map<string, number>) => void;
   totalValue: number;
   setTotalValue: (value: number) => void;
+  isCreatingContract: boolean;
 };
 
 export const createContractFormSchema = z
@@ -36,9 +39,6 @@ export const createContractFormSchema = z
     }),
     returnDate: z.string({ required_error: "Data de devolução é obrigatória" }),
     memberId: z.string({ required_error: "Membro é obrigatório" }),
-    contractDate: z.string({
-      required_error: "Data de contrato é obrigatória",
-    }),
     additionalInformation: z.string().optional(),
     items: z.array(
       z.object({
@@ -55,11 +55,11 @@ export const createContractFormSchema = z
     ),
     paymentMethod: z.array(
       z.object({
-        method: z.string({
+        method: z.nativeEnum(PaymentMethod, {
           required_error: "Método de pagamento é obrigatório",
         }),
         value: z.number(),
-        cardInstallments: z.number({
+        creditParcelAmount: z.number({
           required_error: "Parcelas são obrigatórias",
         }),
         paymentDate: z.string({
@@ -108,15 +108,39 @@ export function CreateContractProvider({
     ...parseAsInteger,
     defaultValue: 1,
   });
-
   const [selectedItems, setSelectedItems] = useState<Map<string, number>>(
     new Map()
   );
-
   const [totalValue, setTotalValue] = useState(0);
+
+  const { mutateAsync: createContract, isPending: isCreatingContract } =
+    useCreateContractService();
 
   async function onSubmit(data: CreateContractFormValues) {
     console.log(data);
+    const { items, ...rest } = data;
+
+    const props = {
+      totalValue,
+      ...rest,
+      items: items.map((item) => {
+        let discountValue = 0;
+        if (item.discount) {
+          if (item.discount.mode === "percent") {
+            discountValue = (item.discount.value / 100) * item.finalValue / (1 - item.discount.value / 100);
+          } else {
+            discountValue = item.discount.value;
+          }
+        }
+
+        return {
+          ...item,
+          discount: discountValue,
+        };
+      }),
+    };
+
+    await createContract(props);
   }
 
   return (
@@ -130,6 +154,7 @@ export function CreateContractProvider({
         setSelectedItems,
         totalValue,
         setTotalValue,
+        isCreatingContract,
       }}
     >
       {children}

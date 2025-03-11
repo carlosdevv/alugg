@@ -10,7 +10,6 @@ model User {
   invites            Invite[]
   member_on          Member[]
   owns_organizations Organization[]
-  contracts          Contract[]
 
   @@index(defaultOrganization)
   @@map("users")

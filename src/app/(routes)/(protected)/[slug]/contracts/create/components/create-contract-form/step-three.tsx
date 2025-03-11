@@ -133,9 +133,9 @@ export function StepThree() {
     form.setValue("paymentMethod", [
       ...currentPaymentMethods,
       {
-        method: "",
+        method: "PIX",
         value: remainingValue,
-        cardInstallments: 1,
+        creditParcelAmount: 1,
         paymentDate: format(new Date(), "dd/MM/yyyy"),
         isPaid: false,
       },
@@ -235,9 +235,9 @@ export function StepThree() {
     if (!currentPaymentMethods || currentPaymentMethods.length === 0) {
       form.setValue("paymentMethod", [
         {
-          method: "",
+          method: "PIX",
           value: totalValueState,
-          cardInstallments: 1,
+          creditParcelAmount: 1,
           paymentDate: format(new Date(), "dd/MM/yyyy"),
           isPaid: false,
         },
@@ -246,16 +246,20 @@ export function StepThree() {
   }, [form, totalValueState]);
 
   // Calcular o valor total dos itens
-  useEffect(() => {
-    const formItems = form.getValues("items") || [];
-    const total = formItems.reduce(
-      (sum, item) => sum + (item.isBonus ? 0 : item.finalValue),
-      0
-    );
+  const watchedItems = form.watch("items");
 
-    setTotalValueState(total);
-    setTotalValue(total); // Atualiza o valor total no contexto
-  }, [form.watch("items"), setTotalValue]);
+  useEffect(() => {
+    if (watchedItems) {
+      const formItems = form.getValues("items") || [];
+      const total = formItems.reduce(
+        (sum, item) => sum + (item.isBonus ? 0 : item.finalValue),
+        0
+      );
+
+      setTotalValueState(total);
+      setTotalValue(total); // Atualiza o valor total no contexto
+    }
+  }, [form, watchedItems, setTotalValue]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.45fr] gap-4">
@@ -564,7 +568,7 @@ export function StepThree() {
                     "CREDIT_CARD" && (
                     <FormField
                       control={form.control}
-                      name={`paymentMethod.${index}.cardInstallments`}
+                      name={`paymentMethod.${index}.creditParcelAmount`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
                           <FormLabel className="text-xs">Parcelas</FormLabel>

@@ -9,11 +9,12 @@ import { z } from "zod";
 import { User } from "./models/user";
 import { permissions } from "./permissions";
 import { categorySubject } from "./subjects/category-subject";
+import { contractSubject } from "./subjects/contract-subject";
+import { customerSubject } from "./subjects/customer-subject";
 import { inviteSubject } from "./subjects/invite-subject";
 import { itemSubject } from "./subjects/item-subject";
 import { organizationSubject } from "./subjects/organization-subject";
 import { userSubject } from "./subjects/user-subject";
-import { customerSubject } from "./subjects/customer-subject";
 
 export * from "./models/user";
 export * from "./roles";
@@ -25,6 +26,7 @@ const appAbilitiesSchema = z.union([
   categorySubject,
   itemSubject,
   customerSubject,
+  contractSubject,
 
   z.tuple([z.literal("manage"), z.literal("all")]),
 ]);

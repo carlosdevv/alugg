@@ -5,15 +5,15 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-// GET /api/organizations/:slug/items/:id - Get item by ID
+// GET /api/organizations/:slug/items/:itemId - Get item by ID
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { itemId: string } }
 ) {
   try {
     const { userId } = auth();
 
-    const id = params.id;
+    const id = params.itemId;
 
     if (!userId) {
       return NextResponse.json(

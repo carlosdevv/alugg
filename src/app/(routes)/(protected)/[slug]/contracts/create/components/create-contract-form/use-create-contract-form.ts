@@ -5,8 +5,14 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 export default function useCreateContractForm() {
-  const { form, onSubmit, setCurrentStep, currentStep, totalValue } =
-    useCreateContractContext();
+  const {
+    form,
+    onSubmit,
+    setCurrentStep,
+    currentStep,
+    totalValue,
+    isCreatingContract,
+  } = useCreateContractContext();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -75,5 +81,6 @@ export default function useCreateContractForm() {
     handleNextStep,
     validatePaymentValues,
     totalValue,
+    isCreatingContract,
   };
 }

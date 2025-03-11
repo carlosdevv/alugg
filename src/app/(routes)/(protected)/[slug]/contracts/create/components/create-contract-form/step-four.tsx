@@ -80,55 +80,6 @@ export function StepFour() {
               </FormItem>
             )}
           />
-
-          <FormField
-            control={form.control}
-            name="contractDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col space-y-2 w-52">
-                <FormLabel className="text-xs">Data de Pagamento</FormLabel>
-                <FormControl>
-                  <DatePicker
-                    className="space-y-2"
-                    onChange={(value) => {
-                      if (!value) return;
-                      const day = value.day > 9 ? value.day : `0${value.day}`;
-                      const month =
-                        value.month > 9 ? value.month : `0${value.month}`;
-                      const formattedDate = `${day}/${month}/${value.year}`;
-                      field.onChange(formattedDate);
-                    }}
-                    defaultValue={
-                      field.value
-                        ? parseDate(field.value.split("/").reverse().join("-"))
-                        : parseDate(new Date().toISOString().split("T")[0]) // Data atual como padrão
-                    }
-                  >
-                    <div className="flex">
-                      <Group className="w-full">
-                        <DateInput className="pe-9 text-xs" />
-                      </Group>
-                      <AriaButton
-                        type="button"
-                        className="z-10 -me-px -ms-9 flex w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus-visible:outline-none data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-ring/70"
-                      >
-                        <Icons.calendar className="size-4" strokeWidth={2} />
-                      </AriaButton>
-                    </div>
-                    <AriaPopover
-                      className="z-50 rounded-lg border border-border bg-background text-popover-foreground shadow-lg shadow-black/5 outline-none data-[entering]:animate-in data-[exiting]:animate-out data-[entering]:fade-in-0 data-[exiting]:fade-out-0 data-[entering]:zoom-in-95 data-[exiting]:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2"
-                      offset={4}
-                    >
-                      <Dialog className="max-h-[inherit] overflow-auto p-2">
-                        <Calendar />
-                      </Dialog>
-                    </AriaPopover>
-                  </DatePicker>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
 
         <FormField

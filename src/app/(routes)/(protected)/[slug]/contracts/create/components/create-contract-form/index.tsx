@@ -36,8 +36,14 @@ const steps = [
 ];
 
 export default function CreateContractForm() {
-  const { form, onSubmit, currentStep, setCurrentStep, handleNextStep } =
-    useCreateContractForm();
+  const {
+    form,
+    onSubmit,
+    currentStep,
+    setCurrentStep,
+    handleNextStep,
+    isCreatingContract,
+  } = useCreateContractForm();
 
   return (
     <Form {...form}>
@@ -71,6 +77,7 @@ export default function CreateContractForm() {
         </div>
         <div className="flex space-x-4">
           <Button
+            type="button"
             variant="outline"
             className="w-min"
             onClick={() => setCurrentStep((prev) => prev - 1)}
@@ -78,20 +85,31 @@ export default function CreateContractForm() {
           >
             Voltar
           </Button>
-          <Button
-            variant="outline"
-            className="w-min"
-            onClick={handleNextStep}
-            disabled={currentStep > steps.length}
-          >
-            {currentStep === steps.length ? (
-              <span className="flex items-center gap-2">
-                Finalizar <Icons.check className="size-4" />
-              </span>
-            ) : (
-              "Avançar"
-            )}
-          </Button>
+          {currentStep === steps.length ? (
+            <Button
+              type="submit"
+              variant="outline"
+              className="w-min"
+              disabled={isCreatingContract}
+            >
+              Finalizar
+              {isCreatingContract ? (
+                <Icons.loader className="size-4 animate-spin" />
+              ) : (
+                <Icons.check className="size-4" />
+              )}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-min"
+              onClick={handleNextStep}
+              disabled={currentStep > steps.length || isCreatingContract}
+            >
+              Avançar
+            </Button>
+          )}
         </div>
       </form>
     </Form>

@@ -16,53 +16,52 @@ enum PaymentMethod {
 }
 
 model Contract {
-  id         String         @id @default(uuid())
-  code       Int            @default(autoincrement())
-  name       String
-  eventDate  DateTime       @map("event_date")
-  startDate  DateTime       @map("start_date")
-  endDate    DateTime       @map("end_date")
-  totalValue Float          @map("total_value")
-  customer   Customer       @relation(fields: [customerId], references: [id])
-  status     ContractStatus @default(OPEN)
-  createdAt  DateTime       @map("created_at")
-  updatedAt  DateTime       @updatedAt @map("updated_at")
-  createdBy  User           @relation(fields: [userId], references: [id])
-  userId     String
-  customerId String
+  id                    String         @id @default(uuid())
+  code                  Int            @default(autoincrement())
+  eventDate             DateTime       @map("event_date")
+  withdrawalDate        DateTime       @map("withdrawal_date")
+  returnDate            DateTime       @map("return_date")
+  totalValue            Float          @map("total_value")
+  status                ContractStatus @default(OPEN)
+  additionalInformation String?        @map("additional_information")
+  createdAt             DateTime       @default(now()) @map("created_at")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
 
-  rentedItems    ContractItem[]
-  payments       Payment[]
-  documents      Document[]
-  organization   Organization?  @relation(fields: [organizationId], references: [id])
+  seller         Member        @relation(fields: [sellerId], references: [id])
+  sellerId       String
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  customerId     String
+  organization   Organization? @relation(fields: [organizationId], references: [id])
   organizationId String?
+
+  rentedItems ContractItem[]
+  payments    Payment[]
 
   @@map("contracts")
 }
 
 model ContractItem {
-  id              String  @id @default(uuid())
-  itemId          String
-  quantity        Int
-  price           Float
-  discount        Float?
-  isFixedDiscount Boolean
-  isCourtesy      Boolean
+  id       String  @id @default(uuid())
+  quantity Int
+  value    Float
+  discount Float?
+  isBonus  Boolean @default(false)
 
   contract   Contract? @relation(fields: [contractId], references: [id])
   contractId String?
   item       Item      @relation(fields: [itemId], references: [id])
+  itemId     String
 
   @@map("contract_items")
 }
 
 model Payment {
   id                 String        @id @default(uuid())
-  value              Float
-  date               DateTime      @map("date")
-  isPaid             Boolean
   method             PaymentMethod
+  value              Float
   creditParcelAmount Int           @map("credit_parcel_amount")
+  paymentDate        DateTime      @map("payment_date")
+  isPaid             Boolean
   createdAt          DateTime      @default(now()) @map("created_at")
 
   contract   Contract? @relation(fields: [contractId], references: [id])
