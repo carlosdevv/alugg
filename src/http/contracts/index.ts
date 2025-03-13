@@ -4,6 +4,7 @@ import type {
   CreateContractServiceResponse,
   GetContractsServiceProps,
   GetContractsServiceResponse,
+  GetNextContractCodeServiceResponse,
 } from "./types";
 
 export async function getContractsService({
@@ -28,4 +29,23 @@ export async function createContractService(
     })
     .json<CreateContractServiceResponse>();
   return result;
+}
+
+export async function getNextContractCodeService(
+  slug: string
+): Promise<GetNextContractCodeServiceResponse> {
+  const url = `api/organizations/${slug}/contracts/next-code`;
+
+  const result = await api.get(url).json<GetNextContractCodeServiceResponse>();
+
+  return result;
+}
+
+export async function deleteContractService(
+  slug: string,
+  contractId: string
+): Promise<void> {
+  const url = `api/organizations/${slug}/contracts/${contractId}`;
+
+  await api.delete(url);
 }

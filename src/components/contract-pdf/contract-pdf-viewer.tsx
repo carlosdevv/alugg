@@ -7,12 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useCreateContractContext } from "@/contexts/create-contract-context";
-import { useGetCustomerByIdService } from "@/http/customers/use-customers-service";
-import { useGetItemsService } from "@/http/items/use-items-service";
-import { useGetMemberByIdService } from "@/http/members/use-members-service";
-import { useGetOrganizationService } from "@/http/organizations/use-organizations-service";
-import { PDFDownloadLink, PDFViewer, pdf } from "@react-pdf/renderer";
-import { useParams } from "next/navigation";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import { useEffect, useState } from "react";
 import { ContractPDF } from "./contract-pdf";
 
@@ -22,21 +17,18 @@ interface ContractPDFViewerProps {
 }
 
 export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
-  const { slug } = useParams() as { slug: string };
-  const { form, totalValue } = useCreateContractContext();
+  const {
+    form,
+    totalValue,
+    nextContractCode,
+    generateContractPDF,
+    organization,
+    customer,
+    items,
+    seller,
+  } = useCreateContractContext();
   const [isClient, setIsClient] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-
-  const { data: organization } = useGetOrganizationService({ slug });
-  const { data: customer } = useGetCustomerByIdService({
-    slug,
-    customerId: form.watch("customerId"),
-  });
-  const { data: items } = useGetItemsService({ slug });
-  const { data: seller } = useGetMemberByIdService({
-    slug,
-    memberId: form.watch("memberId"),
-  });
 
   // Obter os itens do formulário em vez de usar selectedItems
   const formItems = form.watch("items") || [];
@@ -64,25 +56,13 @@ export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
 
   const formValues = form.getValues();
 
-  // Função para gerar o PDF e abrir em nova aba
   const handleOpenInNewTab = async () => {
-    const blob = await pdf(
-      <ContractPDF
-        organization={organization}
-        customer={customer}
-        items={selectedItemsData}
-        totalValue={totalValue}
-        seller={seller}
-        formValues={formValues}
-      />
-    ).toBlob();
-
+    const blob = await generateContractPDF();
     const url = URL.createObjectURL(blob);
     setPdfUrl(url);
     window.open(url, "_blank");
   };
 
-  // Limpar URL do objeto ao desmontar o componente
   useEffect(() => {
     return () => {
       if (pdfUrl) {
@@ -108,6 +88,7 @@ export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
                 totalValue={totalValue}
                 seller={seller}
                 formValues={formValues}
+                code={nextContractCode}
               />
             </PDFViewer>
           )}
@@ -136,13 +117,14 @@ export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
                     totalValue={totalValue}
                     seller={seller}
                     formValues={formValues}
+                    code={nextContractCode}
                   />
                 }
-                fileName={`contrato-.pdf`}
+                fileName={`contrato-${nextContractCode}.pdf`}
               >
                 {({ loading }) => (
                   <Button disabled={loading}>
-                    {loading ? "Gerando PDF..." : "Baixar PDF"}
+                    {loading ? "Baixando PDF..." : "Baixar PDF"}
                     <Icons.download className="ml-2 size-4" />
                   </Button>
                 )}

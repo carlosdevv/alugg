@@ -68,8 +68,13 @@ const paymentMethods = [
 
 export function StepThree() {
   const { slug } = useParams() as { slug: string };
-  const { form, selectedItems, setCurrentStep, setTotalValue } =
-    useCreateContractContext();
+  const {
+    form,
+    selectedItems,
+    setCurrentStep,
+    setTotalValue,
+    nextContractCode,
+  } = useCreateContractContext();
   const { data: items } = useGetItemsService({ slug });
   const [totalValueState, setTotalValueState] = useState(0);
 
@@ -82,44 +87,6 @@ export function StepThree() {
       locale: ptBR,
     });
   };
-
-  // Inicializar os itens no formulário
-  useEffect(() => {
-    if (items && selectedItems.size > 0 && !form.getValues("items")) {
-      const formItems = Array.from(selectedItems)
-        .map(([itemId, quantity]) => {
-          const item = items.find((i) => i.id === itemId);
-          if (!item) return null;
-
-          const baseValue = item.rentPrice * quantity;
-
-          return {
-            itemId,
-            quantity,
-            isBonus: false,
-            baseValue,
-            discount: {
-              value: 0,
-              mode: "currency" as const,
-            },
-            finalValue: baseValue,
-          };
-        })
-        .filter(Boolean) as {
-        itemId: string;
-        quantity: number;
-        isBonus: boolean;
-        baseValue: number;
-        discount: {
-          value: number;
-          mode: "currency" | "percent";
-        };
-        finalValue: number;
-      }[];
-
-      form.setValue("items", formItems);
-    }
-  }, [items, selectedItems, form]);
 
   // Função para adicionar novo método de pagamento
   const addPaymentMethod = () => {
@@ -260,6 +227,44 @@ export function StepThree() {
       setTotalValue(total); // Atualiza o valor total no contexto
     }
   }, [form, watchedItems, setTotalValue]);
+
+  // Inicializar os itens no formulário
+  useEffect(() => {
+    if (items && selectedItems.size > 0 && !form.getValues("items")) {
+      const formItems = Array.from(selectedItems)
+        .map(([itemId, quantity]) => {
+          const item = items.find((i) => i.id === itemId);
+          if (!item) return null;
+
+          const baseValue = item.rentPrice * quantity;
+
+          return {
+            itemId,
+            quantity,
+            isBonus: false,
+            baseValue,
+            discount: {
+              value: 0,
+              mode: "currency" as const,
+            },
+            finalValue: baseValue,
+          };
+        })
+        .filter(Boolean) as {
+        itemId: string;
+        quantity: number;
+        isBonus: boolean;
+        baseValue: number;
+        discount: {
+          value: number;
+          mode: "currency" | "percent";
+        };
+        finalValue: number;
+      }[];
+
+      form.setValue("items", formItems);
+    }
+  }, [items, selectedItems, form]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.45fr] gap-4">
@@ -618,16 +623,21 @@ export function StepThree() {
       </div>
 
       {/* Summary Total Card */}
-      <Card className="h-min lg:min-h-96 w-full lg:w-auto">
-        <CardHeader>
-          <CardTitle>
-            Total: {formatToCurrency(totalValueState.toString())}
+      <Card className="h-min w-full lg:w-auto">
+        <CardHeader className="flex flex-col">
+          <span className="text-xs text-muted-foreground">Pedido</span>
+          <CardTitle className="text-2xl">
+            {nextContractCode && nextContractCode <= 9
+              ? `#0${nextContractCode}`
+              : `#${nextContractCode}`}
+            {!nextContractCode && "N/A"}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            <span>Total: {formatToCurrency(totalValueState.toString())}</span>
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-medium">Resumo dos Pagamentos</h3>
+              <h3 className="text-sm font-medium">Resumo</h3>
               {form.watch("paymentMethod")?.length > 0 ? (
                 <div className="space-y-2">
                   {form.watch("paymentMethod").map((method, index) => (
@@ -640,7 +650,7 @@ export function StepThree() {
                     </div>
                   ))}
                   <Separator className="my-2" />
-                  <div className="flex justify-between font-medium">
+                  <div className="flex items-center justify-between font-medium gap-x-2">
                     <span className="text-sm">Total dos Pagamentos:</span>
                     <span>
                       {formatToCurrency(

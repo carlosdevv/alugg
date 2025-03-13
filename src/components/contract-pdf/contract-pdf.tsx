@@ -32,9 +32,9 @@ interface ContractPDFProps {
     name: string;
     userId: string;
   };
+  code?: number;
 }
 
-// Definir estilos para o PDF
 const styles = StyleSheet.create({
   page: {
     padding: 30,
@@ -43,9 +43,15 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     marginBottom: 20,
     alignItems: "center",
+  },
+  logoContainer: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   logo: {
     width: 150,
@@ -55,6 +61,9 @@ const styles = StyleSheet.create({
   contractNumber: {
     fontSize: 12,
     fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 5,
+    marginBottom: 5,
   },
   companyInfo: {
     marginBottom: 10,
@@ -64,9 +73,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 15,
+    marginBottom: 5,
   },
   section: {
+    marginTop: 10,
     marginBottom: 10,
   },
   sectionTitle: {
@@ -166,18 +176,19 @@ export function ContractPDF({
   totalValue,
   formValues,
   seller,
+  code,
 }: ContractPDFProps) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Cabeçalho */}
         <View style={styles.header}>
-          <View>
+          <View style={styles.logoContainer}>
             {organization?.logo && (
+              // eslint-disable-next-line jsx-a11y/alt-text
               <Image src={organization.logo} style={styles.logo} />
             )}
           </View>
-          <Text style={styles.contractNumber}>Nº: number</Text>
         </View>
 
         {/* Informações da empresa */}
@@ -193,6 +204,11 @@ export function ContractPDF({
         {/* Título do contrato */}
         <View style={styles.title}>
           <Text>CONTRATO DE LOCAÇÃO</Text>
+        </View>
+
+        {/* Número do contrato */}
+        <View>
+          <Text style={styles.contractNumber}>Nº: {code}</Text>
         </View>
 
         {/* Introdução */}
@@ -372,7 +388,7 @@ export function ContractPDF({
                 : payment.method}{" "}
               {formatToCurrency(payment.value)}{" "}
               {payment.method === "CREDIT_CARD"
-                ? `Parcela ${payment.cardInstallments}`
+                ? `Parcela ${payment.creditParcelAmount}`
                 : ""}{" "}
               {payment.paymentDate} {payment.isPaid ? "(PAGO)" : ""}
             </Text>

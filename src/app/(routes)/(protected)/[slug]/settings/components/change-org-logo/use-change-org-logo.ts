@@ -53,7 +53,7 @@ export default function useChangeOrgLogo({
   });
 
   async function uploadImageAndGetUrl(file: File) {
-    const supabase = await createClient();
+    const supabase = createClient();
 
     if (organization.logo) {
       const { error: supabaseError } = await supabase.storage
@@ -118,7 +118,7 @@ export default function useChangeOrgLogo({
 
   useEffect(() => {
     if (isSuccess) router.refresh();
-  }, [isSuccess]);
+  }, [isSuccess, router]);
 
   return {
     newImageMode,

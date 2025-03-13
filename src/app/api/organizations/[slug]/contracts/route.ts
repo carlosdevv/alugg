@@ -2,7 +2,7 @@ import { getUserMembership } from "@/actions/get-user-membership";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
-import { PaymentMethod } from "@prisma/client";
+import { PaymentMethod, type ContractStatus } from "@prisma/client";
 import { compareDesc } from "date-fns";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
@@ -15,6 +15,8 @@ export async function GET(
   try {
     const { userId } = auth();
     const { slug } = params;
+    const searchParams = req.nextUrl.searchParams;
+    const statusParam = searchParams.get("status");
 
     if (!userId) {
       return NextResponse.json(
@@ -32,24 +34,140 @@ export async function GET(
 
     const { organization } = await getUserMembership(slug);
 
-    const [contracts, total] = await Promise.all([
-      prisma.contract.findMany({
-        where: {
-          organizationId: organization.id,
-        },
-      }),
-      prisma.contract.count({
-        where: {
-          organizationId: organization.id,
-        },
-      }),
-    ]);
+    const baseFilter = {
+      organizationId: organization.id,
+    };
 
-    if (total === 0) {
-      return NextResponse.json({ data: [] }, { status: 200 });
+    let statusFilter = {};
+    if (statusParam) {
+      const statusList = statusParam.toUpperCase().split(",");
+      const validStatus = statusList.filter((s) =>
+        ["OPEN", "CLOSED", "CANCELLED", "COLLECTED"].includes(s)
+      ) as ContractStatus[];
+
+      if (validStatus.length > 0) {
+        statusFilter = {
+          status: {
+            in: validStatus,
+          },
+        };
+      }
     }
 
-    return NextResponse.json({ data: contracts, total }, { status: 200 });
+    const whereFilter = { ...baseFilter, ...statusFilter };
+
+    const [contracts, statusCounts] = await Promise.all([
+      prisma.contract.findMany({
+        where: whereFilter,
+        select: {
+          id: true,
+          code: true,
+          eventDate: true,
+          withdrawalDate: true,
+          returnDate: true,
+          status: true,
+          createdAt: true,
+          totalValue: true,
+          contractDocuments: {
+            select: {
+              url: true,
+              type: true,
+            },
+          },
+          customer: {
+            select: {
+              name: true,
+              phone: true,
+            },
+          },
+          payments: {
+            select: {
+              value: true,
+              isPaid: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      // Conta os contratos por status
+      prisma.$transaction([
+        prisma.contract.count({
+          where: baseFilter,
+        }),
+        prisma.contract.count({
+          where: {
+            ...baseFilter,
+            status: "OPEN",
+          },
+        }),
+        prisma.contract.count({
+          where: {
+            ...baseFilter,
+            status: "CLOSED",
+          },
+        }),
+        prisma.contract.count({
+          where: {
+            ...baseFilter,
+            status: "CANCELLED",
+          },
+        }),
+        prisma.contract.count({
+          where: {
+            ...baseFilter,
+            status: "COLLECTED",
+          },
+        }),
+      ]),
+    ]);
+
+    const formattedContracts = contracts.map((contract) => {
+      const pendingDebt = contract.payments.reduce((total, payment) => {
+        if (!payment.isPaid) {
+          return total + payment.value;
+        }
+        return total;
+      }, 0);
+
+      return {
+        id: contract.id,
+        code: contract.code,
+        customer: {
+          name: contract.customer.name,
+          phone: contract.customer.phone,
+        },
+        eventDate: contract.eventDate,
+        withdrawalDate: contract.withdrawalDate,
+        returnDate: contract.returnDate,
+        status: contract.status,
+        createdAt: contract.createdAt,
+        totalValue: contract.totalValue,
+        pendingDebt,
+        contractDocuments: contract.contractDocuments,
+      };
+    });
+
+    const count = {
+      total: statusCounts[0],
+      open: statusCounts[1],
+      closed: statusCounts[2],
+      cancelled: statusCounts[3],
+      collected: statusCounts[4],
+    };
+
+    if (formattedContracts.length === 0) {
+      return NextResponse.json({ data: [], count }, { status: 200 });
+    }
+
+    return NextResponse.json(
+      {
+        data: formattedContracts,
+        count,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
@@ -62,6 +180,7 @@ export async function GET(
 // POST /api/organizations/:slug/contracts - Create a new contract
 const createContractSchema = z
   .object({
+    code: z.number().optional(),
     totalValue: z.number(),
     customerId: z.string({ required_error: "Cliente é obrigatório" }),
     eventDate: z.string({ required_error: "Data do evento é obrigatória" }),
@@ -71,6 +190,7 @@ const createContractSchema = z
     returnDate: z.string({ required_error: "Data de devolução é obrigatória" }),
     memberId: z.string({ required_error: "Membro é obrigatório" }),
     additionalInformation: z.string().optional(),
+    contractUrl: z.string(),
     items: z.array(
       z.object({
         itemId: z.string(),
@@ -165,6 +285,10 @@ export async function POST(
       );
     }
 
+    const eventDate = parseDate(contractData.eventDate);
+    const withdrawalDate = parseDate(contractData.withdrawalDate);
+    const returnDate = parseDate(contractData.returnDate);
+
     // Verificar disponibilidade dos itens
     for (const item of contractData.items) {
       const isAvailable = await checkItemAvailability(
@@ -194,9 +318,10 @@ export async function POST(
 
     const contract = await prisma.contract.create({
       data: {
-        eventDate: new Date(contractData.eventDate),
-        withdrawalDate: new Date(contractData.withdrawalDate),
-        returnDate: new Date(contractData.returnDate),
+        code: contractData.code,
+        eventDate: eventDate,
+        withdrawalDate: withdrawalDate,
+        returnDate: returnDate,
         totalValue: contractData.totalValue,
         sellerId: contractData.memberId,
         customerId: contractData.customerId,
@@ -213,17 +338,29 @@ export async function POST(
         payments: {
           create: contractData.paymentMethod.map((payment) => ({
             value: payment.value,
-            paymentDate: new Date(payment.paymentDate),
+            paymentDate: parseDate(payment.paymentDate),
             isPaid: payment.isPaid,
             method: payment.method,
             creditParcelAmount: payment.creditParcelAmount,
           })),
+        },
+        contractDocuments: {
+          create: {
+            url: contractData.contractUrl,
+            type: "INVOICE",
+          },
         },
         organizationId: organization.id,
       },
       include: {
         rentedItems: true,
         payments: true,
+        contractDocuments: {
+          select: {
+            url: true,
+            type: true,
+          },
+        },
       },
     });
 
@@ -244,10 +381,13 @@ export async function POST(
 async function checkItemAvailability(
   itemId: string,
   requestedQuantity: number,
-  withdrawalDate: string,
-  returnDate: string,
+  withdrawalDateStr: string,
+  returnDateStr: string,
   organizationId: string
 ): Promise<boolean> {
+  const withdrawalDate = parseDate(withdrawalDateStr);
+  const returnDate = parseDate(returnDateStr);
+
   // Buscar o item para verificar a quantidade total disponível
   const item = await prisma.item.findUnique({
     where: { id: itemId },
@@ -264,14 +404,14 @@ async function checkItemAvailability(
       OR: [
         {
           // Contratos que começam antes e terminam durante o período solicitado
-          withdrawalDate: { lte: new Date(returnDate) },
-          returnDate: { gte: new Date(withdrawalDate) },
+          withdrawalDate: { lte: returnDate },
+          returnDate: { gte: withdrawalDate },
         },
         {
           // Contratos que começam durante o período solicitado
           withdrawalDate: {
-            gte: new Date(withdrawalDate),
-            lte: new Date(returnDate),
+            gte: withdrawalDate,
+            lte: returnDate,
           },
         },
       ],
@@ -297,3 +437,12 @@ async function checkItemAvailability(
   // Verificar se há quantidade suficiente disponível
   return item.amount - reservedQuantity >= requestedQuantity;
 }
+
+const parseDate = (dateString: string): Date => {
+  if (dateString.includes("-")) {
+    return new Date(dateString);
+  }
+
+  const [day, month, year] = dateString.split("/").map(Number);
+  return new Date(year, month - 1, day);
+};

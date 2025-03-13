@@ -14,7 +14,7 @@ import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
 import { useState } from "react";
 import type { ContractColumn } from "./columns";
-import { DeleteCustomerDialog } from "./delete-customer-dialog";
+import { DeleteContractDialog } from "./delete-contract-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
@@ -22,7 +22,7 @@ type RowActionsProps<TData> = {
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
   const props = row.original as ContractColumn;
-  const customerId = props.id;
+  const contractId = props.id;
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -42,7 +42,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
               <DropdownMenuItem className="cursor-pointer" asChild>
                 <Link
                   href={{
-                    pathname: `${appRoutes.customers.root}/${props.id}`,
+                    pathname: `${appRoutes.contracts.root}/${props.id}`,
                   }}
                   className="flex items-center justify-between"
                 >
@@ -61,8 +61,8 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DeleteCustomerDialog
-        customerId={customerId}
+      <DeleteContractDialog
+        contractId={contractId}
         open={openDeleteDialog}
         onOpenChange={setOpenDeleteDialog}
       />

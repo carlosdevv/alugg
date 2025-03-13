@@ -2,25 +2,36 @@ import type { ContractStatus, PaymentMethod } from "@prisma/client";
 
 export type GetContractsServiceProps = {
   slug: string;
+  status?: ContractStatus[];
 };
 
 export type GetContractsServiceResponse = {
   data: {
     id: string;
     code: number;
-    name: string;
-    userId: string;
-    status: ContractStatus;
+    customer: {
+      name: string;
+      phone: string;
+    };
     eventDate: Date;
-    startDate: Date;
-    endDate: Date;
-    totalValue: number;
+    withdrawalDate: Date;
+    returnDate: Date;
+    status: ContractStatus;
     createdAt: Date;
-    updatedAt: Date;
-    customerId: string;
-    organizationId: string | null;
+    totalValue: number;
+    pendingDebt: number;
+    contractDocuments: {
+      url: string;
+      type: string;
+    }[];
   }[];
-  total: number;
+  count: {
+    total: number;
+    open: number;
+    closed: number;
+    cancelled: number;
+    collected: number;
+  };
 };
 
 export type CreateContractServiceBody = {
@@ -31,6 +42,8 @@ export type CreateContractServiceBody = {
   returnDate: string;
   memberId: string;
   additionalInformation?: string;
+  contractUrl: string;
+  code?: number;
   items: {
     itemId: string;
     quantity: number;
@@ -51,5 +64,15 @@ export type CreateContractServiceResponse = {
   data: {
     id: string;
     code: number;
+  };
+};
+
+export type GetNextContractCodeServiceProps = {
+  slug: string;
+};
+
+export type GetNextContractCodeServiceResponse = {
+  data: {
+    nextCode: number;
   };
 };

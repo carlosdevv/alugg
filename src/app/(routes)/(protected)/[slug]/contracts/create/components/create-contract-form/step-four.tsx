@@ -1,8 +1,6 @@
 import { ContractPDFViewer } from "@/components/contract-pdf/contract-pdf-viewer";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/custom/calendar-rac";
-import { DateInput } from "@/components/ui/custom/date-rac";
 import {
   FormControl,
   FormField,
@@ -20,23 +18,50 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateContractContext } from "@/contexts/create-contract-context";
 import { useGetMembersService } from "@/http/members/use-members-service";
-import { parseDate } from "@internationalized/date";
 import { useParams } from "next/navigation";
-import { useState } from "react";
-import {
-  Button as AriaButton,
-  Popover as AriaPopover,
-  DatePicker,
-  Dialog,
-  Group,
-} from "react-aria-components";
+import { useEffect, useState } from "react";
 
 export function StepFour() {
   const { slug } = useParams() as { slug: string };
-  const { form } = useCreateContractContext();
+  const {
+    form,
+    generateContractPDF,
+    isCreatingContract,
+    isUploadingPdf,
+    setCurrentStep,
+  } = useCreateContractContext();
   const [isPdfOpen, setIsPdfOpen] = useState(false);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
 
   const { data: members, isLoading } = useGetMembersService({ slug });
+
+  const handleOpenPdfViewer = async () => {
+    // Se o PDF ainda não foi gerado, gere-o agora
+    if (!pdfBlob) {
+      try {
+        const blob = await generateContractPDF();
+        setPdfBlob(blob);
+      } catch (error) {
+        console.error("Erro ao gerar o PDF do contrato:", error);
+      }
+    }
+
+    setIsPdfOpen(true);
+  };
+
+  // Gerar o PDF quando o componente for montado
+  useEffect(() => {
+    async function loadPdf() {
+      try {
+        const blob = await generateContractPDF();
+        setPdfBlob(blob);
+      } catch (error) {
+        console.error("Erro ao gerar o PDF do contrato:", error);
+      }
+    }
+
+    loadPdf();
+  }, [generateContractPDF]);
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -97,10 +122,40 @@ export function StepFour() {
         />
 
         <div className="flex items-center gap-x-4">
-          <Button type="button" onClick={() => setIsPdfOpen(true)}>
+          <Button
+            type="button"
+            onClick={handleOpenPdfViewer}
+            disabled={
+              !form.getValues().memberId || isCreatingContract || isUploadingPdf
+            }
+          >
             Visualizar Contrato
           </Button>
         </div>
+      </div>
+      <div className="mt-4 flex items-center gap-x-4">
+        <Button
+          type="button"
+          variant="outline"
+          className="w-min"
+          onClick={() => setCurrentStep((prev) => prev - 1)}
+          disabled={isCreatingContract || isUploadingPdf}
+        >
+          Voltar
+        </Button>
+        <Button
+          type="submit"
+          variant="outline"
+          className="w-min"
+          disabled={isCreatingContract || isUploadingPdf}
+        >
+          Finalizar
+          {isCreatingContract || isUploadingPdf ? (
+            <Icons.loader className="ml-2 size-4 animate-spin" />
+          ) : (
+            <Icons.check className="ml-2 size-4" />
+          )}
+        </Button>
       </div>
 
       {/* PDF Viewer */}

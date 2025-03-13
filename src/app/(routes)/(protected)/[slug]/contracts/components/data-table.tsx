@@ -12,7 +12,6 @@ import {
 
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -28,9 +27,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { appRoutes } from "@/lib/constants";
-import Link from "next/link";
 import { useState } from "react";
+import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -52,7 +50,6 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
-
     state: {
       columnFilters,
       rowSelection,
@@ -60,23 +57,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-y-4 justify-between items-center py-4">
-        <Input
-          placeholder="Buscar por Nome"
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-60"
-        />
-        <Button size="sm" asChild>
-          <Link href={appRoutes.contracts.create}>
-            <Icons.circlePlus className="size-4 mr-2" />
-            Novo Contrato
-          </Link>
-        </Button>
-      </div>
+    <div className="w-full space-y-4 mt-4">
+      <DataTableToolbar table={table} />
       <div className="rounded-md border mb-2">
         <Table>
           <TableHeader>

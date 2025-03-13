@@ -1,7 +1,7 @@
 "use client";
 
 import { Icons } from "@/components/icons";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   FloatingPanelBody,
@@ -11,7 +11,6 @@ import {
   FloatingPanelRoot,
   FloatingPanelTrigger,
 } from "@/components/ui/floating-panel";
-import { cn } from "@/lib/utils";
 import type { ItemStatus } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { motion } from "framer-motion";
@@ -127,18 +126,13 @@ export const columns: ColumnDef<CreateContractColumn>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status: boolean = row.getValue("status") === "ACTIVE";
+      const status: ItemStatus = row.getValue("status") || "ACTIVE";
       return (
-        <Badge
-          className={cn(
-            status
-              ? "bg-emerald-400 hover:bg-emerald-500"
-              : "bg-rose-500 hover:bg-rose-600",
-            "font-medium"
-          )}
-        >
-          {status ? "ATIVO" : "INATIVO"}
-        </Badge>
+        <div className="flex justify-center">
+          <Badge variant={statusVariant[status]} className="uppercase">
+            {statusText[status]}
+          </Badge>
+        </div>
       );
     },
   },
@@ -146,11 +140,7 @@ export const columns: ColumnDef<CreateContractColumn>[] = [
     accessorKey: "disponibility",
     header: "Disponibilidade",
     cell: ({ row }) => {
-      return (
-        <Badge className="bg-emerald-400 hover:bg-emerald-500">
-          DISPONIVEL
-        </Badge>
-      );
+      return <Badge variant="green">DISPONIVEL</Badge>;
     },
   },
   {
@@ -162,3 +152,21 @@ export const columns: ColumnDef<CreateContractColumn>[] = [
     header: "Eventos",
   },
 ];
+
+const statusVariant: Record<ItemStatus, BadgeProps["variant"]> = {
+  ACTIVE: "violet",
+  INACTIVE: "rose",
+  PENDING: "yellow",
+  AVALIABLE: "green",
+  IN_USE: "indigo",
+  IN_REPAIR: "gray",
+};
+
+const statusText: Record<ItemStatus, string> = {
+  ACTIVE: "Ativo",
+  INACTIVE: "Inativo",
+  PENDING: "Pendente",
+  AVALIABLE: "Disponível",
+  IN_USE: "Em uso",
+  IN_REPAIR: "Em reparo",
+};

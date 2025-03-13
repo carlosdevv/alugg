@@ -1,6 +1,5 @@
 "use client";
 
-import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import {
@@ -76,30 +75,18 @@ export default function CreateContractForm() {
           {currentStep === 4 && <StepFour />}
         </div>
         <div className="flex space-x-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-min"
-            onClick={() => setCurrentStep((prev) => prev - 1)}
-            disabled={currentStep === 1}
-          >
-            Voltar
-          </Button>
-          {currentStep === steps.length ? (
+          {currentStep > 1 && currentStep <= 3 && (
             <Button
-              type="submit"
+              type="button"
               variant="outline"
               className="w-min"
-              disabled={isCreatingContract}
+              onClick={() => setCurrentStep((prev) => prev - 1)}
+              disabled={currentStep === 1 || isCreatingContract}
             >
-              Finalizar
-              {isCreatingContract ? (
-                <Icons.loader className="size-4 animate-spin" />
-              ) : (
-                <Icons.check className="size-4" />
-              )}
+              Voltar
             </Button>
-          ) : (
+          )}
+          {currentStep <= 3 && (
             <Button
               type="button"
               variant="outline"
