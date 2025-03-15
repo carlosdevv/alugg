@@ -1,21 +1,21 @@
 import { PageContent } from "@/components/page-layout";
 import { PageWrapper } from "@/components/page-layout/page-wrapper";
-import UpdateCustomerPageClient from "./page-client";
+import UpdateContractPageClient from "./page-client";
 
-interface UpdateCustomerPageProps {
+interface UpdateContractPageProps {
   params: {
     slug: string;
     id: string;
   };
 }
 
-export default function UpdateCustomerPage({
+export default function UpdateContractPage({
   params: { id, slug },
-}: UpdateCustomerPageProps) {
+}: UpdateContractPageProps) {
   return (
-    <PageContent title="Editar Cliente" hasBackButton>
+    <PageContent title="Editar Contrato" hasBackButton>
       <PageWrapper>
-        <UpdateCustomerPageClient slug={slug} id={id} />
+        <UpdateContractPageClient slug={slug} id={id} />
       </PageWrapper>
     </PageContent>
   );

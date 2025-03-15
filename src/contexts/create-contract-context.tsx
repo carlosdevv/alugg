@@ -18,7 +18,7 @@ import { pdf } from "@react-pdf/renderer";
 import { compareDesc } from "date-fns";
 import { useParams } from "next/navigation";
 import { parseAsInteger, useQueryState, type Options } from "nuqs";
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -331,6 +331,23 @@ export const CreateContractProvider = ({
       throw error; // Propagar o erro para tratamento adicional, se necessário
     }
   }
+
+  // Efeito para verificar se as datas estão preenchidas quando o usuário está nas steps 2, 3 ou 4
+  useEffect(() => {
+    const checkDatesAndRedirect = async () => {
+      if (currentStep > 1) {
+        const formValues = form.getValues();
+        const { eventDate, withdrawalDate, returnDate } = formValues;
+
+        if (!eventDate || !withdrawalDate || !returnDate) {
+          toast.warning("Por favor, preencha as datas do contrato primeiro.");
+          await setCurrentStep(1);
+        }
+      }
+    };
+
+    checkDatesAndRedirect();
+  }, [currentStep, form, setCurrentStep]);
 
   return (
     <CreateContractContext.Provider

@@ -1,37 +1,35 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useGetCustomerByIdService } from "@/http/customers/use-customers-service";
+import { useGetContractByIdService } from "@/http/contracts/use-contracts-service";
 import { useRouter } from "next/navigation";
-import UpdateCustomerForm from "./components/update-customer-form";
-import UpdateCustomerPageLoading from "./loading";
+import UpdateContractPageLoading from "./loading";
+import UpdateContractForm from "./components/update-contract-form";
 
-interface UpdateCustomerPageClientProps {
+interface UpdateContractPageClientProps {
   slug: string;
   id: string;
 }
 
-export default function UpdateCustomerPageClient({
+export default function UpdateContractPageClient({
   id,
   slug,
-}: UpdateCustomerPageClientProps) {
+}: UpdateContractPageClientProps) {
   const router = useRouter();
-  const { data: customer, isLoading } = useGetCustomerByIdService({
-    customerId: id,
+  const { data: contract, isLoading } = useGetContractByIdService({
+    contractId: id,
     slug,
   });
 
   return (
     <>
-      {isLoading && <UpdateCustomerPageLoading />}
+      {isLoading && <UpdateContractPageLoading />}
 
-      {customer && !isLoading && (
-        <UpdateCustomerForm customer={customer} id={id} />
-      )}
+      {contract && !isLoading && <UpdateContractForm contract={contract} />}
 
-      {!customer && !isLoading && (
+      {!contract && !isLoading && (
         <div className="flex items-center space-x-6">
-          <span>Cliente não encontrado.</span>
+          <span>Contrato não encontrado.</span>
           <Button onClick={() => router.back()} variant="link">
             Voltar
           </Button>

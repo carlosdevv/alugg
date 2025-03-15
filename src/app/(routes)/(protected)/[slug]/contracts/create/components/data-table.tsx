@@ -48,34 +48,53 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const handleSelectAll = (checked: boolean) => {
-    const newSelectedItems = new Map(selectedItems);
+  // Função para verificar se um item pode ser selecionado
+  const isItemSelectable = (item: any) => {
+    return (
+      item.isAvailable !== false &&
+      (item.availableQuantity === undefined || item.availableQuantity > 0)
+    );
+  };
 
-    if (checked) {
-      // Seleciona todos os itens da página atual
-      table.getRowModel().rows.forEach((row: any) => {
-        if (!newSelectedItems.has(row.original.id)) {
-          newSelectedItems.set(row.original.id, 1);
-        }
-      });
-    } else {
-      // Remove todos os itens da página atual
-      table.getRowModel().rows.forEach((row: any) => {
-        newSelectedItems.delete(row.original.id);
-      });
+  // Função para lidar com a seleção/deseleção de uma linha
+  const handleRowSelectionChange = (row: any) => {
+    const item = row.original;
+
+    // Verificar se o item pode ser selecionado
+    if (!isItemSelectable(item)) {
+      return; // Não permitir seleção de itens indisponíveis
     }
 
+    const newSelectedItems = new Map(selectedItems);
+    if (selectedItems.has(item.id)) {
+      newSelectedItems.delete(item.id);
+    } else {
+      newSelectedItems.set(item.id, 1); // Definir quantidade inicial como 1
+    }
     onSelectedItemsChange(newSelectedItems);
   };
 
-  const handleRowSelectionChange = (row: any) => {
-    const itemId = row.original.id;
+  // Função para selecionar/desselecionar todas as linhas
+  const handleSelectAll = (checked: boolean) => {
     const newSelectedItems = new Map(selectedItems);
 
-    if (selectedItems.has(itemId)) {
-      newSelectedItems.delete(itemId);
+    // Obter todas as linhas da página atual
+    const pageRows = table.getRowModel().rows;
+
+    if (checked) {
+      // Adicionar apenas itens selecionáveis
+      pageRows.forEach((row: any) => {
+        const item = row.original;
+        if (isItemSelectable(item) && !selectedItems.has(item.id)) {
+          newSelectedItems.set(item.id, 1);
+        }
+      });
     } else {
-      newSelectedItems.set(itemId, 1);
+      // Remover todos os itens da página atual
+      pageRows.forEach((row: any) => {
+        const item = row.original;
+        newSelectedItems.delete(item.id);
+      });
     }
 
     onSelectedItemsChange(newSelectedItems);
@@ -103,13 +122,19 @@ export function DataTable<TData, TValue>({
               />
             );
           },
-          cell: (props) => (
-            <Checkbox
-              checked={selectedItems.has((props.row.original as any).id)}
-              onCheckedChange={() => handleRowSelectionChange(props.row)}
-              aria-label="Select row"
-            />
-          ),
+          cell: (props) => {
+            const item = props.row.original as any;
+            const isSelectable = isItemSelectable(item);
+
+            return (
+              <Checkbox
+                checked={selectedItems.has(item.id)}
+                onCheckedChange={() => handleRowSelectionChange(props.row)}
+                aria-label="Select row"
+                disabled={!isSelectable}
+              />
+            );
+          },
         } as ColumnDef<TData, any>;
       }
       return col;

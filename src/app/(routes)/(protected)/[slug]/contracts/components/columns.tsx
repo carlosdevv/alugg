@@ -25,6 +25,7 @@ export type ContractColumn = {
   totalValue: number;
   pendingDebt: number;
   createdAt: Date;
+  contractUrl?: string;
 };
 
 export const columns: ColumnDef<ContractColumn>[] = [

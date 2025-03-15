@@ -76,3 +76,15 @@ export type GetNextContractCodeServiceResponse = {
     nextCode: number;
   };
 };
+
+export type GetContractByIdServiceProps = {
+  contractId: string;
+  slug: string;
+};
+
+export type GetContractByIdServiceResponse = {
+  data: {
+    id: string;
+    code: number;
+  };
+};

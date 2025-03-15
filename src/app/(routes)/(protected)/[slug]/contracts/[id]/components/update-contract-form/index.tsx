@@ -24,18 +24,16 @@ import type { CustomerProps } from "@/http/customers/types";
 import { parseToNumber } from "@/lib/utils";
 import { parseDate } from "@internationalized/date";
 import { DateField, DateInput, DateSegment } from "react-aria-components";
-import useUpdateCustomerForm from "./use-update-customer-form";
+import useUpdateContractForm from "./use-update-contract-form";
 import { format } from "date-fns";
 
-type UpdateCustomerFormProps = {
-  customer: CustomerProps;
-  id: string;
+type UpdateContractFormProps = {
+  contract: ContractProps;
 };
 
-export default function UpdateCustomerForm({
-  customer,
-  id,
-}: UpdateCustomerFormProps) {
+export default function UpdateContractForm({
+  contract,
+}: UpdateContractFormProps) {
   const {
     form,
     onSubmit,

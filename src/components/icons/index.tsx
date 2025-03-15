@@ -25,6 +25,8 @@ import {
   ExternalLinkIcon,
   EyeIcon,
   EyeOffIcon,
+  FileTextIcon,
+  HistoryIcon,
   Home,
   ImageIcon,
   LayersIcon,
@@ -103,4 +105,6 @@ export const Icons = {
   circleAlert: CircleAlertIcon,
   externalLink: ExternalLinkIcon,
   download: DownloadIcon,
+  file: FileTextIcon,
+  history: HistoryIcon,
 };

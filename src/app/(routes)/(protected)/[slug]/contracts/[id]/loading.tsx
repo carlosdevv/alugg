@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function UpdateCustomerPageLoading() {
+export default function UpdateContractPageLoading() {
   return (
     <>
       <div className="grid gap-4 grid-cols-[1fr_250px]">

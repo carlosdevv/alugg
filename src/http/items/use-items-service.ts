@@ -1,6 +1,6 @@
 import {
   useMutation,
-  UseMutationOptions,
+  type UseMutationOptions,
   useQuery,
   useQueryClient,
   type UseQueryOptions,
@@ -11,21 +11,27 @@ import {
   createItemService,
   deleteItemService,
   getItemByIdService,
+  getItemHistoryService,
+  getItemsAvailabilityService,
   getItemsService,
   updateItemByIdService,
 } from ".";
 import { ErrorResponse } from "../types";
 import {
-  DeleteItemServiceProps,
-  GetItemByIdApiResponse,
-  GetItemByIdServiceProps,
-  GetItemServiceProps,
-  GetItemsServiceResponse,
-  UpdateItemByIdApiResponse,
-  UpdateItemByIdServiceProps,
   type CreateItemServiceBody,
   type CreateItemServiceResponse,
+  type DeleteItemServiceProps,
+  type GetItemByIdApiResponse,
+  type GetItemByIdServiceProps,
+  type GetItemHistoryServiceProps,
+  type GetItemHistoryServiceResponse,
+  type GetItemsAvailabilityServiceProps,
+  type GetItemsAvailabilityServiceResponse,
+  type GetItemServiceProps,
+  type GetItemsServiceResponse,
+  type UpdateItemByIdApiResponse,
   type UpdateItemByIdServiceBody,
+  type UpdateItemByIdServiceProps,
 } from "./types";
 
 export function useGetItemsService(
@@ -125,6 +131,42 @@ export function useDeleteItemService(
         queryKey: ["getItems", variables.slug],
       });
     },
+    ...options,
+  });
+}
+
+export function useGetItemsAvailabilityService(
+  props: GetItemsAvailabilityServiceProps,
+  options?: UseQueryOptions<
+    GetItemsAvailabilityServiceResponse,
+    HTTPError<ErrorResponse>
+  >
+) {
+  return useQuery({
+    queryKey: [
+      "getItemsAvailability",
+      props.slug,
+      props.eventDate,
+      props.withdrawalDate,
+      props.returnDate,
+    ],
+    queryFn: async () => await getItemsAvailabilityService(props),
+    enabled: !!props.eventDate && !!props.withdrawalDate && !!props.returnDate,
+    ...options,
+  });
+}
+
+export function useGetItemHistoryService(
+  props: GetItemHistoryServiceProps,
+  options?: UseQueryOptions<
+    GetItemHistoryServiceResponse,
+    HTTPError<ErrorResponse>
+  >
+) {
+  return useQuery({
+    queryKey: ["getItemHistory", props.itemId],
+    queryFn: async () => await getItemHistoryService(props),
+    enabled: !!props.itemId,
     ...options,
   });
 }

@@ -21,6 +21,9 @@ export default function ContractsPageClient({
       ...contract,
       customerName: contract.customer.name,
       customerPhone: contract.customer.phone,
+      contractUrl: contract.contractDocuments.find(
+        (document) => document.type === "INVOICE"
+      )?.url,
     }));
   }, [contracts]);
 

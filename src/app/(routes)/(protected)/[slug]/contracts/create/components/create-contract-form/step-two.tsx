@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCreateContractContext } from "@/contexts/create-contract-context";
-import { useGetItemsService } from "@/http/items/use-items-service";
+import { useGetItemsAvailabilityService } from "@/http/items/use-items-service";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { columns } from "../columns";
@@ -14,19 +16,46 @@ import { DataTable } from "../data-table";
 export function StepTwo() {
   const { slug } = useParams() as { slug: string };
   const { form, selectedItems, setSelectedItems } = useCreateContractContext();
-  const { data: items, isLoading } = useGetItemsService({ slug });
 
-  const formattedData = items
-    ? items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        amount: item.amount,
-        status: item.status,
-        imageUrl: item.imageUrl,
-        code: item.code,
-        price: item.rentPrice,
-      }))
-    : [];
+  const formDates = form.watch(["eventDate", "withdrawalDate", "returnDate"]);
+  const [eventDate, withdrawalDate, returnDate] = formDates;
+
+  const { data: availabilityData, isLoading } = useGetItemsAvailabilityService(
+    {
+      slug,
+      eventDate,
+      withdrawalDate,
+      returnDate,
+    },
+    {
+      queryKey: [
+        "getItemsAvailability",
+        slug,
+        eventDate,
+        withdrawalDate,
+        returnDate,
+      ],
+      enabled: !!eventDate && !!withdrawalDate && !!returnDate,
+    }
+  );
+
+  const items = availabilityData?.data || [];
+
+  const formattedData =
+    items.length > 0
+      ? items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          amount: item.amount,
+          availableQuantity: item.availableQuantity,
+          status: item.status,
+          imageUrl: item.imageUrl,
+          code: item.code,
+          price: item.rentPrice,
+          isAvailable: item.isAvailable,
+          reservations: item.reservations,
+        }))
+      : [];
 
   const handleQuantityChange = (itemId: string, quantity: number) => {
     const item = items?.find((i) => i.id === itemId);
@@ -36,7 +65,7 @@ export function StepTwo() {
       return;
     }
 
-    if (quantity > item.amount) {
+    if (quantity > item.availableQuantity) {
       toast.error(
         "Não é possível adicionar mais itens que o estoque disponível."
       );
@@ -52,6 +81,12 @@ export function StepTwo() {
     const newSelectedItems = new Map(selectedItems);
     newSelectedItems.delete(itemId);
     setSelectedItems(newSelectedItems);
+  };
+
+  const formatDateRange = (start: Date, end: Date) => {
+    return `${format(new Date(start), "dd/MM/yyyy", {
+      locale: ptBR,
+    })} - ${format(new Date(end), "dd/MM/yyyy", { locale: ptBR })}`;
   };
 
   return (
@@ -85,7 +120,7 @@ export function StepTwo() {
                       <Icons.circleMinus className="size-4" />
                     </Button>
                     <Input
-                      max={item.amount}
+                      max={item.availableQuantity}
                       value={quantity}
                       onChange={(e) => {
                         const formattedValue = e.target.value.replace(
@@ -110,7 +145,9 @@ export function StepTwo() {
                       <Icons.circlePlus className="size-4" />
                     </Button>
                   </div>
-                  <Badge variant="secondary">Disponível: {item.amount}</Badge>
+                  <Badge variant="secondary">
+                    Disponível: {item.availableQuantity}
+                  </Badge>
                   <Button
                     size="icon"
                     variant="outline"
@@ -125,6 +162,7 @@ export function StepTwo() {
           })}
         </div>
       </div>
+
       {isLoading ? (
         <div className="flex flex-col gap-y-2">
           <div className="flex w-full items-center justify-between">

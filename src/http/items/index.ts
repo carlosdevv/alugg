@@ -1,12 +1,15 @@
 import { api } from "../api-client";
 import {
+  GetItemsAvailabilityServiceProps,
+  GetItemsAvailabilityServiceResponse,
   type CreateItemServiceBody,
   type CreateItemServiceResponse,
   type DeleteItemServiceProps,
   type GetItemByIdApiResponse,
   type GetItemByIdServiceProps,
+  type GetItemHistoryServiceProps,
+  type GetItemHistoryServiceResponse,
   type GetItemServiceProps,
-  type GetItemsApiResponse,
   type GetItemsServiceResponse,
   type UpdateItemByIdApiResponse,
   type UpdateItemByIdServiceBody,
@@ -16,11 +19,12 @@ import {
 export async function getItemsService({
   slug,
 }: GetItemServiceProps): Promise<GetItemsServiceResponse> {
-  const result = await api
-    .get(`api/organizations/${slug}/items`)
-    .json<GetItemsApiResponse>();
+  const url = `api/organizations/${slug}/items`;
 
-  return result.items;
+  const response = await api
+    .get(url)
+    .json<{ items: GetItemsServiceResponse }>();
+  return response.items;
 }
 
 export async function getItemByIdService({
@@ -64,4 +68,36 @@ export async function deleteItemService({
 }: DeleteItemServiceProps) {
   await api.delete(`api/organizations/${slug}/items/${itemId}`);
   return;
+}
+
+export async function getItemsAvailabilityService({
+  slug,
+  eventDate,
+  withdrawalDate,
+  returnDate,
+}: GetItemsAvailabilityServiceProps): Promise<GetItemsAvailabilityServiceResponse> {
+  const url = `api/organizations/${slug}/items/availability`;
+
+  const response = await api
+    .get(url, {
+      searchParams: {
+        eventDate,
+        withdrawalDate,
+        returnDate,
+      },
+    })
+    .json<GetItemsAvailabilityServiceResponse>();
+
+  return response;
+}
+
+export async function getItemHistoryService({
+  slug,
+  itemId,
+}: GetItemHistoryServiceProps): Promise<GetItemHistoryServiceResponse> {
+  const url = `api/organizations/${slug}/items/${itemId}/history`;
+
+  const response = await api.get(url).json<GetItemHistoryServiceResponse>();
+
+  return response;
 }

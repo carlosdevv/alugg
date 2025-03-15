@@ -2,6 +2,8 @@ import { api } from "../api-client";
 import type {
   CreateContractServiceBody,
   CreateContractServiceResponse,
+  GetContractByIdServiceProps,
+  GetContractByIdServiceResponse,
   GetContractsServiceProps,
   GetContractsServiceResponse,
   GetNextContractCodeServiceResponse,
@@ -48,4 +50,15 @@ export async function deleteContractService(
   const url = `api/organizations/${slug}/contracts/${contractId}`;
 
   await api.delete(url);
+}
+
+export async function getContractByIdService({
+  slug,
+  contractId,
+}: GetContractByIdServiceProps): Promise<GetContractByIdServiceResponse> {
+  const url = `api/organizations/${slug}/contracts/${contractId}`;
+
+  const result = await api.get(url).json<GetContractByIdServiceResponse>();
+
+  return result;
 }

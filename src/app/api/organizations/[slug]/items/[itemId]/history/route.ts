@@ -80,6 +80,7 @@ export async function GET(
     // Formatar os dados para retornar apenas o necessário
     const formattedHistory = contractHistory.map((item) => ({
       contractId: item.contract?.id,
+      code: item.contract?.code,
       customerName: item.contract?.customer?.name,
       eventDate: item.contract?.eventDate,
       withdrawalDate: item.contract?.withdrawalDate,

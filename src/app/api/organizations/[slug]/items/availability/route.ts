@@ -1,142 +1,150 @@
 import { getUserMembership } from "@/actions/get-user-membership";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse, type NextRequest } from "next/server";
+import { parse } from "date-fns";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-const checkAvailabilitySchema = z.object({
-  items: z.array(
-    z.object({
-      itemId: z.string(),
-      quantity: z.number().positive(),
-    })
-  ),
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+const availabilityQuerySchema = z.object({
+  eventDate: z.string().min(1, "Data do evento é obrigatória"),
+  withdrawalDate: z.string().min(1, "Data de retirada é obrigatória"),
+  returnDate: z.string().min(1, "Data de devolução é obrigatória"),
 });
 
-export async function POST(
+export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
     const { userId } = auth();
-    const { slug } = params;
 
     if (!userId) {
       return NextResponse.json(
-        { message: "Usuário não encontrado." },
-        { status: 404 }
+        { message: "Usuário não autenticado." },
+        { status: 401 }
       );
     }
 
-    if (!slug) {
+    const { slug } = params;
+    const searchParams = req.nextUrl.searchParams;
+
+    const eventDate = searchParams.get("eventDate");
+    const withdrawalDate = searchParams.get("withdrawalDate");
+    const returnDate = searchParams.get("returnDate");
+
+    const validation = availabilityQuerySchema.safeParse({
+      eventDate,
+      withdrawalDate,
+      returnDate,
+    });
+
+    if (!validation.success) {
       return NextResponse.json(
-        { message: "É necessário informar o ID da Organização." },
+        { message: "Parâmetros inválidos", errors: validation.error.format() },
         { status: 400 }
       );
     }
 
-    const body = await req.json();
-    const parsed = checkAvailabilitySchema.safeParse(body);
-
-    if (!parsed.success) {
-      return NextResponse.json(
-        { message: "Dados inválidos para verificação de disponibilidade." },
-        { status: 400 }
-      );
-    }
-
-    const { items, startDate, endDate } = parsed.data;
     const { organization } = await getUserMembership(slug);
 
-    const availabilityResults = await Promise.all(
-      items.map(async (item) => {
-        const isAvailable = await checkItemAvailability(
-          item.itemId,
-          item.quantity,
-          startDate,
-          endDate,
-          organization.id
-        );
+    // Converter datas do formato dd/MM/yyyy para objetos Date
+    const parsedEventDate = parse(eventDate as string, "dd/MM/yyyy", new Date());
+    const parsedWithdrawalDate = parse(withdrawalDate as string, "dd/MM/yyyy", new Date());
+    const parsedReturnDate = parse(returnDate as string, "dd/MM/yyyy", new Date());
 
-        const itemDetails = await prisma.item.findUnique({
-          where: { id: item.itemId },
-          select: { name: true, amount: true },
-        });
+    // Buscar todos os itens da organização
+    const items = await prisma.item.findMany({
+      where: {
+        organizationId: organization.id,
+      },
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
 
-        return {
-          itemId: item.itemId,
-          name: itemDetails?.name || "Item desconhecido",
-          requestedQuantity: item.quantity,
-          totalQuantity: itemDetails?.amount || 0,
-          isAvailable,
-        };
-      })
-    );
+    // Buscar contratos que se sobrepõem às datas solicitadas
+    const overlappingContracts = await prisma.contract.findMany({
+      where: {
+        organizationId: organization.id,
+        status: { notIn: ["CANCELLED"] },
+        OR: [
+          {
+            // Contratos que começam durante o período solicitado
+            eventDate: {
+              gte: parsedWithdrawalDate,
+              lte: parsedReturnDate,
+            },
+          },
+          {
+            // Contratos que terminam durante o período solicitado
+            returnDate: {
+              gte: parsedWithdrawalDate,
+              lte: parsedReturnDate,
+            },
+          },
+          {
+            // Contratos que abrangem todo o período solicitado
+            eventDate: { lte: parsedWithdrawalDate },
+            returnDate: { gte: parsedReturnDate },
+          },
+        ],
+      },
+      include: {
+        rentedItems: {
+          include: {
+            item: true,
+          },
+        },
+      },
+    });
 
-    const allAvailable = availabilityResults.every((result) => result.isAvailable);
+    // Calcular a disponibilidade para cada item
+    const itemsAvailability = items.map((item) => {
+      // Verificar quantos deste item estão reservados durante o período
+      const reservedQuantity = overlappingContracts.reduce(
+        (total, contract) => {
+          const rentedItem = contract.rentedItems.find(
+            (ri) => ri.itemId === item.id
+          );
+          return total + (rentedItem ? rentedItem.quantity : 0);
+        },
+        0
+      );
 
-    return NextResponse.json({
-      allAvailable,
-      items: availabilityResults,
-    }, { status: 200 });
+      // Calcular quantidade disponível
+      const availableQuantity = Math.max(0, item.amount - reservedQuantity);
+
+      // Obter datas de reserva para esse item (se não estiver totalmente disponível)
+      const reservations = overlappingContracts
+        .filter((contract) =>
+          contract.rentedItems.some((ri) => ri.itemId === item.id)
+        )
+        .map((contract) => ({
+          eventDate: contract.eventDate,
+          withdrawalDate: contract.withdrawalDate,
+          returnDate: contract.returnDate,
+        }));
+
+      return {
+        ...item,
+        availableQuantity,
+        isAvailable: availableQuantity > 0,
+        reservations: reservations.length > 0 ? reservations : null,
+      };
+    });
+
+    console.log("BATIIIIIIIIII", itemsAvailability);
+
+    return NextResponse.json({ data: itemsAvailability });
   } catch (error) {
-    console.error("Erro ao verificar disponibilidade:", error);
+    console.error(error);
     return NextResponse.json(
-      { message: "Ocorreu um erro ao verificar a disponibilidade dos itens." },
+      { message: "Erro interno do servidor." },
       { status: 500 }
     );
   }
 }
-
-async function checkItemAvailability(
-  itemId: string,
-  requestedQuantity: number,
-  startDate: string,
-  endDate: string,
-  organizationId: string
-): Promise<boolean> {
-  // Buscar o item para verificar a quantidade total disponível
-  const item = await prisma.item.findUnique({
-    where: { id: itemId },
-    select: { amount: true },
-  });
-
-  if (!item) return false;
-
-  // Buscar todos os contratos ativos que se sobrepõem ao período solicitado
-  const overlappingContracts = await prisma.contract.findMany({
-    where: {
-      organizationId,
-      status: { not: "CANCELLED" },
-      OR: [
-        {
-          // Contratos que começam antes e terminam durante o período solicitado
-          withdrawalDate: { lte: new Date(endDate) },
-          returnDate: { gte: new Date(startDate) },
-        },
-        {
-          // Contratos que começam durante o período solicitado
-          withdrawalDate: { 
-            gte: new Date(startDate),
-            lte: new Date(endDate) 
-          },
-        },
-      ],
-    },
-    include: {
-      rentedItems: {
-        where: { itemId },
-      },
-    },
-  });
-
-  // Calcular a quantidade total já reservada para o período
-  const reservedQuantity = overlappingContracts.reduce((total, contract) => {
-    return total + contract.rentedItems.reduce((sum, rentedItem) => sum + rentedItem.quantity, 0);
-  }, 0);
-
-  // Verificar se há quantidade suficiente disponível
-  return item.amount - reservedQuantity >= requestedQuantity;
-} 

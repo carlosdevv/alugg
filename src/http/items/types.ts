@@ -66,3 +66,76 @@ export type CreateItemServiceBody = {
 export type CreateItemServiceResponse = ItemProps;
 
 export type DeleteItemServiceProps = GetItemByIdServiceProps;
+
+export type Item = {
+  id: string;
+  name: string;
+  code: string | null;
+  objectPrice: number;
+  rentPrice: number;
+  size: string | null;
+  color: string | null;
+  description: string | null;
+  amount: number;
+  status: ItemStatus;
+  imageUrl: string | null;
+  categoryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  organizationId: string;
+  category: {
+    name: string;
+  };
+};
+
+export type ItemReservation = {
+  eventDate: Date;
+  withdrawalDate: Date;
+  returnDate: Date;
+};
+
+export type ItemAvailability = Item & {
+  availableQuantity: number;
+  isAvailable: boolean;
+  reservations: ItemReservation[] | null;
+};
+
+export type GetItemsAvailabilityServiceProps = {
+  slug: string;
+  eventDate: string;
+  withdrawalDate: string;
+  returnDate: string;
+};
+
+export type GetItemsAvailabilityServiceResponse = {
+  data: ItemAvailability[];
+};
+
+export type ItemHistoryContract = {
+  contractId: string;
+  code: string;
+  customerName: string;
+  eventDate: Date;
+  withdrawalDate: Date;
+  returnDate: Date;
+  totalValue: number;
+  quantity: number;
+};
+
+export type ItemHistoryData = {
+  item: {
+    id: string;
+    name: string;
+    amount: number;
+  };
+  contractHistory: ItemHistoryContract[];
+};
+
+export type GetItemHistoryServiceProps = {
+  slug: string;
+  itemId: string;
+};
+
+export type GetItemHistoryServiceResponse = {
+  data: ItemHistoryData;
+};

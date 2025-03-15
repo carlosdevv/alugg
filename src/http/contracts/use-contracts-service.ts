@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import {
   createContractService,
   deleteContractService,
+  getContractByIdService,
   getContractsService,
   getNextContractCodeService,
 } from ".";
@@ -19,6 +20,8 @@ import type { ErrorResponse } from "../types";
 import type {
   CreateContractServiceBody,
   CreateContractServiceResponse,
+  GetContractByIdServiceProps,
+  GetContractByIdServiceResponse,
   GetContractsServiceProps,
   GetContractsServiceResponse,
   GetNextContractCodeServiceProps,
@@ -35,6 +38,20 @@ export function useGetContractsService(
   return useQuery({
     queryKey: ["getContracts", props.slug],
     queryFn: async () => await getContractsService(props),
+    ...options,
+  });
+}
+
+export function useGetContractByIdService(
+  props: GetContractByIdServiceProps,
+  options?: UseQueryOptions<
+    GetContractByIdServiceResponse,
+    HTTPError<ErrorResponse>
+  >
+) {
+  return useQuery({
+    queryKey: ["getContractById", props.slug, props.contractId],
+    queryFn: async () => await getContractByIdService(props),
     ...options,
   });
 }

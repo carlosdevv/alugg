@@ -2,7 +2,6 @@
 
 import { Icons } from "@/components/icons";
 import { Badge, type BadgeProps } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   FloatingPanelBody,
   FloatingPanelCloseButton,
@@ -13,29 +12,38 @@ import {
 } from "@/components/ui/floating-panel";
 import type { ItemStatus } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { ItemHistorySheet } from "./item-history-sheet";
 
-export type CreateContractColumn = {
-  id: string;
-  imageUrl?: string;
-  name: string;
-  amount: number;
-  status: ItemStatus;
-  code?: string;
-  price: number;
+type Status = {
+  value: ItemStatus;
+  label: string;
+  variant: BadgeProps["variant"];
 };
 
-export const columns: ColumnDef<CreateContractColumn>[] = [
+export type Item = {
+  id: string;
+  name: string;
+  code: string | null;
+  amount: number;
+  status: ItemStatus;
+  imageUrl: string | null;
+  price: number;
+  isAvailable?: boolean;
+  availableQuantity: number;
+  reservations?: Array<{
+    eventDate: Date;
+    withdrawalDate: Date;
+    returnDate: Date;
+  }> | null;
+};
+
+export const columns: ColumnDef<Item>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
     enableSorting: false,
     enableHiding: false,
   },
@@ -87,27 +95,38 @@ export const columns: ColumnDef<CreateContractColumn>[] = [
     },
   },
   {
-    accessorKey: "code",
-    header: "Código",
-    cell: ({ row }) => {
-      const code: string = row.getValue("code") || "-";
-      return <div className="font-medium">{code}</div>;
-    },
-  },
-  {
     accessorKey: "name",
     header: "Nome",
-    cell: ({ row }) => {
-      return (
-        <div className="truncate max-w-60 font-medium">
-          {row.getValue("name")}
-        </div>
-      );
-    },
+  },
+  {
+    accessorKey: "code",
+    header: "Código",
   },
   {
     accessorKey: "amount",
     header: "Quantidade",
+    cell: ({ row }) => {
+      const item = row.original;
+      return (
+        <span>
+          {item.availableQuantity !== undefined
+            ? `${item.availableQuantity}/${item.amount}`
+            : item.amount}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const item = row.original;
+      return (
+        <Badge variant={statuses[item.status].variant}>
+          {statuses[item.status].label}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: "price",
@@ -123,50 +142,85 @@ export const columns: ColumnDef<CreateContractColumn>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "history",
+    header: "Histórico",
     cell: ({ row }) => {
-      const status: ItemStatus = row.getValue("status") || "ACTIVE";
+      const item = row.original;
+
+      return <ItemHistorySheet itemId={item.id} itemName={item.name} />;
+    },
+  },
+  {
+    id: "availability",
+    header: "Disponibilidade",
+    cell: ({ row }) => {
+      const item = row.original;
+      if (item.isAvailable) {
+        return <Badge variant="green">Disponível</Badge>;
+      }
+
       return (
-        <div className="flex justify-center">
-          <Badge variant={statusVariant[status]} className="uppercase">
-            {statusText[status]}
+        <div className="flex flex-col">
+          <Badge variant="rose" className="w-fit">
+            Não Disponível
           </Badge>
+          {item.reservations && (
+            <div className="mt-1 text-xs text-gray-500">
+              <p className="font-semibold">Reservado em:</p>
+              <ul className="list-disc ml-4">
+                {item.reservations.map((reservation, idx) => (
+                  <li key={idx}>
+                    {formatDateRange(
+                      reservation.withdrawalDate,
+                      reservation.returnDate
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       );
     },
   },
-  {
-    accessorKey: "disponibility",
-    header: "Disponibilidade",
-    cell: ({ row }) => {
-      return <Badge variant="green">DISPONIVEL</Badge>;
-    },
-  },
-  {
-    accessorKey: "history",
-    header: "Histórico",
-  },
-  {
-    accessorKey: "events",
-    header: "Eventos",
-  },
 ];
 
-const statusVariant: Record<ItemStatus, BadgeProps["variant"]> = {
-  ACTIVE: "violet",
-  INACTIVE: "rose",
-  PENDING: "yellow",
-  AVALIABLE: "green",
-  IN_USE: "indigo",
-  IN_REPAIR: "gray",
+// Função auxiliar para formatar intervalo de datas
+const formatDateRange = (start: Date, end: Date) => {
+  return `${format(new Date(start), "dd/MM/yyyy", {
+    locale: ptBR,
+  })} - ${format(new Date(end), "dd/MM/yyyy", { locale: ptBR })}`;
 };
 
-const statusText: Record<ItemStatus, string> = {
-  ACTIVE: "Ativo",
-  INACTIVE: "Inativo",
-  PENDING: "Pendente",
-  AVALIABLE: "Disponível",
-  IN_USE: "Em uso",
-  IN_REPAIR: "Em reparo",
+const statuses: Record<ItemStatus, Status> = {
+  ACTIVE: {
+    value: "ACTIVE",
+    label: "Ativo",
+    variant: "violet",
+  },
+  INACTIVE: {
+    value: "INACTIVE",
+    label: "Inativo",
+    variant: "rose",
+  },
+  PENDING: {
+    value: "PENDING",
+    label: "Pendente",
+    variant: "yellow",
+  },
+  AVALIABLE: {
+    value: "AVALIABLE",
+    label: "Disponível",
+    variant: "green",
+  },
+  IN_USE: {
+    value: "IN_USE",
+    label: "Em uso",
+    variant: "indigo",
+  },
+  IN_REPAIR: {
+    value: "IN_REPAIR",
+    label: "Em reparo",
+    variant: "gray",
+  },
 };

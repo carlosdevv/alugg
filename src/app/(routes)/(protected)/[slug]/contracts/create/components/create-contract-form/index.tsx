@@ -44,6 +44,20 @@ export default function CreateContractForm() {
     isCreatingContract,
   } = useCreateContractForm();
 
+  // Obter valores do formulário para validação
+  const formValues = form.watch();
+  const { customerId, eventDate, withdrawalDate, returnDate } = formValues;
+  
+  // Verificar se pode avançar da step 1
+  const canAdvanceFromStepOne = 
+    !!customerId && !!eventDate && !!withdrawalDate && !!returnDate;
+  
+  // Determinar se o botão "Avançar" deve estar desabilitado
+  const isNextButtonDisabled = 
+    isCreatingContract || 
+    (currentStep === 1 && !canAdvanceFromStepOne) ||
+    currentStep > steps.length;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
@@ -92,7 +106,7 @@ export default function CreateContractForm() {
               variant="outline"
               className="w-min"
               onClick={handleNextStep}
-              disabled={currentStep > steps.length || isCreatingContract}
+              disabled={isNextButtonDisabled}
             >
               Avançar
             </Button>

@@ -68,7 +68,7 @@ type useUpdateCustomerFormProps = {
   id: string;
 };
 
-export default function useUpdateCustomerForm({
+export default function useUpdateContractForm({
   customer,
   id,
 }: useUpdateCustomerFormProps) {
