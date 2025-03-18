@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { useGetContractByIdService } from "@/http/contracts/use-contracts-service";
 import { useRouter } from "next/navigation";
-import UpdateContractPageLoading from "./loading";
 import UpdateContractForm from "./components/update-contract-form";
+import UpdateContractPageLoading from "./loading";
 
 interface UpdateContractPageClientProps {
   slug: string;
@@ -25,7 +25,9 @@ export default function UpdateContractPageClient({
     <>
       {isLoading && <UpdateContractPageLoading />}
 
-      {contract && !isLoading && <UpdateContractForm contract={contract} />}
+      {contract && !isLoading && (
+        <UpdateContractForm contract={contract.data} />
+      )}
 
       {!contract && !isLoading && (
         <div className="flex items-center space-x-6">

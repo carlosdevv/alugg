@@ -15,6 +15,7 @@ import {
   getContractByIdService,
   getContractsService,
   getNextContractCodeService,
+  updateContractService,
 } from ".";
 import type { ErrorResponse } from "../types";
 import type {
@@ -26,6 +27,8 @@ import type {
   GetContractsServiceResponse,
   GetNextContractCodeServiceProps,
   GetNextContractCodeServiceResponse,
+  UpdateContractServiceBody,
+  UpdateContractServiceResponse,
 } from "./types";
 
 export function useGetContractsService(
@@ -110,6 +113,32 @@ export function useDeleteContractService(
       await deleteContractService(slug, contractId),
     onSuccess: () => {
       toast.success("Contrato deletado com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["getContracts", slug] });
+    },
+    onError: async (error) => {
+      const { message } = await error.response.json();
+      toast.error(message);
+    },
+    ...options,
+  });
+}
+
+export function useUpdateContractService(
+  options?: UseMutationOptions<
+    UpdateContractServiceResponse,
+    HTTPError<ErrorResponse>,
+    UpdateContractServiceBody
+  >
+) {
+  const queryClient = useQueryClient();
+  const { slug } = useParams() as { slug: string };
+
+  return useMutation({
+    mutationKey: ["updateContract", slug],
+    mutationFn: async (body: UpdateContractServiceBody) =>
+      await updateContractService(slug, body),
+    onSuccess: () => {
+      toast.success("Contrato atualizado com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["getContracts", slug] });
     },
     onError: async (error) => {

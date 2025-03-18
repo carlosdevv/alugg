@@ -189,7 +189,6 @@ export const CreateContractProvider = ({
     }
   );
 
-  // Função para gerar o PDF do contrato
   async function generateContractPDF() {
     const formValues = form.getValues();
     const formItems = formValues.items || [];
@@ -233,8 +232,7 @@ export const CreateContractProvider = ({
       const supabase = createClient();
       const pdfBlob = await generateContractPDF();
 
-      // Criar um nome de arquivo único com o código do contrato
-      const fileName = `contrato-${nextContractCode}-${slug}-${Date.now()}.pdf`;
+      const fileName = `${slug}/${slug}-contrato-${nextContractCode}.pdf`;
 
       const { error: supabaseError } = await supabase.storage
         .from("organization-contracts")

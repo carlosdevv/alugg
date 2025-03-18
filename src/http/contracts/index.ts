@@ -7,6 +7,8 @@ import type {
   GetContractsServiceProps,
   GetContractsServiceResponse,
   GetNextContractCodeServiceResponse,
+  UpdateContractServiceBody,
+  UpdateContractServiceResponse,
 } from "./types";
 
 export async function getContractsService({
@@ -59,6 +61,22 @@ export async function getContractByIdService({
   const url = `api/organizations/${slug}/contracts/${contractId}`;
 
   const result = await api.get(url).json<GetContractByIdServiceResponse>();
+
+  return result;
+}
+
+export async function updateContractService(
+  slug: string,
+  body: UpdateContractServiceBody
+): Promise<UpdateContractServiceResponse> {
+  const { contractId, ...rest } = body;
+  const url = `api/organizations/${slug}/contracts/${contractId}`;
+
+  const result = await api
+    .put(url, {
+      json: rest,
+    })
+    .json<UpdateContractServiceResponse>();
 
   return result;
 }

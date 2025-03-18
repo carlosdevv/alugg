@@ -13,9 +13,9 @@ import { appRoutes } from "@/lib/constants";
 import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import type { ContractColumn } from "./columns";
 import { DeleteContractDialog } from "./delete-contract-dialog";
-import { toast } from "sonner";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
@@ -46,7 +46,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
               <Icons.verticalEllipsis className="size-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-44 mr-4">
+          <DropdownMenuContent className="w-48 mr-4">
             <DropdownMenuLabel>Opções</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup className="space-y-1">
@@ -57,8 +57,8 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
                   }}
                   className="flex items-center justify-between"
                 >
-                  Ver Detalhes
-                  <Icons.horizontalEllipsis className="size-4" />
+                  Atualizar Contrato
+                  <Icons.update className="size-4" />
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -82,6 +82,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
       </div>
       <DeleteContractDialog
         contractId={contractId}
+        contractCode={props.code}
         open={openDeleteDialog}
         onOpenChange={setOpenDeleteDialog}
       />
