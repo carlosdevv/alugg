@@ -48,9 +48,21 @@ export async function GET(
     const { organization } = await getUserMembership(slug);
 
     // Converter datas do formato dd/MM/yyyy para objetos Date
-    const parsedEventDate = parse(eventDate as string, "dd/MM/yyyy", new Date());
-    const parsedWithdrawalDate = parse(withdrawalDate as string, "dd/MM/yyyy", new Date());
-    const parsedReturnDate = parse(returnDate as string, "dd/MM/yyyy", new Date());
+    const parsedEventDate = parse(
+      eventDate as string,
+      "dd/MM/yyyy",
+      new Date()
+    );
+    const parsedWithdrawalDate = parse(
+      withdrawalDate as string,
+      "dd/MM/yyyy",
+      new Date()
+    );
+    const parsedReturnDate = parse(
+      returnDate as string,
+      "dd/MM/yyyy",
+      new Date()
+    );
 
     // Buscar todos os itens da organização
     const items = await prisma.item.findMany({
@@ -136,8 +148,6 @@ export async function GET(
         reservations: reservations.length > 0 ? reservations : null,
       };
     });
-
-    console.log("BATIIIIIIIIII", itemsAvailability);
 
     return NextResponse.json({ data: itemsAvailability });
   } catch (error) {

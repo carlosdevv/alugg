@@ -230,14 +230,47 @@ export function StepThree() {
 
   // Inicializar os itens no formulário
   useEffect(() => {
-    if (items && selectedItems.size > 0 && !form.getValues("items")) {
+    if (items && selectedItems.size > 0) {
       const formItems = Array.from(selectedItems)
         .map(([itemId, quantity]) => {
           const item = items.find((i) => i.id === itemId);
           if (!item) return null;
 
           const baseValue = item.rentPrice * quantity;
+          
+          // Verificar se o item já existe no formulário para preservar configurações
+          const existingItem = form.getValues("items")?.find(
+            (formItem) => formItem.itemId === itemId
+          );
 
+          if (existingItem) {
+            // Se a quantidade mudou, atualizar o valor base e final
+            if (existingItem.quantity !== quantity) {
+              const newBaseValue = item.rentPrice * quantity;
+              let newFinalValue = newBaseValue;
+              
+              // Recalcular desconto se existir
+              if (existingItem.discount.value > 0) {
+                if (existingItem.discount.mode === "percent") {
+                  newFinalValue = newBaseValue * (1 - existingItem.discount.value / 100);
+                } else {
+                  newFinalValue = Math.max(0, newBaseValue - existingItem.discount.value);
+                }
+              }
+              
+              return {
+                ...existingItem,
+                quantity,
+                baseValue: newBaseValue,
+                finalValue: existingItem.isBonus ? 0 : newFinalValue,
+              };
+            }
+            
+            // Se a quantidade não mudou, manter as configurações existentes
+            return existingItem;
+          }
+
+          // Criar novo item se não existir
           return {
             itemId,
             quantity,
@@ -262,7 +295,20 @@ export function StepThree() {
         finalValue: number;
       }[];
 
-      form.setValue("items", formItems);
+      // Atualizar apenas se houver mudanças nos itens
+      const currentItems = form.getValues("items") || [];
+      const itemsChanged = 
+        formItems.length !== currentItems.length || 
+        formItems.some((item, index) => {
+          const currentItem = currentItems[index];
+          return !currentItem || 
+                 item.itemId !== currentItem.itemId || 
+                 item.quantity !== currentItem.quantity;
+        });
+
+      if (itemsChanged) {
+        form.setValue("items", formItems);
+      }
     }
   }, [items, selectedItems, form]);
 
@@ -311,14 +357,18 @@ export function StepThree() {
           </CardHeader>
           <Separator />
           <CardContent className="flex flex-col gap-y-2">
-            <header className="grid grid-cols-2 sm:grid-cols-6 text-xs text-muted-foreground mt-4 gap-x-4">
-              <span className="col-span-1 sm:col-span-1">Nome</span>
-              <span className="hidden sm:block sm:col-span-1">Código</span>
-              <span className="col-span-1 sm:col-span-1">Quantidade</span>
-              <span className="hidden sm:block sm:col-span-1 text-center">
+            <header className="grid grid-cols-2 sm:grid-cols-[1.5fr_80px_50px_50px_1fr_1.4fr] text-xs text-muted-foreground mt-4 gap-x-4">
+              <span className="col-span-1 truncate">Nome</span>
+              <span className="hidden sm:block text-center">
+                Código
+              </span>
+              <span className="col-span-1 text-center">
+                Qtd
+              </span>
+              <span className="hidden sm:block text-center">
                 Bônus
               </span>
-              <div className="hidden sm:flex sm:col-span-1 items-center gap-x-2 justify-center">
+              <div className="hidden sm:flex items-center gap-x-1 justify-center">
                 <span>Desconto</span>
                 <TooltipProvider>
                   <Tooltip>
@@ -332,7 +382,7 @@ export function StepThree() {
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <span className="hidden sm:block sm:col-span-1 text-right truncate">
+              <span className="hidden sm:block text-right truncate">
                 Valor por Item
               </span>
             </header>
@@ -346,18 +396,18 @@ export function StepThree() {
                 return (
                   <div
                     key={formItem.itemId}
-                    className="grid grid-cols-2 sm:grid-cols-6 items-center gap-x-4 gap-y-2 py-2 border-b border-border"
+                    className="grid grid-cols-2 sm:grid-cols-[1.5fr_80px_50px_50px_1fr_1.4fr] items-center gap-x-4 gap-y-2 py-2 border-b border-border"
                   >
-                    <span className="col-span-1 sm:col-span-1 font-medium text-xs truncate">
+                    <span className="col-span-1 font-medium text-xs truncate max-w-full" title={item.name}>
                       {item.name}
                     </span>
-                    <span className="hidden sm:block sm:col-span-1 font-medium text-xs">
+                    <span className="hidden sm:block font-medium text-xs text-center">
                       {item.code ?? "N/A"}
                     </span>
-                    <span className="col-span-1 sm:col-span-1 font-medium text-xs">
+                    <span className="col-span-1 font-medium text-xs text-center">
                       {formItem.quantity}
                     </span>
-                    <div className="hidden sm:flex sm:col-span-1 justify-center">
+                    <div className="hidden sm:flex justify-center">
                       <Checkbox
                         checked={formItem.isBonus}
                         onCheckedChange={(checked) => {
@@ -365,9 +415,9 @@ export function StepThree() {
                         }}
                       />
                     </div>
-                    <div className="col-span-1 sm:col-span-1 relative flex rounded-md shadow-xs justify-center">
+                    <div className="col-span-1 relative flex rounded-md shadow-xs justify-center w-full">
                       <CurrencyPercentInput
-                        className="rounded shadow-none"
+                        className="rounded shadow-none w-full"
                         defaultMode={formItem.discount.mode}
                         defaultValue={formItem.discount.value}
                         onValueChange={(value, mode) => {
@@ -380,10 +430,10 @@ export function StepThree() {
                         maxCurrencyValue={formItem.baseValue}
                       />
                     </div>
-                    <div className="col-span-1 sm:col-span-1 relative flex rounded-md shadow-xs justify-end">
+                    <div className="col-span-1 relative flex rounded-md shadow-xs justify-end w-full">
                       <div className="relative w-full">
                         <Input
-                          className="peer ps-9"
+                          className="peer ps-9 w-full"
                           placeholder="0,00"
                           value={(formItem.finalValue / formItem.quantity)
                             .toFixed(2)
@@ -635,9 +685,42 @@ export function StepThree() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <span>Total: {formatToCurrency(totalValueState.toString())}</span>
+            {/* Seção de itens contratados */}
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-medium">Resumo</h3>
+              <h3 className="text-sm font-medium">Itens Contratados</h3>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {form.watch("items")?.map((formItem, index) => {
+                  const item = items?.find((i) => i.id === formItem.itemId);
+                  if (!item) return null;
+
+                  return (
+                    <div key={index} className="flex justify-between text-xs">
+                      <div className="flex-1 truncate">
+                        <span className="font-medium">{item.name}</span>
+                        <span className="text-muted-foreground ml-1">
+                          ({formItem.quantity}x)
+                        </span>
+                      </div>
+                      <span className="ml-2">
+                        {formItem.isBonus
+                          ? "Bônus"
+                          : formatToCurrency(formItem.finalValue.toString())}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <Separator className="my-2" />
+              <div className="flex items-center justify-between font-medium">
+                <span className="text-sm">Subtotal:</span>
+                <span>{formatToCurrency(totalValueState.toString())}</span>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-col gap-2">
+              <h3 className="text-sm font-medium">Resumo de Pagamentos</h3>
               {form.watch("paymentMethod")?.length > 0 ? (
                 <div className="space-y-2">
                   {form.watch("paymentMethod").map((method, index) => (

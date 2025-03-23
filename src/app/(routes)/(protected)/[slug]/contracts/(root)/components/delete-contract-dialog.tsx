@@ -1,6 +1,7 @@
 import DeleteDialog from "@/components/ui/custom/delete-dialog";
 import { useDeleteContractService } from "@/http/contracts/use-contracts-service";
 import { createClient } from "@/lib/supabase/client";
+import { ContractDocumentType } from "@prisma/client";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -33,12 +34,23 @@ export function DeleteContractDialog({
         try {
           await deleteContractService(contractId);
 
-          const { error: storageError } = await supabase.storage
+          const { error: storageErrorInvoice } = await supabase.storage
             .from("organization-contracts")
-            .remove([`${slug}/${slug}-contrato-${contractCode}.pdf`]);
+            .remove([
+              `${slug}/${ContractDocumentType.INVOICE.toLowerCase()}/contrato-${contractCode}-${ContractDocumentType.INVOICE.toLowerCase()}.pdf`,
+            ]);
 
-          if (storageError) {
-            console.error("Erro ao remover arquivo:", storageError);
+          const { error: storageErrorWithdrawal } = await supabase.storage
+            .from("organization-contracts")
+            .remove([
+              `${slug}/${ContractDocumentType.WITHDRAWAL.toLowerCase()}/contrato-${contractCode}-${ContractDocumentType.WITHDRAWAL.toLowerCase()}.pdf`,
+            ]);
+
+          if (storageErrorInvoice || storageErrorWithdrawal) {
+            console.error(
+              "Erro ao remover arquivo:",
+              storageErrorInvoice || storageErrorWithdrawal
+            );
           }
 
           return true;

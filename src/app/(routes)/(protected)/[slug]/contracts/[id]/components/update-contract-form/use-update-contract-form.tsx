@@ -1,9 +1,18 @@
+import { ContractInvoicePDF } from "@/components/contract-pdf/invoice/contract-invoice-pdf";
 import type { BadgeProps } from "@/components/ui/badge";
 import type { ContractProps } from "@/http/contracts/types";
 import { useUpdateContractService } from "@/http/contracts/use-contracts-service";
+import { useGetCustomerByIdService } from "@/http/customers/use-customers-service";
 import { useGetItemsAvailabilityService } from "@/http/items/use-items-service";
+import { useGetOrganizationService } from "@/http/organizations/use-organizations-service";
+import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ContractStatus, PaymentMethod } from "@prisma/client";
+import {
+  ContractDocumentType,
+  ContractStatus,
+  PaymentMethod,
+} from "@prisma/client";
+import { pdf } from "@react-pdf/renderer";
 import { format } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -37,10 +46,8 @@ const updateContractFormSchema = z.object({
   withdrawalDate: z.string(),
   returnDate: z.string(),
   additionalInformation: z.string().optional(),
-  payments: z.array(paymentMethodSchema),
-  items: z.array(rentedItemSchema).optional(),
-  customerId: z.string().optional(),
-  memberId: z.string().optional(),
+  paymentMethod: z.array(paymentMethodSchema),
+  items: z.array(rentedItemSchema),
   totalValue: z.number().optional(),
 });
 
@@ -48,6 +55,19 @@ type UpdateContractFormValues = z.infer<typeof updateContractFormSchema>;
 
 type UseUpdateContractFormProps = {
   contract: ContractProps;
+};
+
+const formatDate = (date: Date | string) => {
+  try {
+    const validDate = date instanceof Date ? date : new Date(date);
+    if (isNaN(validDate.getTime())) {
+      return format(new Date(), "yyyy-MM-dd");
+    }
+    return format(validDate, "yyyy-MM-dd");
+  } catch (error) {
+    console.error("Erro ao formatar data:", error);
+    return format(new Date(), "yyyy-MM-dd");
+  }
 };
 
 export default function useUpdateContractForm({
@@ -58,19 +78,8 @@ export default function useUpdateContractForm({
   const [isGeneratingDocument, setIsGeneratingDocument] = useState(false);
   const [paymentToRemove, setPaymentToRemove] = useState<number | null>(null);
   const [availableItems, setAvailableItems] = useState<any[]>([]);
-
-  const formatDate = (date: Date | string) => {
-    try {
-      const validDate = date instanceof Date ? date : new Date(date);
-      if (isNaN(validDate.getTime())) {
-        return format(new Date(), "yyyy-MM-dd");
-      }
-      return format(validDate, "yyyy-MM-dd");
-    } catch (error) {
-      console.error("Erro ao formatar data:", error);
-      return format(new Date(), "yyyy-MM-dd");
-    }
-  };
+  const [isUpdatingPdf, setIsUpdatingPdf] = useState(false);
+  const [isOpenDialog, setIsOpenDialog] = useState(false);
 
   const form = useForm<UpdateContractFormValues>({
     resolver: zodResolver(updateContractFormSchema),
@@ -79,9 +88,8 @@ export default function useUpdateContractForm({
       withdrawalDate: formatDate(contract?.withdrawalDate || new Date()),
       returnDate: formatDate(contract?.returnDate || new Date()),
       additionalInformation: contract?.additionalInformation || "",
-      customerId: contract?.customer?.id || "",
       totalValue: contract?.totalValue || 0,
-      payments:
+      paymentMethod:
         Array.isArray(contract?.payments) && contract.payments.length > 0
           ? contract.payments.map((payment) => ({
               id: payment.id,
@@ -115,6 +123,8 @@ export default function useUpdateContractForm({
     },
   });
 
+  const { data: organization } = useGetOrganizationService({ slug });
+
   const { mutateAsync: updateContractService, isPending: isUpdatingContract } =
     useUpdateContractService();
 
@@ -129,7 +139,8 @@ export default function useUpdateContractForm({
       enabled:
         !!form.watch("eventDate") &&
         !!form.watch("withdrawalDate") &&
-        !!form.watch("returnDate"),
+        !!form.watch("returnDate") &&
+        isOpenDialog,
       queryKey: [
         "getItemsAvailability",
         slug,
@@ -140,17 +151,139 @@ export default function useUpdateContractForm({
     }
   );
 
-  useEffect(() => {
-    if (availabilityData?.data) {
-      setAvailableItems(availabilityData.data);
+  const { data: customerProps } = useGetCustomerByIdService({
+    customerId: contract.customer.id,
+    slug,
+  });
+
+  async function generateContractPDF() {
+    const formValues = form.getValues();
+    const formItems = formValues.items || [];
+
+    const selectedItemsData = formItems
+      .map((formItem) => {
+        // Primeiro, verificar se o item existe nos itens disponíveis
+        const itemData = availableItems?.find(
+          (item) => item.id === formItem.itemId
+        );
+
+        // Se não encontrar nos itens disponíveis, procurar nos itens originais do contrato
+        const originalItem = contract.rentedItems?.find(
+          (item) => item.itemId === formItem.itemId
+        );
+
+        // Se não encontrar em nenhum lugar, retornar null
+        if (!itemData && !originalItem) return null;
+
+        // Usar os dados do item disponível ou do item original do contrato
+        const baseItemData = itemData || {
+          id: formItem.itemId,
+          name: originalItem?.item?.name || "Item não encontrado",
+          price: originalItem?.item?.price || 0,
+        };
+
+        // Adaptar o formato do desconto para o esperado pelo ContractPDF
+        const discount = formItem.discountMode
+          ? {
+              value: formItem.discount || 0,
+              mode: formItem.discountMode as "currency" | "percent",
+            }
+          : formItem.discount || 0;
+
+        return {
+          ...baseItemData,
+          quantity: formItem.quantity,
+          isBonus: formItem.isBonus,
+          discount: discount,
+          discountMode: formItem.discountMode,
+          finalValue: formItem.finalValue,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+
+    const seller = {
+      name: contract.seller.name || "",
+    };
+
+    // Gerar o PDF
+    const blob = await pdf(
+      <ContractInvoicePDF
+        organization={organization}
+        customer={customerProps}
+        items={selectedItemsData}
+        totalValue={contract.totalValue}
+        seller={seller}
+        formValues={formValues}
+        code={contract.code}
+      />
+    ).toBlob();
+
+    return blob;
+  }
+
+  async function getContractPdfAndUpdateContract() {
+    setIsUpdatingPdf(true);
+    try {
+      const supabase = createClient();
+      const pdfBlob = await generateContractPDF();
+
+      const fileNamePath = `${slug}/${ContractDocumentType.INVOICE.toLowerCase()}/contrato-${
+        contract.code
+      }-${ContractDocumentType.INVOICE.toLowerCase()}.pdf`;
+
+      const { error: supabaseError } = await supabase.storage
+        .from("organization-contracts")
+        .upload(fileNamePath, pdfBlob, {
+          upsert: true,
+          contentType: "application/pdf",
+          cacheControl: "1",
+        });
+
+      if (supabaseError) {
+        console.error("Error uploading contract PDF", supabaseError);
+        toast.warning(
+          "Não foi possível fazer upload do contrato, tente novamente."
+        );
+        return null;
+      }
+
+      const { data } = await supabase.storage
+        .from("organization-contracts")
+        .getPublicUrl(fileNamePath);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error("Error generating or uploading PDF", error);
+      toast.error("Erro ao gerar ou fazer upload do PDF do contrato");
+      return null;
+    } finally {
+      setIsUpdatingPdf(false);
     }
-  }, [availabilityData]);
+  }
 
   async function onSubmit(data: UpdateContractFormValues) {
+    // Verificar se há erros no formulário
+    if (Object.keys(form.formState.errors).length > 0) {
+      const errorFields = Object.keys(form.formState.errors)
+        .map((field) => {
+          const fieldName = field as keyof typeof form.formState.errors;
+          const errorMessage = form.formState.errors[fieldName]?.message;
+          if (errorMessage) {
+            return `${field}: ${errorMessage}`;
+          }
+          return field;
+        })
+        .join(", ");
+
+      toast.error(`Por favor, corrija os seguintes campos: ${errorFields}`);
+      return;
+    }
+
     try {
       setIsGeneratingDocument(true);
 
-      const contractUrl = ""; // URL do documento gerado
+      const contractUrl = await getContractPdfAndUpdateContract();
+      console.log("contractUrl", contractUrl);
 
       await updateContractService({
         contractId: id,
@@ -158,10 +291,8 @@ export default function useUpdateContractForm({
         withdrawalDate: data.withdrawalDate,
         returnDate: data.returnDate,
         additionalInformation: data.additionalInformation,
-        customerId: data.customerId,
-        memberId: data.memberId,
         totalValue: data.totalValue,
-        payments: data.payments.map((payment) => ({
+        payments: data.paymentMethod.map((payment) => ({
           id: payment.id,
           method: payment.method,
           value: payment.value,
@@ -177,7 +308,11 @@ export default function useUpdateContractForm({
           discount: item.discount,
           finalValue: item.finalValue,
         })),
-        contractUrl: contractUrl || undefined,
+        contractUrl:
+          contractUrl ??
+          contract.contractDocuments.find(
+            (document) => document.type === ContractDocumentType.INVOICE
+          )?.url,
       });
 
       toast.success("Contrato atualizado com sucesso!");
@@ -191,8 +326,8 @@ export default function useUpdateContractForm({
   }
 
   const addPayment = () => {
-    const payments = form.getValues("payments") || [];
-    form.setValue("payments", [
+    const payments = form.getValues("paymentMethod") || [];
+    form.setValue("paymentMethod", [
       ...payments,
       {
         method: PaymentMethod.CASH,
@@ -205,15 +340,15 @@ export default function useUpdateContractForm({
   };
 
   const removePayment = (index: number) => {
-    const payments = form.getValues("payments") || [];
+    const payments = form.getValues("paymentMethod") || [];
     form.setValue(
-      "payments",
+      "paymentMethod",
       payments.filter((_, i) => i !== index)
     );
   };
 
   const calculateTotalPaid = () => {
-    const payments = form.getValues("payments") || [];
+    const payments = form.getValues("paymentMethod") || [];
     // Somar apenas os pagamentos marcados como pagos (isPaid === true)
     return payments.reduce((acc, payment) => {
       return payment.isPaid ? acc + payment.value : acc;
@@ -266,7 +401,7 @@ export default function useUpdateContractForm({
 
   // Função para verificar se o pagamento é original do contrato
   const isOriginalPayment = (index: number) => {
-    const payment = form.getValues("payments")[index];
+    const payment = form.getValues("paymentMethod")[index];
     return !!payment.id;
   };
 
@@ -274,6 +409,7 @@ export default function useUpdateContractForm({
   const confirmRemovePayment = (index: number) => {
     if (isOriginalPayment(index)) {
       setPaymentToRemove(index);
+      setIsOpenDialog(true);
     } else {
       removePayment(index);
     }
@@ -295,7 +431,7 @@ export default function useUpdateContractForm({
           quantity,
           isBonus: false,
           discount: 0,
-          finalValue: item.rentPrice * quantity,
+          finalValue: item.price * quantity,
         });
       }
     });
@@ -329,7 +465,7 @@ export default function useUpdateContractForm({
   ) => {
     const items = form.getValues("items") || [];
     const updatedItems = [...items];
-    
+
     // Atualizar o item com o novo desconto e valor final
     updatedItems[index] = {
       ...updatedItems[index],
@@ -337,9 +473,9 @@ export default function useUpdateContractForm({
       finalValue,
       discountMode, // Armazenar o modo de desconto
     };
-    
+
     form.setValue("items", updatedItems);
-    
+
     // Recalcular o valor total do contrato
     updateTotalValue();
   };
@@ -349,13 +485,19 @@ export default function useUpdateContractForm({
     const items = form.getValues("items") || [];
     const totalValue = items.reduce((sum, item) => sum + item.finalValue, 0);
     form.setValue("totalValue", totalValue);
-    
+
     // Recalcular o valor pendente
     const pendingDebt = calculatePendingDebt();
-    
+
     // Atualizar a UI
     form.trigger("totalValue");
   };
+
+  useEffect(() => {
+    if (availabilityData?.data) {
+      setAvailableItems(availabilityData.data);
+    }
+  }, [availabilityData]);
 
   return {
     form,
@@ -378,5 +520,8 @@ export default function useUpdateContractForm({
     updateItemValue,
     updateTotalValue,
     availableItems,
+    isUpdatingPdf,
+    isOpenDialog,
+    setIsOpenDialog,
   };
 }

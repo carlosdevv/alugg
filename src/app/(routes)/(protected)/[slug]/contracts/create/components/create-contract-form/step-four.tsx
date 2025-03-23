@@ -1,4 +1,4 @@
-import { ContractPDFViewer } from "@/components/contract-pdf/contract-pdf-viewer";
+import { ContractInvoicePDFViewer } from "@/components/contract-pdf/invoice/contract-invoice-pdf-viewer";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -147,7 +147,13 @@ export function StepFour() {
           type="submit"
           variant="outline"
           className="w-min"
-          disabled={isCreatingContract || isUploadingPdf}
+          disabled={
+            isCreatingContract ||
+            isUploadingPdf ||
+            !form.getValues().memberId ||
+            (Array.isArray(form.getValues().paymentMethod) &&
+              form.getValues().paymentMethod.length === 0)
+          }
         >
           Finalizar
           {isCreatingContract || isUploadingPdf ? (
@@ -159,7 +165,7 @@ export function StepFour() {
       </div>
 
       {/* PDF Viewer */}
-      <ContractPDFViewer
+      <ContractInvoicePDFViewer
         isOpen={isPdfOpen}
         onClose={() => setIsPdfOpen(false)}
       />

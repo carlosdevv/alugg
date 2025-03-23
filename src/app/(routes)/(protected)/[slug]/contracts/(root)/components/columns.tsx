@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn, formatToCurrency } from "@/lib/utils";
-import type { ContractStatus } from "@prisma/client";
+import type { ContractDocument, ContractStatus } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { RowActions } from "./row-actions";
@@ -25,7 +25,10 @@ export type ContractColumn = {
   totalValue: number;
   pendingDebt: number;
   createdAt: Date;
-  contractUrl?: string;
+  contractDocuments: {
+    url: string;
+    type: string;
+  }[];
 };
 
 export const columns: ColumnDef<ContractColumn>[] = [
@@ -187,5 +190,5 @@ const statusText: Record<ContractStatus, string> = {
   OPEN: "Aberto",
   CLOSED: "Fechado",
   CANCELLED: "Cancelado",
-  COLLECTED: "Coletado",
+  COLLECTED: "Retirado",
 };

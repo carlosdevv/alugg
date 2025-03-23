@@ -4,21 +4,19 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type UseAddItemsDialogProps = {
+type UseAddItemsModalProps = {
   eventDate: string;
   withdrawalDate: string;
   returnDate: string;
   onItemsSelected: (items: Map<string, number>) => void;
-  existingItemIds?: string[];
 };
 
-export function useAddItemsDialog({
+export function useAddItemsModal({
   eventDate,
   withdrawalDate,
   returnDate,
   onItemsSelected,
-  existingItemIds = [],
-}: UseAddItemsDialogProps) {
+}: UseAddItemsModalProps) {
   const { slug } = useParams() as { slug: string };
   const [open, setOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Map<string, number>>(
@@ -67,7 +65,7 @@ export function useAddItemsDialog({
   );
 
   const items = availabilityData?.data || [];
-  
+
   const formattedData =
     items.length > 0
       ? items

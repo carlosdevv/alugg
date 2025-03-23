@@ -9,14 +9,17 @@ import {
 import { useCreateContractContext } from "@/contexts/create-contract-context";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import { useEffect, useState } from "react";
-import { ContractPDF } from "./contract-pdf";
+import { ContractInvoicePDF } from "./contract-invoice-pdf";
 
-interface ContractPDFViewerProps {
+interface ContractInvoicePDFViewerProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
+export function ContractInvoicePDFViewer({
+  isOpen,
+  onClose,
+}: ContractInvoicePDFViewerProps) {
   const {
     form,
     totalValue,
@@ -81,7 +84,7 @@ export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
         <div className="flex-1 overflow-hidden">
           {isClient && (
             <PDFViewer width="100%" height="100%" className="border rounded-md">
-              <ContractPDF
+              <ContractInvoicePDF
                 organization={organization}
                 customer={customer}
                 items={selectedItemsData}
@@ -110,7 +113,7 @@ export function ContractPDFViewer({ isOpen, onClose }: ContractPDFViewerProps) {
               </Button>
               <PDFDownloadLink
                 document={
-                  <ContractPDF
+                  <ContractInvoicePDF
                     organization={organization}
                     customer={customer}
                     items={selectedItemsData}

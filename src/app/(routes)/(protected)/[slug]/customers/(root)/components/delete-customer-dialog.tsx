@@ -34,7 +34,7 @@ export function DeleteCustomerDialog({
     if (isSuccess) {
       onOpenChange(false);
     }
-  }, [isSuccess]);
+  }, [isSuccess, onOpenChange]);
 
   return (
     <>

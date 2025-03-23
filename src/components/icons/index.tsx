@@ -25,7 +25,9 @@ import {
   ExternalLinkIcon,
   EyeIcon,
   EyeOffIcon,
+  FileDownIcon,
   FileTextIcon,
+  FileUpIcon,
   HistoryIcon,
   Home,
   ImageIcon,
@@ -107,4 +109,6 @@ export const Icons = {
   download: DownloadIcon,
   file: FileTextIcon,
   history: HistoryIcon,
+  fileUp: FileUpIcon,
+  fileDown: FileDownIcon,
 };

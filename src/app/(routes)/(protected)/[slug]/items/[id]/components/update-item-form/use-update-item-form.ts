@@ -89,7 +89,7 @@ export default function useUpdateItemForm({
   }
 
   async function uploadImageAndGetUrl(file: File, itemName: string) {
-    const supabase = await createClient();
+    const supabase = createClient();
 
     if (itemName === item.name) {
       const { error: supabaseError } = await supabase.storage

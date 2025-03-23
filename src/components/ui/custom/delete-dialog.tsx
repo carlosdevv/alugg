@@ -63,6 +63,7 @@ export default function DeleteDialog({
             className="flex-1 bg-rose-600 text-white hover:bg-rose-500"
             onClick={onClick}
           >
+            {isPending && <Icons.loader className="mr-2 size-4 animate-spin" />}
             Remover
           </Button>
         </DialogFooter>

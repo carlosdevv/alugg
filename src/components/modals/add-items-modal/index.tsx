@@ -14,23 +14,21 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAddItemsDialog } from "./use-add-items-dialog";
+import { useAddItemsModal } from "./use-add-items-modal";
 
-export type AddItemsDialogProps = {
+export type AddItemsModalProps = {
   eventDate: string;
   withdrawalDate: string;
   returnDate: string;
   onItemsSelected: (items: Map<string, number>) => void;
-  existingItemIds?: string[];
 };
 
-export function AddItemsDialog({
+export function AddItemsModal({
   eventDate,
   withdrawalDate,
   returnDate,
   onItemsSelected,
-  existingItemIds,
-}: AddItemsDialogProps) {
+}: AddItemsModalProps) {
   const {
     open,
     setOpen,
@@ -41,12 +39,11 @@ export function AddItemsDialog({
     handleAddItems,
     isLoading,
     formattedData,
-  } = useAddItemsDialog({
+  } = useAddItemsModal({
     eventDate,
     withdrawalDate,
     returnDate,
     onItemsSelected,
-    existingItemIds,
   });
 
   return (
@@ -92,7 +89,9 @@ export function AddItemsDialog({
                           size="icon"
                           variant="secondary"
                           className="size-8"
-                          onClick={() => handleQuantityChange(itemId, quantity - 1)}
+                          onClick={() =>
+                            handleQuantityChange(itemId, quantity - 1)
+                          }
                         >
                           <Icons.circleMinus className="size-4" />
                         </Button>
@@ -109,7 +108,10 @@ export function AddItemsDialog({
                               return;
                             }
 
-                            handleQuantityChange(itemId, parseInt(formattedValue));
+                            handleQuantityChange(
+                              itemId,
+                              parseInt(formattedValue)
+                            );
                           }}
                           className="w-14"
                         />
@@ -117,7 +119,9 @@ export function AddItemsDialog({
                           size="icon"
                           variant="secondary"
                           className="size-8"
-                          onClick={() => handleQuantityChange(itemId, quantity + 1)}
+                          onClick={() =>
+                            handleQuantityChange(itemId, quantity + 1)
+                          }
                         >
                           <Icons.circlePlus className="size-4" />
                         </Button>
@@ -165,7 +169,8 @@ export function AddItemsDialog({
               Cancelar
             </Button>
             <Button onClick={handleAddItems}>
-              Adicionar {selectedItems.size} {selectedItems.size === 1 ? 'Item' : 'Itens'}
+              Adicionar {selectedItems.size}{" "}
+              {selectedItems.size === 1 ? "Item" : "Itens"}
             </Button>
           </div>
         </div>

@@ -92,6 +92,7 @@ export async function GET(
             value: true,
             item: {
               select: {
+                code: true,
                 name: true,
                 rentPrice: true,
               },
@@ -156,6 +157,7 @@ export async function GET(
         item: {
           ...item.item,
           price: item.item.rentPrice,
+          code: item.item.code,
         },
       })),
       seller: {
@@ -222,6 +224,61 @@ export async function DELETE(
   return NextResponse.json(contract, { status: 200 });
 }
 
+const updateContractSchema = z
+  .object({
+    totalValue: z.number().optional(),
+    customerId: z.string().optional(),
+    eventDate: z.string(),
+    withdrawalDate: z.string(),
+    returnDate: z.string(),
+    memberId: z.string().optional(),
+    additionalInformation: z.string().optional(),
+    contractUrl: z.string().optional(),
+    items: z
+      .array(
+        z.object({
+          id: z.string().optional(), // ID do item alugado (para atualização)
+          itemId: z.string(),
+          quantity: z.number(),
+          isBonus: z.boolean().default(false),
+          discount: z.number().default(0),
+          finalValue: z.number(),
+        })
+      )
+      .optional(),
+    payments: z.array(
+      z.object({
+        id: z.string().optional(), // ID do pagamento (para atualização)
+        method: z.nativeEnum(PaymentMethod),
+        value: z.number(),
+        creditParcelAmount: z.number(),
+        paymentDate: z.string(),
+        isPaid: z.boolean(),
+      })
+    ),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      compareDesc(new Date(data.withdrawalDate), new Date(data.eventDate)) ===
+      -1
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Data de retirada deve ser antes da data do evento",
+        path: ["withdrawalDate"],
+      });
+    }
+
+    if (
+      compareDesc(new Date(data.returnDate), new Date(data.eventDate)) === 1
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Data do devolução deve ser depois da data do evento",
+        path: ["returnDate"],
+      });
+    }
+  });
 // PUT /api/organizations/:slug/contracts/:contractId - Update a contract
 export async function PUT(
   req: NextRequest,
@@ -264,65 +321,6 @@ export async function PUT(
     }
 
     const body = await req.json();
-
-    // Usar o mesmo schema de validação da criação, mas tornando alguns campos opcionais
-    const updateContractSchema = z
-      .object({
-        totalValue: z.number().optional(),
-        customerId: z.string().optional(),
-        eventDate: z.string(),
-        withdrawalDate: z.string(),
-        returnDate: z.string(),
-        memberId: z.string().optional(),
-        additionalInformation: z.string().optional(),
-        contractUrl: z.string().optional(),
-        items: z
-          .array(
-            z.object({
-              id: z.string().optional(), // ID do item alugado (para atualização)
-              itemId: z.string(),
-              quantity: z.number(),
-              isBonus: z.boolean().default(false),
-              discount: z.number().default(0),
-              finalValue: z.number(),
-            })
-          )
-          .optional(),
-        payments: z.array(
-          z.object({
-            id: z.string().optional(), // ID do pagamento (para atualização)
-            method: z.nativeEnum(PaymentMethod),
-            value: z.number(),
-            creditParcelAmount: z.number(),
-            paymentDate: z.string(),
-            isPaid: z.boolean(),
-          })
-        ),
-      })
-      .superRefine((data, ctx) => {
-        if (
-          compareDesc(
-            new Date(data.withdrawalDate),
-            new Date(data.eventDate)
-          ) === -1
-        ) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Data de retirada deve ser antes da data do evento",
-            path: ["withdrawalDate"],
-          });
-        }
-
-        if (
-          compareDesc(new Date(data.returnDate), new Date(data.eventDate)) === 1
-        ) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Data do devolução deve ser depois da data do evento",
-            path: ["returnDate"],
-          });
-        }
-      });
 
     const parsed = updateContractSchema.safeParse(body);
 
@@ -523,15 +521,32 @@ export async function PUT(
         }
       }
 
-      // 4. Adicionar documento do contrato se fornecido
+      // 4. Adicionar ou atualizar documento do contrato se fornecido
       if (contractUrl) {
-        await tx.contractDocument.create({
-          data: {
+        // Verificar se já existe um documento do tipo INVOICE
+        const existingDocument = await tx.contractDocument.findFirst({
+          where: {
             contractId,
-            url: contractUrl,
             type: "INVOICE",
           },
         });
+
+        if (existingDocument) {
+          // Atualizar o documento existente
+          await tx.contractDocument.update({
+            where: { id: existingDocument.id },
+            data: { url: contractUrl },
+          });
+        } else {
+          // Criar novo documento
+          await tx.contractDocument.create({
+            data: {
+              contractId,
+              url: contractUrl,
+              type: "INVOICE",
+            },
+          });
+        }
       }
 
       return contract;

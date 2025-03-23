@@ -1,4 +1,3 @@
-import type { CreateContractFormValues } from "@/contexts/create-contract-context";
 import type { CustomerProps } from "@/http/customers/types";
 import type { ItemProps } from "@/http/items/types";
 import type { OrganizationProps } from "@/http/organizations/types";
@@ -12,25 +11,26 @@ import {
   View,
 } from "@react-pdf/renderer";
 
-interface ContractPDFProps {
+interface ContractInvoicePDFProps {
   organization?: OrganizationProps;
   customer?: CustomerProps;
   items?: (ItemProps & {
     quantity: number;
     isBonus?: boolean;
     baseValue?: number;
-    discount?: {
-      value: number;
-      mode: "currency" | "percent";
-    };
+    discount?:
+      | {
+          value: number;
+          mode: "currency" | "percent";
+        }
+      | number;
+    discountMode?: "currency" | "percent";
     finalValue?: number;
   })[];
   totalValue: number;
-  formValues: CreateContractFormValues;
+  formValues: any;
   seller?: {
-    memberId: string;
     name: string;
-    userId: string;
   };
   code?: number;
 }
@@ -121,9 +121,12 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   itemCol: {
-    width: "35%",
+    width: "30%",
   },
   codeCol: {
+    width: "10%",
+  },
+  quantityCol: {
     width: "10%",
   },
   valueCol: {
@@ -169,7 +172,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export function ContractPDF({
+export function ContractInvoicePDF({
   organization,
   customer,
   items,
@@ -177,7 +180,25 @@ export function ContractPDF({
   formValues,
   seller,
   code,
-}: ContractPDFProps) {
+}: ContractInvoicePDFProps) {
+  const formatDiscount = (item: any) => {
+    if (
+      item.discount &&
+      typeof item.discount === "object" &&
+      "value" in item.discount &&
+      "mode" in item.discount
+    ) {
+      return item.discount.mode === "percent"
+        ? `${item.discount.value}%`
+        : formatToCurrency(item.discount.value);
+    } else if (typeof item.discount === "number" && item.discountMode) {
+      return item.discountMode === "percent"
+        ? `${item.discount}%`
+        : formatToCurrency(item.discount);
+    }
+    return formatToCurrency(item.discount || 0);
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -324,6 +345,7 @@ export function ContractPDF({
             <View style={[styles.tableRow, styles.tableHeader]}>
               <Text style={[styles.tableCell, styles.itemCol]}>Item</Text>
               <Text style={[styles.tableCell, styles.codeCol]}>Código</Text>
+              <Text style={[styles.tableCell, styles.quantityCol]}>Qtd</Text>
               <Text style={[styles.tableCell, styles.valueCol]}>
                 Valor do Objeto
               </Text>
@@ -343,15 +365,14 @@ export function ContractPDF({
                 <Text style={[styles.tableCell, styles.codeCol]}>
                   {item.code || ""}
                 </Text>
+                <Text style={[styles.tableCell, styles.quantityCol]}>
+                  {item.quantity}
+                </Text>
                 <Text style={[styles.tableCell, styles.valueCol]}>
                   {formatToCurrency(item.objectPrice)}
                 </Text>
                 <Text style={[styles.tableCell, styles.discountCol]}>
-                  {item.discount?.value
-                    ? item.discount.mode === "percent"
-                      ? `${item.discount.value}%`
-                      : formatToCurrency(item.discount.value)
-                    : "R$ 0,00"}
+                  {formatDiscount(item)}
                 </Text>
                 <Text style={[styles.tableCellLast, styles.rentCol]}>
                   {formatToCurrency(item.finalValue || 0)}
@@ -373,7 +394,7 @@ export function ContractPDF({
         {/* Forma de pagamento - exibindo todos os pagamentos */}
         <View style={styles.paymentSection}>
           <Text style={styles.sectionTitle}>5 - Forma de pagamento</Text>
-          {formValues.paymentMethod?.map((payment, index) => (
+          {formValues.paymentMethod?.map((payment: any, index: number) => (
             <Text key={index}>
               {payment.method === "CREDIT_CARD"
                 ? "Cartão de Crédito"

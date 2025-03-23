@@ -1,5 +1,6 @@
 "use client";
 import { Icons } from "@/components/icons";
+import { AddItemsModal } from "@/components/modals/add-items-modal";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,8 +21,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-
-import { AddItemsDialog } from "@/components/modals/add-items-dialog";
 import { Calendar } from "@/components/ui/custom/calendar-rac";
 import { DateInput } from "@/components/ui/custom/date-rac";
 import {
@@ -94,6 +93,9 @@ export default function UpdateContractForm({
     updateItemValue,
     updateTotalValue,
     availableItems,
+    isUpdatingPdf,
+    isOpenDialog,
+    setIsOpenDialog,
   } = useUpdateContractForm({ contract });
 
   return (
@@ -101,9 +103,9 @@ export default function UpdateContractForm({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col space-y-8"
+          className="flex flex-col space-y-8 pb-8"
         >
-          <div className="grid gap-4 md:grid-cols-[1fr_350px] lg:gap-8">
+          <div className="grid gap-4 md:grid-cols-1 xl:grid-cols-[1fr_350px] lg:gap-8">
             <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
               <Card>
                 <CardHeader>
@@ -517,28 +519,42 @@ export default function UpdateContractForm({
                                   </td>
                                   <td className="p-4 align-middle">
                                     <CurrencyPercentInput
+                                      className="w-20"
                                       value={item.discount || 0}
                                       maxCurrencyValue={totalPrice}
                                       onValueChange={(value, mode) => {
                                         const basePrice = itemDetails.rentPrice;
                                         const totalPrice =
                                           basePrice * item.quantity;
-                                        
+
                                         let finalValue: number;
                                         let limitedPercent = 0;
                                         let limitedDiscount = 0;
-                                        
+
                                         if (mode === "percent") {
                                           limitedPercent = Math.min(value, 100);
-                                          finalValue = Math.max(0, totalPrice - (totalPrice * limitedPercent / 100));
+                                          finalValue = Math.max(
+                                            0,
+                                            totalPrice -
+                                              (totalPrice * limitedPercent) /
+                                                100
+                                          );
                                         } else {
-                                          limitedDiscount = Math.min(value, totalPrice);
-                                          finalValue = Math.max(0, totalPrice - limitedDiscount);
+                                          limitedDiscount = Math.min(
+                                            value,
+                                            totalPrice
+                                          );
+                                          finalValue = Math.max(
+                                            0,
+                                            totalPrice - limitedDiscount
+                                          );
                                         }
-                                        
+
                                         updateItemValue(
                                           realIndex,
-                                          mode === "percent" ? limitedPercent : limitedDiscount,
+                                          mode === "percent"
+                                            ? limitedPercent
+                                            : limitedDiscount,
                                           finalValue,
                                           mode
                                         );
@@ -555,34 +571,35 @@ export default function UpdateContractForm({
                                           .toFixed(2)
                                           .replace(".", ",")}
                                         onChange={(e) => {
-                                          handleCurrencyInputChange(e, (value) => {
-                                            const basePrice =
-                                              itemDetails.rentPrice;
-                                            const totalPrice =
-                                              basePrice * item.quantity;
-                                            
-                                            // Remover a limitação do valor final
-                                            const finalValue = value;
-                                            
-                                            // Não recalcular o desconto, apenas atualizar o valor final
-                                            const items =
-                                              form.getValues("items") || [];
-                                            const currentItem =
-                                              items[realIndex];
-                                            const mode =
-                                              currentItem?.discountMode ||
-                                              "currency";
-                                            
-                                            // Manter o desconto atual, apenas atualizar o valor final
-                                            updateItemValue(
-                                              realIndex,
-                                              currentItem.discount, // Manter o desconto atual
-                                              finalValue,
-                                              mode
-                                            );
-                                            
-                                            updateTotalValue();
-                                          });
+                                          handleCurrencyInputChange(
+                                            e,
+                                            (value) => {
+                                              const basePrice =
+                                                itemDetails.rentPrice;
+
+                                              // Remover a limitação do valor final
+                                              const finalValue = value;
+
+                                              // Não recalcular o desconto, apenas atualizar o valor final
+                                              const items =
+                                                form.getValues("items") || [];
+                                              const currentItem =
+                                                items[realIndex];
+                                              const mode =
+                                                currentItem?.discountMode ||
+                                                "currency";
+
+                                              // Manter o desconto atual, apenas atualizar o valor final
+                                              updateItemValue(
+                                                realIndex,
+                                                currentItem.discount, // Manter o desconto atual
+                                                finalValue,
+                                                mode
+                                              );
+
+                                              updateTotalValue();
+                                            }
+                                          );
                                         }}
                                       />
                                       <div className="text-muted-foreground/80 text-xs pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
@@ -610,7 +627,7 @@ export default function UpdateContractForm({
                       </table>
                     </div>
 
-                    <AddItemsDialog
+                    <AddItemsModal
                       eventDate={form.watch("eventDate")}
                       withdrawalDate={form.watch("withdrawalDate")}
                       returnDate={form.watch("returnDate")}
@@ -618,24 +635,10 @@ export default function UpdateContractForm({
                         addNewItems(items);
                         updateTotalValue();
                       }}
-                      existingItemIds={
-                        form.watch("items")?.map((item) => item.itemId) || []
-                      }
                     />
                   </div>
                 </CardContent>
               </Card>
-
-              <Button
-                type="submit"
-                disabled={isUpdatingContract || isGeneratingDocument}
-                className="w-min"
-              >
-                {(isUpdatingContract || isGeneratingDocument) && (
-                  <Icons.loader className="mr-2 size-4 animate-spin" />
-                )}
-                Atualizar Contrato
-              </Button>
             </div>
 
             <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
@@ -655,7 +658,7 @@ export default function UpdateContractForm({
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col space-y-4">
-                  {form.watch("payments").map((_, index) => (
+                  {form.watch("paymentMethod").map((_, index) => (
                     <div
                       key={index}
                       className="space-y-4 rounded-lg border p-4"
@@ -674,7 +677,7 @@ export default function UpdateContractForm({
                       <div className="space-y-4">
                         <FormField
                           control={form.control}
-                          name={`payments.${index}.method`}
+                          name={`paymentMethod.${index}.method`}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Método de Pagamento</FormLabel>
@@ -703,7 +706,7 @@ export default function UpdateContractForm({
                         />
                         <FormField
                           control={form.control}
-                          name={`payments.${index}.value`}
+                          name={`paymentMethod.${index}.value`}
                           render={({ field }) => (
                             <FormItem className="flex flex-col">
                               <FormLabel>Valor</FormLabel>
@@ -730,11 +733,11 @@ export default function UpdateContractForm({
                             </FormItem>
                           )}
                         />
-                        {form.watch(`payments.${index}.method`) ===
+                        {form.watch(`paymentMethod.${index}.method`) ===
                           PaymentMethod.CREDIT_CARD && (
                           <FormField
                             control={form.control}
-                            name={`payments.${index}.creditParcelAmount`}
+                            name={`paymentMethod.${index}.creditParcelAmount`}
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Parcelas</FormLabel>
@@ -759,7 +762,7 @@ export default function UpdateContractForm({
                         )}
                         <FormField
                           control={form.control}
-                          name={`payments.${index}.paymentDate`}
+                          name={`paymentMethod.${index}.paymentDate`}
                           render={({ field }) => (
                             <FormItem className="flex flex-col space-y-3 w-full">
                               <FormLabel
@@ -818,7 +821,7 @@ export default function UpdateContractForm({
                         />
                         <FormField
                           control={form.control}
-                          name={`payments.${index}.isPaid`}
+                          name={`paymentMethod.${index}.isPaid`}
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                               <FormControl>
@@ -862,12 +865,28 @@ export default function UpdateContractForm({
               </Card>
             </div>
           </div>
+
+          <Button
+            type="submit"
+            disabled={
+              isUpdatingContract || isGeneratingDocument || isUpdatingPdf
+            }
+            className="w-min"
+          >
+            {(isUpdatingContract || isGeneratingDocument || isUpdatingPdf) && (
+              <Icons.loader className="mr-2 size-4 animate-spin" />
+            )}
+            Atualizar Contrato
+          </Button>
         </form>
       </Form>
       {/* Dialog de confirmação para remover pagamento */}
       <AlertDialog
-        open={paymentToRemove !== null}
-        onOpenChange={() => setPaymentToRemove(null)}
+        open={isOpenDialog && paymentToRemove !== null}
+        onOpenChange={(open) => {
+          setIsOpenDialog(open);
+          if (!open) setPaymentToRemove(null);
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -885,6 +904,7 @@ export default function UpdateContractForm({
                 if (paymentToRemove !== null) {
                   removePayment(paymentToRemove);
                   setPaymentToRemove(null);
+                  setIsOpenDialog(false);
                 }
               }}
             >

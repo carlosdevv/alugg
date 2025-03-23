@@ -1,4 +1,4 @@
-import { ContractPDF } from "@/components/contract-pdf/contract-pdf";
+import { ContractInvoicePDF } from "@/components/contract-pdf/invoice/contract-invoice-pdf";
 import {
   useCreateContractService,
   useGetNextContractCodeService,
@@ -13,7 +13,7 @@ import type { OrganizationProps } from "@/http/organizations/types";
 import { useGetOrganizationService } from "@/http/organizations/use-organizations-service";
 import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PaymentMethod } from "@prisma/client";
+import { ContractDocumentType, PaymentMethod } from "@prisma/client";
 import { pdf } from "@react-pdf/renderer";
 import { compareDesc } from "date-fns";
 import { useParams } from "next/navigation";
@@ -76,23 +76,27 @@ export const createContractFormSchema = z
         finalValue: z.number(),
       })
     ),
-    paymentMethod: z.array(
-      z.object({
-        method: z.nativeEnum(PaymentMethod, {
-          required_error: "Método de pagamento é obrigatório",
-        }),
-        value: z.number(),
-        creditParcelAmount: z.number({
-          required_error: "Parcelas são obrigatórias",
-        }),
-        paymentDate: z.string({
-          required_error: "Data de pagamento é obrigatória",
-        }),
-        isPaid: z.boolean({
-          required_error: "Status de pagamento é obrigatório",
-        }),
-      })
-    ),
+    paymentMethod: z
+      .array(
+        z.object({
+          method: z.nativeEnum(PaymentMethod, {
+            required_error: "Método de pagamento é obrigatório",
+          }),
+          value: z.number({
+            required_error: "Valor é obrigatório",
+          }),
+          creditParcelAmount: z.number({
+            required_error: "Parcelas são obrigatórias",
+          }),
+          paymentDate: z.string({
+            required_error: "Data de pagamento é obrigatória",
+          }),
+          isPaid: z.boolean({
+            required_error: "Status de pagamento é obrigatório",
+          }),
+        })
+      )
+      .min(1, "Adicione pelo menos um método de pagamento"),
   })
   .superRefine((data, ctx) => {
     if (
@@ -114,6 +118,36 @@ export const createContractFormSchema = z
         message: "Data do devolução deve ser depois da data do evento",
         path: ["returnDate"],
       });
+    }
+
+    // Verificar se o valor total dos métodos de pagamento corresponde ao valor total do contrato
+    if (data.paymentMethod && data.paymentMethod.length > 0) {
+      const totalPaymentValue = data.paymentMethod.reduce(
+        (sum, payment) => sum + payment.value,
+        0
+      );
+
+      // Verificar se o valor total dos pagamentos é igual ao valor total do contrato
+      // Usamos uma pequena margem de tolerância para evitar problemas com arredondamento
+      const totalItemsValue = data.items.reduce(
+        (sum, item) => sum + item.finalValue * item.quantity,
+        0
+      );
+
+      // Tolerância de 1 centavo para evitar problemas de arredondamento
+      const tolerance = 0.01;
+
+      if (Math.abs(totalPaymentValue - totalItemsValue) > tolerance) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `O valor total dos pagamentos (${totalPaymentValue.toFixed(
+            2
+          )}) deve ser igual ao valor total dos itens (${totalItemsValue.toFixed(
+            2
+          )})`,
+          path: ["paymentMethod"],
+        });
+      }
     }
   });
 
@@ -212,7 +246,7 @@ export const CreateContractProvider = ({
 
     // Gerar o PDF
     const blob = await pdf(
-      <ContractPDF
+      <ContractInvoicePDF
         organization={organization}
         customer={customer}
         items={selectedItemsData}
@@ -232,7 +266,7 @@ export const CreateContractProvider = ({
       const supabase = createClient();
       const pdfBlob = await generateContractPDF();
 
-      const fileName = `${slug}/${slug}-contrato-${nextContractCode}.pdf`;
+      const fileName = `${slug}/${ContractDocumentType.INVOICE.toLowerCase()}/contrato-${nextContractCode}-${ContractDocumentType.INVOICE.toLowerCase()}.pdf`;
 
       const { error: supabaseError } = await supabase.storage
         .from("organization-contracts")
@@ -261,7 +295,18 @@ export const CreateContractProvider = ({
   }
 
   async function onSubmit(data: CreateContractFormValues) {
-    if (Object.keys(form.formState.errors).length > 0) {
+    // Verificar se há erros no formulário
+    const formErrors = form.formState.errors;
+
+    // Verificar especificamente os erros de paymentMethod
+    const hasPaymentMethodErrors =
+      formErrors.paymentMethod ||
+      (Array.isArray(data.paymentMethod) && data.paymentMethod.length === 0);
+
+    if (Object.keys(formErrors).length > 0 || hasPaymentMethodErrors) {
+      // Forçar a validação de todos os campos
+      await form.trigger();
+
       const errorFields = Object.keys(form.formState.errors)
         .map((field) => {
           const fieldName = field as keyof typeof form.formState.errors;
@@ -272,6 +317,15 @@ export const CreateContractProvider = ({
           return field;
         })
         .join(", ");
+
+      // Verificar se há métodos de pagamento
+      if (
+        Array.isArray(data.paymentMethod) &&
+        data.paymentMethod.length === 0
+      ) {
+        toast.error("Por favor, adicione pelo menos um método de pagamento");
+        return;
+      }
 
       toast.error(`Por favor, corrija os seguintes campos: ${errorFields}`);
       return;

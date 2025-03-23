@@ -2,9 +2,9 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetCustomersService } from "@/http/customers/use-customers-service";
+import { useMemo } from "react";
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
-import { useMemo } from "react";
 
 type CustomersPageClientProps = {
   slug: string;

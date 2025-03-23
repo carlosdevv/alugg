@@ -127,6 +127,7 @@ export type ContractProps = {
     item: {
       name: string;
       price: number;
+      code: string;
     };
   }[];
   contractDocuments: {
@@ -169,5 +170,17 @@ export type UpdateContractServiceResponse = {
   data: {
     id: string;
     code: number;
+  };
+};
+
+export type WithdrawalContractServiceBody = {
+  pdfUrl: string;
+  contractId: string;
+};
+
+export type WithdrawalContractServiceResponse = {
+  data: {
+    pdfUrl: string;
+    documentId: string;
   };
 };
