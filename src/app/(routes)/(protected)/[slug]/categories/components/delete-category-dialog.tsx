@@ -1,12 +1,3 @@
-import {
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import DeleteDialog from "@/components/ui/custom/delete-dialog";
 import { useDeleteCategoryService } from "@/http/category/use-categories-service";
 import { useParams } from "next/navigation";
@@ -41,7 +32,7 @@ export function DeleteCategoryDialog({
     if (isSuccess) {
       onOpenChange(false);
     }
-  }, [isSuccess]);
+  }, [isSuccess, onOpenChange]);
 
   return (
     <>
