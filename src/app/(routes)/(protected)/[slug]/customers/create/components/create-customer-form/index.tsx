@@ -125,7 +125,7 @@ export default function CreateCustomerForm() {
                         <FormControl>
                           <InputPhone
                             placeholder="+55 (00) 00000-0000"
-                            value={field.value}
+                            value={field.value ?? ""}
                             onChange={field.onChange}
                           />
                         </FormControl>

@@ -61,8 +61,8 @@ export default function useChangeOrgSlugForm({
           });
           toast.success("Organização atualizada com sucesso!");
 
-          if (data.slug !== organization.slug) {
-            router.push(`/${data.slug}/settings`);
+          if (data.organization.slug !== organization.slug) {
+            router.push(`/${data.organization.slug}/settings`);
           }
         },
       }
