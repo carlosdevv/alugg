@@ -4,11 +4,9 @@ import { Role } from "@prisma/client";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
-import sessionStore from "../../hooks/session-context";
 
 export default function useOrganizationSwitcher() {
   const { userId } = useAuth();
-  const { setSlug: setSlugSessionStore } = sessionStore();
 
   const { data: organizations } = useGetOrganizationsService();
 
@@ -22,7 +20,6 @@ export default function useOrganizationSwitcher() {
   const [slug, setSlug] = useState(currentSlug);
   useEffect(() => {
     if (currentSlug) {
-      setSlugSessionStore(currentSlug);
       setSlug(currentSlug);
     }
   }, [currentSlug]);

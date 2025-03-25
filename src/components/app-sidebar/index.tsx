@@ -18,7 +18,7 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
 
 export function AppSidebar({ ...props }: AppSidebarProps) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="none" {...props}>
       <SidebarHeader className="w-full grid grid-cols-[1fr_2rem] items-center">
         <OrganizationSwitcher />
         <PendingInvites />

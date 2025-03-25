@@ -10,8 +10,7 @@ import {
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+  TooltipTrigger
 } from "@/components/ui/tooltip";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -32,21 +31,19 @@ export function PendingInvites() {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-neutral-200/50 dark:hover:bg-neutral-800"
-              >
-                <Icons.bell className="size-4" />
-                <span className="sr-only">Convites pendentes</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Ver convites pendentes</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="hover:bg-neutral-200/50 dark:hover:bg-neutral-800"
+            >
+              <Icons.bell className="size-4" />
+              <span className="sr-only">Convites pendentes</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Ver convites pendentes</TooltipContent>
+        </Tooltip>
       </PopoverTrigger>
 
       <PopoverContent className="space-y-2 w-60">

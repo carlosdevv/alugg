@@ -1,0 +1,92 @@
+enum ContractStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+  COLLECTED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  BANK_TRANSFER
+  VOUCHER
+  CASH
+  OTHER
+}
+
+enum ContractDocumentType {
+  WITHDRAWAL
+  INVOICE
+  RETURN
+  OTHER
+}
+
+model Contract {
+  id                    String         @id @default(uuid())
+  code                  Int            @default(autoincrement())
+  eventDate             DateTime       @map("event_date")
+  withdrawalDate        DateTime       @map("withdrawal_date")
+  returnDate            DateTime       @map("return_date")
+  totalValue            Float          @map("total_value")
+  status                ContractStatus @default(OPEN)
+  additionalInformation String?        @map("additional_information")
+  createdAt             DateTime       @default(now()) @map("created_at")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
+
+  seller         Member        @relation(fields: [sellerId], references: [id])
+  sellerId       String
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  customerId     String
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+
+  rentedItems       ContractItem[]
+  payments          ContractPayment[]
+  contractDocuments ContractDocument[]
+
+  @@map("contracts")
+}
+
+model ContractItem {
+  id       String  @id @default(uuid())
+  quantity Int
+  value    Float
+  discount Float?
+  isBonus  Boolean @default(false)
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
+  item       Item     @relation(fields: [itemId], references: [id])
+  itemId     String
+
+  @@map("contract_items")
+}
+
+model ContractPayment {
+  id                 String        @id @default(uuid())
+  method             PaymentMethod
+  value              Float
+  creditParcelAmount Int           @map("credit_parcel_amount")
+  paymentDate        DateTime      @map("payment_date")
+  isPaid             Boolean
+  createdAt          DateTime      @default(now()) @map("created_at")
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
+
+  @@map("contract_payments")
+}
+
+model ContractDocument {
+  id        String               @id @default(uuid())
+  type      ContractDocumentType @default(INVOICE)
+  url       String
+  createdAt DateTime             @default(now()) @map("created_at")
+  updatedAt DateTime             @updatedAt @map("updated_at")
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
+
+  @@map("contract_documents")
+}

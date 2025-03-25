@@ -195,6 +195,21 @@ export function FloatingPanelContent({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [closeFloatingPanel]);
 
+  useEffect(() => {
+    if (contentRef.current && triggerRect) {
+      const panelHeight = contentRef.current.offsetHeight;
+      const spaceBelow = window.innerHeight - triggerRect.bottom;
+
+      if (spaceBelow < panelHeight) {
+        contentRef.current.style.top = `${triggerRect.top - panelHeight - 8}px`;
+        contentRef.current.style.transformOrigin = "bottom left";
+      } else {
+        contentRef.current.style.top = `${triggerRect.bottom + 8}px`;
+        contentRef.current.style.transformOrigin = "top left";
+      }
+    }
+  }, [triggerRect]);
+
   const variants: Variants = {
     hidden: { opacity: 0, scale: 0.9, y: 10 },
     visible: { opacity: 1, scale: 1, y: 0 },
@@ -220,8 +235,15 @@ export function FloatingPanelContent({
             style={{
               borderRadius: 12,
               left: triggerRect ? triggerRect.left : "50%",
-              top: triggerRect ? triggerRect.bottom + 8 : "50%",
-              transformOrigin: "top left",
+              top: triggerRect
+                ? window.innerHeight - triggerRect.bottom < 300
+                  ? triggerRect.top - (contentRef.current?.offsetHeight ?? 0) - 8
+                  : triggerRect.bottom + 8
+                : "50%",
+              transformOrigin:
+                triggerRect && window.innerHeight - triggerRect.bottom < 300
+                  ? "bottom left"
+                  : "top left",
             }}
             initial="hidden"
             animate="visible"

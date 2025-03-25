@@ -1,9 +1,6 @@
 "use client";
 
-import googleImg from "@/assets/google-icon.svg";
 import { Icons } from "@/components/icons";
-import EmailInput from "@/components/inputs/email-input";
-import PasswordInput from "@/components/inputs/password-input";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,8 +10,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import EmailInput from "@/components/ui/inputs/email-input";
+import PasswordInput from "@/components/ui/inputs/password-input";
 import { appRoutes } from "@/lib/constants";
-import Image from "next/image";
 import Link from "next/link";
 import useSignInForm from "./use-sign-in-form";
 
@@ -23,22 +21,6 @@ export default function SignInForm() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center relative">
-        <div className="w-full">
-          <Button variant="outline" disabled className="w-full">
-            <Image src={googleImg} alt="Google Logo" className="size-4 mr-2" />
-            Google (em breve)
-          </Button>
-        </div>
-      </div>
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 text-sm bg-background text-foreground">ou</span>
-        </div>
-      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

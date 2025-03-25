@@ -1,15 +1,27 @@
 import type { Role } from "@/lib/casl/roles";
 
+export type OrganizationProps = {
+  id: string;
+  name: string;
+  fantasyName?: string;
+  socialName?: string;
+  cnpj?: string;
+  phone?: string;
+  email?: string;
+  zipcode?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  neighborhood?: string;
+  slug: string;
+  logo?: string;
+  role: Role;
+  plan: "free" | "pro";
+  ownerId: string;
+};
+
 export type GetOrganizationsApiProps = {
-  organizations: {
-    id: string;
-    name: string;
-    slug: string;
-    logo?: string;
-    role: Role;
-    plan: "free" | "pro";
-    ownerId: string;
-  }[];
+  organizations: OrganizationProps[];
 };
 
 export type GetOrganizationsResponse =
@@ -19,15 +31,7 @@ export type GetOrganizationServiceProps = {
   slug: string;
 };
 
-export type GetOrganizationResponse = {
-  id: string;
-  name: string;
-  slug: string;
-  logo?: string;
-  role: Role;
-  plan: "free" | "pro";
-  ownerId: string;
-};
+export type GetOrganizationResponse = OrganizationProps;
 
 export type GetOrganizationApiProps = {
   organization: {
@@ -53,13 +57,24 @@ export type CreateOrganizationServiceResponse = {
 };
 
 export type UpdateOrganizationServiceBody = {
-  slug: string;
   newSlug?: string;
   name?: string;
+  socialName?: string;
+  fantasyName?: string;
+  cnpj?: string;
+  phone?: string;
+  email?: string;
+  zipcode?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  neighborhood?: string;
+  logo?: string;
 };
 
-export type UpdateOrganizationServiceResponse =
-  CreateOrganizationServiceResponse;
+export type UpdateOrganizationServiceResponse = {
+  organization: GetOrganizationResponse;
+};
 
 export type FetchExistentSlugServiceProps = {
   slug: string;

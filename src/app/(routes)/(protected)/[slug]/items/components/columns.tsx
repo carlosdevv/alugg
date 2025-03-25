@@ -21,8 +21,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { RowActions } from "./row-actions";
+import type { ItemStatus } from "@prisma/client";
 
-export type Item = {
+export type ItemColumn = {
   id: string;
   name: string;
   category: {
@@ -36,11 +37,10 @@ export type Item = {
   description?: string;
   amount: number;
   imageUrl?: string;
-  itemInRenovation: boolean;
-  status: string;
+  status: ItemStatus;
 };
 
-export const columns: ColumnDef<Item>[] = [
+export const columns: ColumnDef<ItemColumn>[] = [
   {
     accessorKey: "imageUrl",
     header: "Imagem",
@@ -158,7 +158,7 @@ export const columns: ColumnDef<Item>[] = [
             status
               ? "bg-emerald-400 hover:bg-emerald-500"
               : "bg-rose-500 hover:bg-rose-600",
-            "font-medium"
+            "font-medium text-primary"
           )}
         >
           {status ? "ATIVO" : "INATIVO"}

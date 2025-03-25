@@ -1,5 +1,4 @@
 import { Icons } from "@/components/icons";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,36 +7,27 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { appRoutes } from "@/lib/constants";
 import type { Row } from "@tanstack/react-table";
 import Link from "next/link";
-import sessionStore from "../../../../../../hooks/session-context";
-import { useDeleteItemService } from "../../../../../../http/items/use-items-service";
-import { appRoutes } from "../../../../../../lib/constants";
-import type { Item } from "./columns";
-import { DeleteInventoryItemDialog } from "./delete-dialog";
+import { useState } from "react";
+import type { ItemColumn } from "./columns";
+import { DeleteInventoryItemDialog } from "./delete-item-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
 };
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
-  const props = row.original as Item;
-  const { slug } = sessionStore();
+  const props = row.original as ItemColumn;
+  const itemId = props.id;
 
-  const deleteItemMutation = useDeleteItemService();
-
-  function handleDelete() {
-    deleteItemMutation.mutate({
-      itemId: props.id,
-      slug,
-    });
-  }
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   return (
-    <AlertDialog>
+    <>
       <div className="flex items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -48,38 +38,34 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
           <DropdownMenuContent className="w-56">
             <DropdownMenuLabel>Opções</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            <DropdownMenuGroup className="space-y-1">
               <DropdownMenuItem className="cursor-pointer" asChild>
                 <Link
                   href={{
                     pathname: `${appRoutes.items.root}/${props.id}`,
                   }}
+                  className="flex items-center justify-between"
                 >
                   Ver Detalhes
-                  <DropdownMenuShortcut>
-                    <Icons.moveUpRight className="size-4 mr-2" />
-                  </DropdownMenuShortcut>
+                  <Icons.horizontalEllipsis className="size-4" />
                 </Link>
               </DropdownMenuItem>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Button
-                    onClick={handleDelete}
-                    variant={"ghost"}
-                    className="w-full justify-between flex"
-                  >
-                    Remover
-                    <DropdownMenuShortcut>
-                      <Icons.delete className="size-4 mr-2" />
-                    </DropdownMenuShortcut>
-                  </Button>
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
+              <DropdownMenuItem
+                className="flex items-center justify-between cursor-pointer text-rose-500 hover:!text-rose-500"
+                onClick={() => setOpenDeleteDialog(true)}
+              >
+                Remover
+                <Icons.delete className="size-4" />
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DeleteInventoryItemDialog />
-    </AlertDialog>
+      <DeleteInventoryItemDialog
+        itemId={itemId}
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+      />
+    </>
   );
 }

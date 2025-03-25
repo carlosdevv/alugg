@@ -1,5 +1,6 @@
 "use client";
 
+import checkIfCodeExistsAction from "@/actions/check-if-code-exists";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,24 +28,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { GetCategoriesResponse } from "../../../../../../../../http/category/types";
-import { CreateItemBody } from "../../../../../../../../http/items/types";
+import { GetCategoriesResponse } from "@/http/category/types";
+import type { ItemProps } from "@/http/items/types";
+import Image from "next/image";
 import useUpdateItemForm from "./use-update-item-form";
 
 type UpdateItemFormProps = {
-  item: CreateItemBody;
-  categories: GetCategoriesResponse;
+  itemProps: ItemProps;
+  categories?: GetCategoriesResponse;
   id: string;
   slug: string;
 };
 
 export default function UpdateItemForm({
-  item,
+  itemProps: item,
   categories,
   id,
   slug,
 }: UpdateItemFormProps) {
-  const { form, onSubmit } = useUpdateItemForm({ item, id, slug });
+  const {
+    form,
+    onSubmit,
+    getRootProps,
+    getInputProps,
+    isUpdatingImage,
+    isUploadingImage,
+    handleRemoveImage,
+    newImageMode,
+    setNewImageMode,
+    imagePreview,
+  } = useUpdateItemForm({ item, id, slug });
 
   return (
     <Form {...form}>
@@ -230,7 +243,20 @@ export default function UpdateItemForm({
                         <Input
                           placeholder="Código do Item"
                           {...field}
-                          value={field.value ?? ""}
+                          onBlur={async () => {
+                            form.clearErrors("code");
+                            if (field.value && field.value !== item.code) {
+                              const existsCode = await checkIfCodeExistsAction(
+                                field.value
+                              );
+
+                              if (existsCode) {
+                                form.setError("code", {
+                                  message: "Código já está em uso, tente outro",
+                                });
+                              }
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -239,10 +265,10 @@ export default function UpdateItemForm({
                 />
                 <FormField
                   control={form.control}
-                  name="itemInRenovation"
+                  name="itemInRepair"
                   render={({ field }) => (
                     <FormItem className="space-y-3">
-                      <FormLabel>Item em Reforma</FormLabel>
+                      <FormLabel>Item em Reparo</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
@@ -269,16 +295,14 @@ export default function UpdateItemForm({
                 />
                 <FormField
                   control={form.control}
-                  name="status"
+                  name="itemInactive"
                   render={({ field }) => (
                     <FormItem className="space-y-3">
                       <FormLabel>Item Inativo</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
-                          defaultValue={
-                            field.value === "ACTIVE" ? "true" : "false"
-                          }
+                          defaultValue={field.value === true ? "true" : "false"}
                           className="flex flex-col space-y-1"
                         >
                           <FormItem className="flex items-center space-x-3 space-y-0">
@@ -303,30 +327,99 @@ export default function UpdateItemForm({
             </Card>
             <Card className="overflow-hidden">
               <CardHeader>
-                <CardTitle>Imagem (em breve)</CardTitle>
+                <CardTitle className="flex items-center w-full">
+                  Imagem do Item
+                  {newImageMode && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-auto"
+                      onClick={() => setNewImageMode(false)}
+                    >
+                      Exibir original
+                    </Button>
+                  )}
+                </CardTitle>
                 <CardDescription>
                   Faça upload da imagem do item.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="bg-gray-200 flex justify-center items-center aspect-square rounded-md object-cover w-full h-52">
-                  <Icons.image className="size-10 text-gray-400" />
-                </div>
-                {/* <div className="grid gap-2">
-                   <Image
-                    alt="Product image"
-                    className="aspect-square w-full rounded-md object-cover"
-                    height="300"
-                    src="/placeholder.svg"
-                    width="300"
-                  /> 
-                </div> */}
+                {item.imageUrl && !newImageMode && (
+                  <div className="relative">
+                    <Image
+                      src={item.imageUrl}
+                      alt="Imagem do Item"
+                      className="w-full h-52 object-cover rounded-md"
+                      width={300}
+                      height={200}
+                    />
+                    <button
+                      disabled={isUpdatingImage || isUploadingImage}
+                      onClick={() => setNewImageMode(true)}
+                      className="absolute top-2 right-2 bg-background text-white p-2 rounded-full shadow-md hover:bg-background/50 transition-colors"
+                    >
+                      <Icons.update className="size-4" />
+                    </button>
+                  </div>
+                )}
+
+                {imagePreview && newImageMode && (
+                  <div className="relative">
+                    <Image
+                      src={imagePreview}
+                      alt="Imagem do Item"
+                      className="w-full h-52 object-cover rounded-md"
+                      width={300}
+                      height={200}
+                    />
+                    <button
+                      disabled={isUpdatingImage || isUploadingImage}
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full shadow-md hover:bg-red-600"
+                    >
+                      <Icons.delete className="size-4" />
+                    </button>
+                  </div>
+                )}
+
+                {newImageMode && !imagePreview && (
+                  <div
+                    {...getRootProps({
+                      className:
+                        "border p-5 border-dashed cursor-pointer gap-y-2 border-border rounded-lg flex flex-col items-center justify-center w-full",
+                    })}
+                  >
+                    <input
+                      {...getInputProps()}
+                      disabled={isUpdatingImage || isUploadingImage}
+                    />
+                    <Icons.image className="size-10 text-gray-400" />
+                    <span className="font-medium mt-2">
+                      Clique ou arraste a imagem aqui
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      Formatos aceitos: .jpg, .png, .jpeg
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      Tamanho máximo: 10Mb
+                    </span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
         </div>
-        <Button type="submit" className="w-min my-8">
-          <Icons.update className="size-4 mr-2" />
+        <Button
+          type="submit"
+          className="w-min my-8"
+          disabled={isUpdatingImage || isUploadingImage}
+        >
+          {isUpdatingImage || isUploadingImage ? (
+            <Icons.loader className="size-4 mr-2 animate-spin" />
+          ) : (
+            <Icons.update className="size-4 mr-2" />
+          )}
           Atualizar Item
         </Button>
       </form>

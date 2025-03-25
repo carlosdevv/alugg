@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   deleteMemberService,
+  getMemberByIdService,
   getMembersService,
   transferOwnershipService,
   updateMemberRoleService,
@@ -17,6 +18,8 @@ import {
 import type { ErrorResponse } from "../types";
 import type {
   DeleteMemberServiceBody,
+  GetMemberByIdServiceProps,
+  GetMemberByIdServiceResponse,
   GetMembersServiceProps,
   GetMembersServiceResponse,
   TransferOwnershipServiceBody,
@@ -30,6 +33,20 @@ export function useGetMembersService(
   return useQuery({
     queryKey: ["getMembers"],
     queryFn: async () => await getMembersService(props),
+    ...options,
+  });
+}
+
+export function useGetMemberByIdService(
+  props: GetMemberByIdServiceProps,
+  options?: UseQueryOptions<
+    GetMemberByIdServiceResponse,
+    HTTPError<ErrorResponse>
+  >
+) {
+  return useQuery({
+    queryKey: ["getMemberById", props.memberId],
+    queryFn: async () => await getMemberByIdService(props),
     ...options,
   });
 }

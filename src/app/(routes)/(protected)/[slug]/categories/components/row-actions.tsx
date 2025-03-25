@@ -1,5 +1,4 @@
 import { Icons } from "@/components/icons";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,21 +11,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Row } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
-import type { InventoryItemColumn } from "./columns";
-import { DeleteCategoryDialog } from "./delete-dialog";
+import { useState } from "react";
+import type { CategoryColumn } from "./columns";
+import { DeleteCategoryDialog } from "./delete-category-dialog";
 
 type RowActionsProps<TData> = {
   row: Row<TData>;
 };
 
 export function RowActions<TData>({ row }: RowActionsProps<TData>) {
-  const props = row.original as InventoryItemColumn;
+  const props = row.original as CategoryColumn;
   const categoryId = props.id;
   const [, setModal] = useQueryState("modal");
   const [, setCategoryId] = useQueryState("id");
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   return (
-    <AlertDialog>
+    <>
       <div className="flex items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -48,18 +49,22 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
                 Editar
                 <Icons.update className="size-4" />
               </DropdownMenuItem>
-
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem className="cursor-pointer flex justify-between text-rose-500">
-                  Remover
-                  <Icons.delete className="size-4" />
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
+              <DropdownMenuItem
+                className="flex items-center justify-between cursor-pointer text-rose-500 hover:!text-rose-500"
+                onClick={() => setOpenDeleteDialog(true)}
+              >
+                Remover
+                <Icons.delete className="size-4" />
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DeleteCategoryDialog categoryId={categoryId} />
-    </AlertDialog>
+      <DeleteCategoryDialog
+        categoryId={categoryId}
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+      />
+    </>
   );
 }

@@ -1,0 +1,21 @@
+model User {
+  id                  String   @id @default(uuid())
+  name                String
+  email               String   @unique
+  passwordHash        String   @map("password_hash")
+  defaultOrganization String? // slug of the user's default organization
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  invites            Invite[]
+  member_on          Member[]
+  owns_organizations Organization[]
+
+  @@index(defaultOrganization)
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}

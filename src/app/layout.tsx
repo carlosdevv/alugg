@@ -1,5 +1,4 @@
 import AppModals from "@/components/modals";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppProviders } from "@/providers/app-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -29,12 +28,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <SidebarProvider>
-              <AppProviders>
-                <AppModals />
-                {children}
-              </AppProviders>
-            </SidebarProvider>
+            <AppProviders>
+              <AppModals />
+              {children}
+            </AppProviders>
           </ThemeProvider>
         </body>
       </html>

@@ -2,24 +2,24 @@
 
 import googleImg from "@/assets/google-icon.svg";
 import { Icons } from "@/components/icons";
-import EmailInput from "@/components/inputs/email-input";
-import PasswordInput from "@/components/inputs/password-input";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSeparator,
+    InputOTPSlot,
 } from "@/components/ui/input-otp";
+import EmailInput from "@/components/ui/inputs/email-input";
+import PasswordInput from "@/components/ui/inputs/password-input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useSignUpForm from "./use-sign-up-form";

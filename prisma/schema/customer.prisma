@@ -1,0 +1,25 @@
+model Customer {
+  id                    String    @id @default(uuid())
+  name                  String
+  document              String
+  secondDocument        String?   @map("second_document")
+  email                 String?
+  phone                 String?
+  birthdate             DateTime?
+  mediaContact          String?   @map("media_contact")
+  additionalInformation String?
+  zipcode               String?
+  city                  String?
+  state                 String?
+  address               String?
+  neighborhood          String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  contracts      Contract[]
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?
+
+  @@unique([email])
+  @@map("customers")
+}

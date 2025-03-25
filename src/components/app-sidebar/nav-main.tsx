@@ -2,11 +2,15 @@
 
 import { Icons, type IconType } from "@/components/icons";
 import {
+  ContractIcon,
+  CreditCardIcon,
+  CustomerIcon,
+  FileIcon,
   GearIcon,
   HomeIcon,
   LayersIcon,
+  ListIcon,
   PeopleIcon,
-  ReceiptIcon,
 } from "@/components/icons/dub";
 import {
   Collapsible,
@@ -46,12 +50,24 @@ export function NavMain() {
       exact: true,
     },
     {
+      name: "Contratos",
+      icon: ContractIcon,
+      href: `/${slug}/contracts`,
+      exact: true,
+    },
+    {
+      name: "Clientes",
+      icon: CustomerIcon,
+      href: `/${slug}/customers`,
+      exact: true,
+    },
+    {
       name: "Estoque",
       icon: Icons.bag,
       items: [
         {
           name: "Items",
-          icon: Icons.list,
+          icon: ListIcon,
           href: `/${slug}/items`,
         },
         {
@@ -73,7 +89,7 @@ export function NavMain() {
         },
         {
           name: "Cobrança",
-          icon: ReceiptIcon,
+          icon: CreditCardIcon,
           href: `/${slug}/settings/billing`,
           exact: true,
         },
@@ -81,6 +97,12 @@ export function NavMain() {
           name: "Membros",
           icon: PeopleIcon,
           href: `/${slug}/settings/members`,
+          exact: true,
+        },
+        {
+          name: "Contrato",
+          icon: FileIcon,
+          href: `/${slug}/settings/contract`,
           exact: true,
         },
       ],

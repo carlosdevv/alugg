@@ -53,6 +53,39 @@ const updateOrganizationSchema = z.object({
     .min(3, { message: "Slug deve ter no mínimo 3 caracteres" })
     .max(48, { message: "Slug deve ter no máximo 48 caracteres" })
     .optional(),
+  fantasyName: z.string().optional(),
+  socialName: z.string().optional(),
+  cnpj: z
+    .string()
+    .optional()
+    .refine(
+      (value) => {
+        if (!value) return true;
+        return value.length === 14 || value.length === 18;
+      },
+      { message: "CNPJ inválido" }
+    ),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+  zipcode: z
+    .string()
+    .optional()
+    .refine(
+      (value) => {
+        if (!value) return true;
+        if (value.length === 8 || (value.length === 9 && value.includes("-")))
+          return true;
+        return false;
+      },
+      {
+        message: "CEP inválido",
+      }
+    ),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  neighborhood: z.string().optional(),
+  logo: z.string().optional(),
 });
 
 // PATCH /api/organizations/:slug - Update an organization
@@ -73,7 +106,7 @@ export async function PATCH(
       );
     }
 
-    const { name, newSlug } = parsed.data;
+    const { ...data } = parsed.data;
 
     if (!userId) {
       return NextResponse.json(
@@ -107,22 +140,19 @@ export async function PATCH(
         id: organization.id,
       },
       data: {
-        name: name || organization.name,
-        slug: newSlug || organization.slug,
+        ...data,
+        slug: data.newSlug || organization.slug,
       },
     });
 
-    if (slug !== newSlug) {
+    if (slug !== data.newSlug) {
       await prisma.user.update({
         where: { id: userId },
-        data: { defaultOrganization: newSlug },
+        data: { defaultOrganization: data.newSlug },
       });
     }
 
-    return NextResponse.json(
-      { organizationId: organization.id, slug: updatedOrg.slug },
-      { status: 200 }
-    );
+    return NextResponse.json({ organization: updatedOrg }, { status: 200 });
   } catch (error) {
     console.error("ERR:", error);
     return NextResponse.json(

@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+// GET /api/organizations/:slug/categories – get all categories
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -72,6 +73,7 @@ const createCategorySchema = z.object({
   name: z.string(),
 });
 
+// POST /api/organizations/:slug/categories – create a new category
 export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } }

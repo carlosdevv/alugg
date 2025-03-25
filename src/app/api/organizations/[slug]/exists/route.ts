@@ -2,7 +2,7 @@ import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
-// GET /api/workspaces/[slug]/exists – check if a project exists
+// GET /api/organizations/:slug/exists – check if a project exists
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }

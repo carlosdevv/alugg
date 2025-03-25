@@ -1,19 +1,21 @@
-export type GetItemProps = {
+import type { ItemStatus } from "@prisma/client";
+
+export type GetItemServiceProps = {
   slug: string;
 };
 
-export type GetItemByIdProps = {
+export type GetItemByIdServiceProps = {
   slug: string;
   itemId: string;
 };
 
 export type GetItemsApiResponse = {
-  items: Item[];
+  items: ItemProps[];
 };
 
-export type GetItemByIdApiResponse = Item;
+export type GetItemByIdApiResponse = ItemProps;
 
-export type Item = {
+export type ItemProps = {
   id: string;
   name: string;
   description: string;
@@ -29,42 +31,111 @@ export type Item = {
   rentPrice: number;
   imageUrl: string;
   amount: number;
-  status: string;
-  itemInRenovation: boolean;
+  status: ItemStatus;
   objectPrice: number;
   code: string;
   size: string;
   color: string;
 };
 
-export type GetItemsResponse = GetItemsApiResponse["items"];
+export type GetItemsServiceResponse = GetItemsApiResponse["items"];
 
-export type UpdateItemByIdProps = {
+export type UpdateItemByIdServiceProps = {
   id: string;
   slug: string;
-  updatedItem: Partial<Item>;
 };
 
-export type UpdateItemByIdApiResponse = Item;
+export type UpdateItemByIdServiceBody = CreateItemServiceBody;
 
-export type CreateItemProps = {
-  slug: string;
-  itemToCreate: CreateItemBody;
-};
+export type UpdateItemByIdApiResponse = ItemProps;
 
-export type CreateItemBody = {
+export type CreateItemServiceBody = {
   name: string;
   categoryId: string;
   rentPrice: number;
   description: string | undefined;
   imageUrl: string | undefined;
   amount: number;
-  status: string;
-  itemInRenovation: boolean;
+  status: ItemStatus;
   objectPrice: number;
   code: string | undefined;
   size: string | undefined;
   color: string | undefined;
 };
 
-export type DeleteItemProps = GetItemByIdProps;
+export type CreateItemServiceResponse = ItemProps;
+
+export type DeleteItemServiceProps = GetItemByIdServiceProps;
+
+export type Item = {
+  id: string;
+  name: string;
+  code: string | null;
+  objectPrice: number;
+  rentPrice: number;
+  size: string | null;
+  color: string | null;
+  description: string | null;
+  amount: number;
+  status: ItemStatus;
+  imageUrl: string | null;
+  categoryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  organizationId: string;
+  category: {
+    name: string;
+  };
+};
+
+export type ItemReservation = {
+  eventDate: Date;
+  withdrawalDate: Date;
+  returnDate: Date;
+};
+
+export type ItemAvailability = Item & {
+  availableQuantity: number;
+  isAvailable: boolean;
+  reservations: ItemReservation[] | null;
+};
+
+export type GetItemsAvailabilityServiceProps = {
+  slug: string;
+  eventDate: string;
+  withdrawalDate: string;
+  returnDate: string;
+};
+
+export type GetItemsAvailabilityServiceResponse = {
+  data: ItemAvailability[];
+};
+
+export type ItemHistoryContract = {
+  contractId: string;
+  code: string;
+  customerName: string;
+  eventDate: Date;
+  withdrawalDate: Date;
+  returnDate: Date;
+  totalValue: number;
+  quantity: number;
+};
+
+export type ItemHistoryData = {
+  item: {
+    id: string;
+    name: string;
+    amount: number;
+  };
+  contractHistory: ItemHistoryContract[];
+};
+
+export type GetItemHistoryServiceProps = {
+  slug: string;
+  itemId: string;
+};
+
+export type GetItemHistoryServiceResponse = {
+  data: ItemHistoryData;
+};

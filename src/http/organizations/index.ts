@@ -48,16 +48,14 @@ export async function createOrganizationService({
     .json<CreateOrganizationServiceResponse>();
 }
 
-export async function updateOrganizationService({
-  name,
-  slug,
-  newSlug,
-}: UpdateOrganizationServiceBody): Promise<UpdateOrganizationServiceResponse> {
+export async function updateOrganizationService(
+  { slug }: { slug: string },
+  body: UpdateOrganizationServiceBody
+): Promise<UpdateOrganizationServiceResponse> {
   return await api
     .patch(`api/organizations/${slug}`, {
       json: {
-        name,
-        newSlug,
+        ...body,
       },
     })
     .json<UpdateOrganizationServiceResponse>();
