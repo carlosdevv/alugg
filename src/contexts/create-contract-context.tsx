@@ -266,7 +266,7 @@ export const CreateContractProvider = ({
       const supabase = createClient();
       const pdfBlob = await generateContractPDF();
 
-      const fileName = `${slug}/${ContractDocumentType.INVOICE.toLowerCase()}/contrato-${nextContractCode}-${ContractDocumentType.INVOICE.toLowerCase()}.pdf`;
+      const fileName = `${slug}/${ContractDocumentType.INVOICE.toLowerCase()}/contrato-${nextContractCode}-locacao.pdf`;
 
       const { error: supabaseError } = await supabase.storage
         .from("organization-contracts")

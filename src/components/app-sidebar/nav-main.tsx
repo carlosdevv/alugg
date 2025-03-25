@@ -3,13 +3,14 @@
 import { Icons, type IconType } from "@/components/icons";
 import {
   ContractIcon,
+  CreditCardIcon,
   CustomerIcon,
+  FileIcon,
   GearIcon,
   HomeIcon,
   LayersIcon,
   ListIcon,
   PeopleIcon,
-  ReceiptIcon,
 } from "@/components/icons/dub";
 import {
   Collapsible,
@@ -88,7 +89,7 @@ export function NavMain() {
         },
         {
           name: "Cobrança",
-          icon: ReceiptIcon,
+          icon: CreditCardIcon,
           href: `/${slug}/settings/billing`,
           exact: true,
         },
@@ -96,6 +97,12 @@ export function NavMain() {
           name: "Membros",
           icon: PeopleIcon,
           href: `/${slug}/settings/members`,
+          exact: true,
+        },
+        {
+          name: "Contrato",
+          icon: FileIcon,
+          href: `/${slug}/settings/contract`,
           exact: true,
         },
       ],

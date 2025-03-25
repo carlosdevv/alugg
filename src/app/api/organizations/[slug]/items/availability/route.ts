@@ -1,7 +1,7 @@
 import { getUserMembership } from "@/actions/get-user-membership";
 import prisma from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
-import { parse } from "date-fns";
+import { addDays, parse, subDays } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -78,30 +78,30 @@ export async function GET(
       },
     });
 
-    // Buscar contratos que se sobrepõem às datas solicitadas
+    // Aplicar os dias extras de reserva configurados na organização
+    const adjustedWithdrawalDate = subDays(
+      parsedWithdrawalDate,
+      organization.contractDaysBefore
+    );
+    const adjustedReturnDate = addDays(
+      parsedReturnDate,
+      organization.contractDaysAfter
+    );
+
+    // Buscar contratos que se sobrepõem às datas solicitadas (considerando os dias extras)
     const overlappingContracts = await prisma.contract.findMany({
       where: {
         organizationId: organization.id,
         status: { notIn: ["CANCELLED"] },
         OR: [
           {
-            // Contratos que começam durante o período solicitado
-            eventDate: {
-              gte: parsedWithdrawalDate,
-              lte: parsedReturnDate,
+            // Contratos que começam durante o período solicitado (ajustado)
+            withdrawalDate: {
+              lte: adjustedReturnDate,
             },
-          },
-          {
-            // Contratos que terminam durante o período solicitado
             returnDate: {
-              gte: parsedWithdrawalDate,
-              lte: parsedReturnDate,
+              gte: adjustedWithdrawalDate,
             },
-          },
-          {
-            // Contratos que abrangem todo o período solicitado
-            eventDate: { lte: parsedWithdrawalDate },
-            returnDate: { gte: parsedReturnDate },
           },
         ],
       },
@@ -119,10 +119,28 @@ export async function GET(
       // Verificar quantos deste item estão reservados durante o período
       const reservedQuantity = overlappingContracts.reduce(
         (total, contract) => {
-          const rentedItem = contract.rentedItems.find(
-            (ri) => ri.itemId === item.id
+          // Para cada contrato sobreposto, aplicar os dias extras de reserva
+          const contractWithdrawalDate = subDays(
+            contract.withdrawalDate,
+            organization.contractDaysBefore
           );
-          return total + (rentedItem ? rentedItem.quantity : 0);
+          const contractReturnDate = addDays(
+            contract.returnDate,
+            organization.contractDaysAfter
+          );
+
+          // Verificar se há sobreposição com o período solicitado (já ajustado)
+          const hasOverlap =
+            (contractWithdrawalDate <= adjustedReturnDate &&
+              contractReturnDate >= adjustedWithdrawalDate);
+
+          if (hasOverlap) {
+            const rentedItem = contract.rentedItems.find(
+              (ri) => ri.itemId === item.id
+            );
+            return total + (rentedItem ? rentedItem.quantity : 0);
+          }
+          return total;
         },
         0
       );
@@ -132,13 +150,40 @@ export async function GET(
 
       // Obter datas de reserva para esse item (se não estiver totalmente disponível)
       const reservations = overlappingContracts
-        .filter((contract) =>
-          contract.rentedItems.some((ri) => ri.itemId === item.id)
-        )
+        .filter((contract) => {
+          // Aplicar os dias extras para cada contrato
+          const contractWithdrawalDate = subDays(
+            contract.withdrawalDate,
+            organization.contractDaysBefore
+          );
+          const contractReturnDate = addDays(
+            contract.returnDate,
+            organization.contractDaysAfter
+          );
+
+          // Verificar sobreposição
+          const hasOverlap =
+            (contractWithdrawalDate <= adjustedReturnDate &&
+              contractReturnDate >= adjustedWithdrawalDate);
+
+          return (
+            hasOverlap &&
+            contract.rentedItems.some((ri) => ri.itemId === item.id)
+          );
+        })
         .map((contract) => ({
           eventDate: contract.eventDate,
           withdrawalDate: contract.withdrawalDate,
           returnDate: contract.returnDate,
+          // Adicionar as datas ajustadas para melhor visualização
+          adjustedWithdrawalDate: subDays(
+            contract.withdrawalDate,
+            organization.contractDaysBefore
+          ),
+          adjustedReturnDate: addDays(
+            contract.returnDate,
+            organization.contractDaysAfter
+          ),
         }));
 
       return {
@@ -146,6 +191,14 @@ export async function GET(
         availableQuantity,
         isAvailable: availableQuantity > 0,
         reservations: reservations.length > 0 ? reservations : null,
+        // Adicionar as datas ajustadas da consulta atual para referência
+        requestedPeriod: {
+          eventDate: parsedEventDate,
+          withdrawalDate: parsedWithdrawalDate,
+          returnDate: parsedReturnDate,
+          adjustedWithdrawalDate,
+          adjustedReturnDate,
+        },
       };
     });
 

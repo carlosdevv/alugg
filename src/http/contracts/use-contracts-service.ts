@@ -13,9 +13,12 @@ import {
   createContractService,
   deleteContractService,
   getContractByIdService,
+  getContractSettingsService,
   getContractsService,
   getNextContractCodeService,
+  returnContractService,
   updateContractService,
+  updateContractSettingsService,
   withdrawalContractService,
 } from ".";
 import type { ErrorResponse } from "../types";
@@ -24,12 +27,17 @@ import type {
   CreateContractServiceResponse,
   GetContractByIdServiceProps,
   GetContractByIdServiceResponse,
+  GetContractSettingsServiceResponse,
   GetContractsServiceProps,
   GetContractsServiceResponse,
   GetNextContractCodeServiceProps,
   GetNextContractCodeServiceResponse,
+  ReturnContractServiceBody,
+  ReturnContractServiceResponse,
   UpdateContractServiceBody,
   UpdateContractServiceResponse,
+  UpdateContractSettingsServiceBody,
+  UpdateContractSettingsServiceResponse,
   WithdrawalContractServiceBody,
   WithdrawalContractServiceResponse,
 } from "./types";
@@ -42,7 +50,7 @@ export function useGetContractsService(
   >
 ) {
   return useQuery({
-    queryKey: ["getContracts", props.slug],
+    queryKey: ["getContracts", props.slug, props.status],
     queryFn: async () => await getContractsService(props),
     ...options,
   });
@@ -169,6 +177,75 @@ export function useWithdrawalContractService(
     onSuccess: () => {
       toast.success("Retirada de contrato realizada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["getContracts", slug] });
+    },
+    onError: async (error) => {
+      const { message } = await error.response.json();
+      toast.error(message);
+    },
+    ...options,
+  });
+}
+
+export function useReturnContractService(
+  options?: UseMutationOptions<
+    ReturnContractServiceResponse,
+    HTTPError<ErrorResponse>,
+    ReturnContractServiceBody
+  >
+) {
+  const queryClient = useQueryClient();
+  const { slug } = useParams() as { slug: string };
+
+  return useMutation({
+    mutationKey: ["returnContract", slug],
+    mutationFn: async (body: ReturnContractServiceBody) =>
+      await returnContractService({ slug, body }),
+    onSuccess: () => {
+      toast.success("Devolução de contrato realizada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["getContracts", slug] });
+    },
+    onError: async (error) => {
+      const { message } = await error.response.json();
+      toast.error(message);
+    },
+    ...options,
+  });
+}
+
+export function useGetContractSettingsService(
+  options?: UseQueryOptions<
+    GetContractSettingsServiceResponse,
+    HTTPError<ErrorResponse>
+  >
+) {
+  const { slug } = useParams() as { slug: string };
+
+  return useQuery({
+    queryKey: ["getContractSettings", slug],
+    queryFn: async () => await getContractSettingsService(slug),
+    ...options,
+  });
+}
+
+export function useUpdateContractSettingsService(
+  options?: UseMutationOptions<
+    UpdateContractSettingsServiceResponse,
+    HTTPError<ErrorResponse>,
+    UpdateContractSettingsServiceBody
+  >
+) {
+  const queryClient = useQueryClient();
+  const { slug } = useParams() as { slug: string };
+
+  return useMutation({
+    mutationKey: ["updateContractSettings", slug],
+    mutationFn: async (body: UpdateContractSettingsServiceBody) =>
+      await updateContractSettingsService(slug, body),
+    onSuccess: () => {
+      toast.success("Configurações de contrato atualizadas com sucesso!");
+      queryClient.invalidateQueries({
+        queryKey: ["getContractSettings", slug],
+      });
     },
     onError: async (error) => {
       const { message } = await error.response.json();

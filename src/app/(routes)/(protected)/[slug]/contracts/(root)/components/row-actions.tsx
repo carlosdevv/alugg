@@ -1,4 +1,5 @@
 import { Icons } from "@/components/icons";
+import { ReturnContractModal } from "@/components/modals/return-contract-modal";
 import { WithdrawalContractModal } from "@/components/modals/withdrawal-contract-modal";
 import { Button } from "@/components/ui/button";
 import {
@@ -83,7 +84,7 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
                     <DropdownMenuItem
                       className="flex items-center justify-between cursor-pointer"
                       onClick={() => setOpenModal("withdrawal-modal")}
-                      disabled={props.status === ContractStatus.COLLECTED}
+                      disabled={props.status !== ContractStatus.OPEN}
                     >
                       Retirada
                       <Icons.fileUp className="size-4" />
@@ -148,6 +149,8 @@ export function RowActions<TData>({ row }: RowActionsProps<TData>) {
       </div>
 
       <WithdrawalContractModal contractId={contractId} />
+
+      <ReturnContractModal contractId={contractId} />
 
       <DeleteContractDialog
         contractId={contractId}

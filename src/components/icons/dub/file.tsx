@@ -1,6 +1,6 @@
 import { SVGProps, useEffect, useRef } from "react";
 
-export function ReceiptIcon({
+export function FileIcon({
   "data-hovered": hovered,
   ...rest
 }: { "data-hovered"?: boolean } & SVGProps<SVGSVGElement>) {

@@ -1,7 +1,7 @@
-import { ContractWithdrawalPDF } from "@/components/contract-pdf/withdrawal/contract-withdrawal-pdf";
+import { ContractReturnPDF } from "@/components/contract-pdf/return/contract-return-pdf";
 import {
   useGetContractByIdService,
-  useWithdrawalContractService,
+  useReturnContractService,
 } from "@/http/contracts/use-contracts-service";
 import { useGetCustomerByIdService } from "@/http/customers/use-customers-service";
 import { useGetOrganizationService } from "@/http/organizations/use-organizations-service";
@@ -18,13 +18,13 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-type UseWithdrawalContractModalProps = {
+type UseReturnContractModalProps = {
   contractId: string;
 };
 
-export function useWithdrawalContractModal({
+export function useReturnContractModal({
   contractId,
-}: UseWithdrawalContractModalProps) {
+}: UseReturnContractModalProps) {
   const { slug } = useParams() as { slug: string };
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -32,8 +32,12 @@ export function useWithdrawalContractModal({
 
   const [open, setOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [withdrawalNotes, setWithdrawalNotes] = useState("");
+  const [returnNotes, setReturnNotes] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [shouldChargeFine, setShouldChargeFine] = useState(false);
+  const [finePaymentMethod, setFinePaymentMethod] = useState("PIX");
+  const [fineValue, setFineValue] = useState(0);
+  const [creditParcelAmount, setCreditParcelAmount] = useState(1);
 
   const { data: organizationProps } = useGetOrganizationService(
     { slug },
@@ -60,26 +64,11 @@ export function useWithdrawalContractModal({
   );
 
   const {
-    mutateAsync: handleWithdrawalContract,
-    isPending: isWithdrawalPending,
-    data: withdrawalData,
-    isSuccess: isSuccessWithdrawal,
-  } = useWithdrawalContractService();
-
-  const hasPendingPayment =
-    contractProps &&
-    contractProps.data.payments.some((payment) => !payment.isPaid);
-
-  const totalPaid =
-    (contractProps &&
-      contractProps.data.payments.reduce(
-        (acc, payment) => (payment.isPaid ? acc + payment.value : acc),
-        0
-      )) ||
-    0;
-
-  const pendingAmount =
-    ((contractProps && contractProps.data.totalValue) || 0) - totalPaid;
+    mutateAsync: handleReturnContract,
+    isPending: isReturnPending,
+    data: returnData,
+    isSuccess: isSuccessReturn,
+  } = useReturnContractService();
 
   const onClose = useCallback(() => {
     const nextSearchParams = new URLSearchParams(searchParams.toString());
@@ -88,7 +77,7 @@ export function useWithdrawalContractModal({
     setOpen(false);
   }, [pathname, router, searchParams]);
 
-  const generateWithdrawalPDF = async () => {
+  const generateReturnPDF = async () => {
     if (!contractProps) {
       toast.error("Dados do contrato não disponíveis");
       return null;
@@ -118,13 +107,22 @@ export function useWithdrawalContractModal({
             new Date(contractProps.data.returnDate),
             "dd/MM/yyyy"
           ),
-          withdrawalNotes,
+          returnNotes,
           code: contractProps.data.code,
+          returnedAt: format(new Date(), "dd/MM/yyyy HH:mm:ss"),
+          shouldChargeFine,
+          fineDetails: shouldChargeFine
+            ? {
+                method: finePaymentMethod,
+                value: fineValue,
+                creditParcelAmount,
+              }
+            : undefined,
         },
       };
 
       const pdfBlob = await pdf(
-        <ContractWithdrawalPDF
+        <ContractReturnPDF
           organization={pdfData.organization}
           customer={customerProps}
           items={pdfData.items}
@@ -133,9 +131,9 @@ export function useWithdrawalContractModal({
       ).toBlob();
 
       const supabase = createClient();
-      const fileName = `${slug}/${ContractDocumentType.WITHDRAWAL.toLowerCase()}/contrato-${
+      const fileName = `${slug}/${ContractDocumentType.RETURN.toLowerCase()}/contrato-${
         contractProps.data.code
-      }-retirada.pdf`;
+      }-devolução.pdf`;
 
       const { error: uploadError } = await supabase.storage
         .from("organization-contracts")
@@ -163,41 +161,36 @@ export function useWithdrawalContractModal({
     }
   };
 
-  const processWithdrawal = async () => {
-    const pdfUrl = await generateWithdrawalPDF();
+  const processReturn = async () => {
+    const pdfUrl = await generateReturnPDF();
 
     if (!pdfUrl) return null;
 
-    await handleWithdrawalContract({
+    await handleReturnContract({
       pdfUrl,
       contractId,
     });
   };
 
-  const handleWithdrawal = async () => {
-    if (hasPendingPayment) {
-      setIsConfirmModalOpen(true);
+  const handleReturn = async () => {
+    if (shouldChargeFine && fineValue <= 0) {
+      toast.error("O valor da multa deve ser maior que zero.");
       return;
     }
 
-    await processWithdrawal();
-  };
-
-  const handleRedirectToUpdate = () => {
-    onClose();
-    router.push(`contracts/${contractId}`);
+    await processReturn();
   };
 
   useEffect(() => {
-    if (isSuccessWithdrawal) {
-      window.open(withdrawalData.data.pdfUrl, "_blank");
+    if (isSuccessReturn) {
+      window.open(returnData.data.pdfUrl, "_blank");
       onClose();
       router.refresh();
     }
-  }, [onClose, router, searchParams, isSuccessWithdrawal, withdrawalData]);
+  }, [onClose, router, searchParams, isSuccessReturn, returnData]);
 
   useEffect(() => {
-    const isShowModal = searchParams.get("modal") === "withdrawal-modal";
+    const isShowModal = searchParams.get("modal") === "return-modal";
 
     if (isShowModal) {
       setOpen(true);
@@ -214,14 +207,20 @@ export function useWithdrawalContractModal({
     customerProps,
     isLoading,
     isGeneratingPdf,
-    processWithdrawal,
-    handleWithdrawal,
-    handleRedirectToUpdate,
+    processReturn,
+    handleReturn,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
-    isWithdrawalPending,
-    withdrawalNotes,
-    setWithdrawalNotes,
-    pendingAmount,
+    isReturnPending,
+    returnNotes,
+    setReturnNotes,
+    shouldChargeFine,
+    setShouldChargeFine,
+    finePaymentMethod,
+    setFinePaymentMethod,
+    fineValue,
+    setFineValue,
+    creditParcelAmount,
+    setCreditParcelAmount,
   };
 }

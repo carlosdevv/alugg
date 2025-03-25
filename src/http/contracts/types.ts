@@ -184,3 +184,34 @@ export type WithdrawalContractServiceResponse = {
     documentId: string;
   };
 };
+
+export type ReturnContractServiceBody = {
+  contractId: string;
+  pdfUrl: string;
+};
+
+export type ReturnContractServiceResponse = {
+  data: {
+    pdfUrl: string;
+    documentId: string;
+  };
+};
+
+export type GetContractSettingsServiceResponse = {
+  data: {
+    daysBefore: number;
+    daysAfter: number;
+  };
+};
+
+export type UpdateContractSettingsServiceBody = {
+  daysBefore: number;
+  daysAfter: number;
+};
+
+export type UpdateContractSettingsServiceResponse = {
+  data: {
+    daysBefore: number;
+    daysAfter: number;
+  };
+};

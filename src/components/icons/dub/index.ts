@@ -5,5 +5,5 @@ export * from "./home";
 export * from "./layers";
 export * from "./list";
 export * from "./people";
-export * from "./receipt";
-
+export * from "./file";
+export * from "./credit-card";

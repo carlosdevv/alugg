@@ -4,19 +4,25 @@ import type {
   CreateContractServiceResponse,
   GetContractByIdServiceProps,
   GetContractByIdServiceResponse,
+  GetContractSettingsServiceResponse,
   GetContractsServiceProps,
   GetContractsServiceResponse,
   GetNextContractCodeServiceResponse,
+  ReturnContractServiceBody,
+  ReturnContractServiceResponse,
   UpdateContractServiceBody,
   UpdateContractServiceResponse,
+  UpdateContractSettingsServiceBody,
+  UpdateContractSettingsServiceResponse,
   WithdrawalContractServiceBody,
   WithdrawalContractServiceResponse,
 } from "./types";
 
 export async function getContractsService({
   slug,
+  status,
 }: GetContractsServiceProps): Promise<GetContractsServiceResponse> {
-  const url = `api/organizations/${slug}/contracts`;
+  const url = `api/organizations/${slug}/contracts?status=${status}`;
 
   const result = await api.get(url).json<GetContractsServiceResponse>();
 
@@ -97,6 +103,47 @@ export async function withdrawalContractService({
       json: body,
     })
     .json<WithdrawalContractServiceResponse>();
+
+  return result;
+}
+
+export async function returnContractService({
+  slug,
+  body,
+}: {
+  slug: string;
+  body: ReturnContractServiceBody;
+}): Promise<ReturnContractServiceResponse> {
+  const url = `api/organizations/${slug}/contracts/${body.contractId}/return`;
+
+  const result = await api
+    .post(url, {
+      json: body,
+    })
+    .json<ReturnContractServiceResponse>();
+
+  return result;
+}
+
+export async function getContractSettingsService(
+  slug: string
+): Promise<GetContractSettingsServiceResponse> {
+  const url = `api/organizations/${slug}/contracts/settings`;
+
+  const result = await api.get(url).json<GetContractSettingsServiceResponse>();
+
+  return result;
+}
+
+export async function updateContractSettingsService(
+  slug: string,
+  body: UpdateContractSettingsServiceBody
+): Promise<UpdateContractSettingsServiceResponse> {
+  const url = `api/organizations/${slug}/contracts/settings`;
+
+  const result = await api
+    .patch(url, { json: body })
+    .json<UpdateContractSettingsServiceResponse>();
 
   return result;
 }

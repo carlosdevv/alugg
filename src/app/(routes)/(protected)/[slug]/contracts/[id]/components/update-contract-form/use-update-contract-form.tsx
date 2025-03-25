@@ -229,7 +229,7 @@ export default function useUpdateContractForm({
 
       const fileNamePath = `${slug}/${ContractDocumentType.INVOICE.toLowerCase()}/contrato-${
         contract.code
-      }-${ContractDocumentType.INVOICE.toLowerCase()}.pdf`;
+      }-locacao.pdf`;
 
       const { error: supabaseError } = await supabase.storage
         .from("organization-contracts")

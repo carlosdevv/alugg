@@ -21,7 +21,7 @@ export default function ContractsPageClient({
       ...contract,
       customerName: contract.customer.name,
       customerPhone: contract.customer.phone,
-      contractDocuments: contract.contractDocuments
+      contractDocuments: contract.contractDocuments,
     }));
   }, [contracts]);
 

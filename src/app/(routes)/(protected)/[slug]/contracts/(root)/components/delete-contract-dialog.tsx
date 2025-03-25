@@ -37,19 +37,31 @@ export function DeleteContractDialog({
           const { error: storageErrorInvoice } = await supabase.storage
             .from("organization-contracts")
             .remove([
-              `${slug}/${ContractDocumentType.INVOICE.toLowerCase()}/contrato-${contractCode}-${ContractDocumentType.INVOICE.toLowerCase()}.pdf`,
+              `${slug}/${ContractDocumentType.INVOICE.toLowerCase()}/contrato-${contractCode}-locacao.pdf`,
             ]);
 
           const { error: storageErrorWithdrawal } = await supabase.storage
             .from("organization-contracts")
             .remove([
-              `${slug}/${ContractDocumentType.WITHDRAWAL.toLowerCase()}/contrato-${contractCode}-${ContractDocumentType.WITHDRAWAL.toLowerCase()}.pdf`,
+              `${slug}/${ContractDocumentType.WITHDRAWAL.toLowerCase()}/contrato-${contractCode}-retirada.pdf`,
             ]);
 
-          if (storageErrorInvoice || storageErrorWithdrawal) {
+          const { error: storageErrorReturn } = await supabase.storage
+            .from("organization-contracts")
+            .remove([
+              `${slug}/${ContractDocumentType.RETURN.toLowerCase()}/contrato-${contractCode}-devolução.pdf`,
+            ]);
+
+          if (
+            storageErrorInvoice ||
+            storageErrorWithdrawal ||
+            storageErrorReturn
+          ) {
             console.error(
               "Erro ao remover arquivo:",
-              storageErrorInvoice || storageErrorWithdrawal
+              storageErrorInvoice ||
+                storageErrorWithdrawal ||
+                storageErrorReturn
             );
           }
 

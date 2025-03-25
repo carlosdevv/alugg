@@ -1,23 +1,25 @@
 model Organization {
-  id           String   @id @default(cuid())
-  name         String
-  fantasyName  String?  @map("fantasy_name")
-  socialName   String?  @map("social_name")
-  cnpj         String?
-  phone        String?
-  email        String?
-  zipcode      String?
-  address      String?
-  city         String?
-  state        String?
-  neighborhood String?
-  slug         String   @unique
-  plan         String   @default("free")
-  logo         String?
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId      String   @map("owner_id")
+  id                 String   @id @default(cuid())
+  name               String
+  fantasyName        String?  @map("fantasy_name")
+  socialName         String?  @map("social_name")
+  cnpj               String?
+  phone              String?
+  email              String?
+  zipcode            String?
+  address            String?
+  city               String?
+  state              String?
+  neighborhood       String?
+  slug               String   @unique
+  plan               String   @default("free")
+  logo               String?
+  contractDaysBefore Int      @default(0) @map("contract_days_before")
+  contractDaysAfter  Int      @default(0) @map("contract_days_after")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  owner              User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId            String   @map("owner_id")
 
   invites    Invite[]
   members    Member[]
@@ -36,8 +38,8 @@ model Member {
   organizationId String       @map("organization_id")
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String       @map("user_id")
-  
-  contracts      Contract[]
+
+  contracts Contract[]
 
   @@unique([organizationId, userId])
   @@map("members")

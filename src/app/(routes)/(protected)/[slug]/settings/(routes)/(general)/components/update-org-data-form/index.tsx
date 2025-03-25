@@ -44,7 +44,7 @@ export default function UpdateOrgDataForm({
               Essas são as informações básicas da sua organização.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4 ">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
             <FormField
               control={form.control}
               name="name"

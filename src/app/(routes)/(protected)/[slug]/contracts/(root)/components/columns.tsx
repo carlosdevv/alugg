@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn, formatToCurrency } from "@/lib/utils";
-import type { ContractDocument, ContractStatus } from "@prisma/client";
+import type { ContractStatus } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { RowActions } from "./row-actions";
@@ -188,7 +188,7 @@ const statusColors: Record<ContractStatus, BadgeProps["variant"]> = {
 
 const statusText: Record<ContractStatus, string> = {
   OPEN: "Aberto",
-  CLOSED: "Fechado",
+  CLOSED: "Finalizado",
   CANCELLED: "Cancelado",
   COLLECTED: "Retirado",
 };
