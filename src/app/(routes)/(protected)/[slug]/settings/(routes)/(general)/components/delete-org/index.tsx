@@ -115,7 +115,7 @@ export default function DeleteOrg({ organization }: ChangeOrgSlugFormProps) {
                         pattern="deletar organização"
                         disabled={!isOwner}
                         className={cn(
-                          "block w-full rounded-md dark:border-zinc-700 dark:bg-neutral-900 text-gray-900 placeholder-gray-400 sm:text-sm",
+                          "block w-full rounded-md dark:border-zinc-700 dark:bg-neutral-900 dark:text-gray-100 text-gray-900 placeholder-gray-400 sm:text-sm",
                           {
                             "cursor-not-allowed bg-gray-100": !isOwner,
                           }

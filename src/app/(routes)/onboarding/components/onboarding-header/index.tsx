@@ -7,7 +7,7 @@ export default function OnboardingHeader() {
   const { signOut } = useAuth();
 
   return (
-    <section className="w-full py-3 px-8 bg-muted border-b shadow-sm">
+    <section className="w-full py-3 px-8 border-b shadow-sm bg-muted">
       <div className="max-w-screen-2xl mx-auto justify-between flex items-center">
         <div className="flex items-center space-x-3">
           <Icons.logo className="size-6" />

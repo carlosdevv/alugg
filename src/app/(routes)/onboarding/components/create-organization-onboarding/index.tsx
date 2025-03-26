@@ -18,11 +18,11 @@ export default function CreateOrganizationOnboarding() {
   const { form, onSubmit, isPending } = useCreateOrganizationOnboarding();
 
   return (
-    <section className="h-screen w-screen bg-slate-50">
+    <section className="h-screen w-screen">
       <div className="slide-in relative mx-auto py-10 max-w-2xl">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="transition-opacity duration-300 rounded-md border shadow-sm overflow-hidden bg-white">
+            <div className="transition-opacity duration-300 rounded-md border shadow-sm overflow-hidden">
               <div className="border-b flex flex-col px-6 py-4">
                 <h4 className="font-medium">Criar nova organização</h4>
                 <p className="text-sm text-muted-foreground">
