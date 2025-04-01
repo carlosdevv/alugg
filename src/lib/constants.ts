@@ -1,6 +1,8 @@
 export const appRoutes = {
+  home: "/",
   signIn: "/auth/sign-in",
   signUp: "/auth/sign-up",
+  verifyEmail: "/auth/verify-email",
   forgotPassword: "/auth/forgot-password",
   onboarding: "/onboarding",
   createOrganization: "/create-organization",

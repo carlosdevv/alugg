@@ -4,89 +4,21 @@ import googleImg from "@/assets/google-icon.svg";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSeparator,
-    InputOTPSlot,
-} from "@/components/ui/input-otp";
 import EmailInput from "@/components/ui/inputs/email-input";
 import PasswordInput from "@/components/ui/inputs/password-input";
-import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useSignUpForm from "./use-sign-up-form";
 
 export default function SignUpForm() {
-  const {
-    form,
-    onSubmit,
-    isPending,
-    verifyCodeScreen,
-    setVerifyCodeScreen,
-    code,
-    setCode,
-    verifyCode,
-    isSendingEmail,
-  } = useSignUpForm();
-
-  if (verifyCodeScreen) {
-    return (
-      <div className="flex flex-col gap-5">
-        <div className="flex flex-col gap-y-4">
-          <div className="flex flex-col space-y-4 justify-center items-center">
-            <Label>Código de verificação</Label>
-            <InputOTP
-              maxLength={6}
-              value={code}
-              onChange={(value) => setCode(value)}
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup>
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-          </div>
-
-          <Button
-            variant="ghost"
-            type="button"
-            className="w-min mx-auto text-muted-foreground"
-            disabled={isPending}
-            onClick={() => setVerifyCodeScreen(false)}
-          >
-            Reenviar código
-          </Button>
-          <Button
-            type="button"
-            className="w-full mt-4"
-            disabled={isPending}
-            onClick={verifyCode}
-          >
-            {isPending ? (
-              <Icons.loader className="size-4 animate-spin" />
-            ) : (
-              "Cadastrar"
-            )}
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const { form, onSubmit, isPending, isFormInvalid } = useSignUpForm();
 
   return (
     <div className="flex flex-col gap-5">
@@ -118,7 +50,11 @@ export default function SignUpForm() {
               <FormItem>
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nome" {...field} />
+                  <Input
+                    placeholder="Nome"
+                    {...field}
+                    value={field.value || ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,7 +67,11 @@ export default function SignUpForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <EmailInput placeholder="email@exemplo.com" {...field} />
+                  <EmailInput
+                    placeholder="email@exemplo.com"
+                    {...field}
+                    value={field.value || ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -145,17 +85,19 @@ export default function SignUpForm() {
                 <FormLabel>Senha</FormLabel>
                 <div className="relative">
                   <FormControl>
-                    <PasswordInput placeholder="••••••••" {...field} />
+                    <PasswordInput
+                      placeholder="••••••••"
+                      {...field}
+                      value={field.value || ""}
+                    />
                   </FormControl>
                 </div>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={isSendingEmail}>
-            {isSendingEmail && (
-              <Icons.loader className="mr-2 size-4 animate-spin" />
-            )}
+          <Button type="submit" disabled={isPending || isFormInvalid}>
+            {isPending && <Icons.loader className="mr-2 size-4 animate-spin" />}
             Cadastrar
           </Button>
         </form>

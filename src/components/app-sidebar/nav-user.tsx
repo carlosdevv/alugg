@@ -18,14 +18,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { appRoutes } from "@/lib/constants";
+import { useAuth } from "@/hooks/use-auth";
 import { getInitials } from "@/lib/utils";
-import { useAuth, useUser } from "@clerk/nextjs";
 
 export function NavUser() {
-  const { signOut } = useAuth();
-  const { user } = useUser();
+  const { signOut, authClient } = useAuth();
   const { isMobile } = useSidebar();
+  const user = authClient.useSession().data?.user;
 
   return (
     <SidebarMenu>
@@ -40,7 +39,7 @@ export function NavUser() {
                 <Avatar className="size-7">
                   <AvatarFallback className="bg-black/15">
                     <span className="text-xs">
-                      {getInitials(user.firstName ?? "AA")}
+                      {getInitials(user.name ?? "AA")}
                     </span>
                   </AvatarFallback>
                 </Avatar>
@@ -53,13 +52,8 @@ export function NavUser() {
               )}
               {user ? (
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    {user.firstName ||
-                      user.primaryEmailAddress?.emailAddress?.split("@")[0]}
-                  </span>
-                  <span className="truncate text-xs">
-                    {user.primaryEmailAddress?.emailAddress}
-                  </span>
+                  <span className="truncate font-semibold">{user.name}</span>
+                  <span className="truncate text-xs">{user.email}</span>
                 </div>
               ) : (
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -82,7 +76,7 @@ export function NavUser() {
                   <Avatar className="size-7">
                     <AvatarFallback className="bg-black/15">
                       <span className="text-xs">
-                        {getInitials(user.firstName ?? "AA")}
+                        {getInitials(user.name ?? "AA")}
                       </span>
                     </AvatarFallback>
                   </Avatar>
@@ -95,13 +89,8 @@ export function NavUser() {
                 )}
                 {user ? (
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {user.firstName ||
-                        user.primaryEmailAddress?.emailAddress?.split("@")[0]}
-                    </span>
-                    <span className="truncate text-xs">
-                      {user.primaryEmailAddress?.emailAddress}
-                    </span>
+                    <span className="truncate font-semibold">{user.name}</span>
+                    <span className="truncate text-xs">{user.email}</span>
                   </div>
                 ) : (
                   <div className="grid flex-1 text-left text-sm leading-tight">
@@ -118,7 +107,7 @@ export function NavUser() {
               <Button
                 variant="ghost"
                 className="w-full justify-start cursor-pointer"
-                onClick={() => signOut({ redirectUrl: appRoutes.signIn })}
+                onClick={() => signOut()}
               >
                 <Icons.signOut className="size-4 mr-2" />
                 Sair

@@ -33,7 +33,11 @@ export default function SignInForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <EmailInput placeholder="email@exemplo.com" {...field} />
+                  <EmailInput
+                    placeholder="email@exemplo.com"
+                    {...field}
+                    value={field.value || ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -56,7 +60,11 @@ export default function SignInForm() {
                 </div>
                 <div className="relative">
                   <FormControl>
-                    <PasswordInput placeholder="••••••••" {...field} />
+                    <PasswordInput
+                      placeholder="••••••••"
+                      {...field}
+                      value={field.value || ""}
+                    />
                   </FormControl>
                 </div>
                 <FormMessage />

@@ -1,3 +1,8 @@
+enum Role {
+  ADMIN
+  MEMBER
+}
+
 model Organization {
   id                 String   @id @default(cuid())
   name               String

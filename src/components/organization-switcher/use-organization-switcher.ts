@@ -1,12 +1,13 @@
+import { useAuth } from "@/hooks/use-auth";
 import { useGetOrganizationsService } from "@/http/organizations/use-organizations-service";
-import { useAuth } from "@clerk/nextjs";
 import { Role } from "@prisma/client";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 
 export default function useOrganizationSwitcher() {
-  const { userId } = useAuth();
+  const { authClient } = useAuth();
+  const userId = authClient.useSession().data?.user.id;
 
   const { data: organizations } = useGetOrganizationsService();
 

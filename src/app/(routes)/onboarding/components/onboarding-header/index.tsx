@@ -1,9 +1,12 @@
 "use client";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
+import { appRoutes } from "@/lib/constants";
+import { useRouter } from "next/navigation";
 
 export default function OnboardingHeader() {
+  const router = useRouter();
   const { signOut } = useAuth();
 
   return (
@@ -14,7 +17,15 @@ export default function OnboardingHeader() {
           <h1 className="font-light text-lg">Allug</h1>
         </div>
         <Button
-          onClick={() => signOut()}
+          onClick={async () =>
+            await signOut({
+              fetchOptions: {
+                onSuccess: () => {
+                  router.push(appRoutes.signIn);
+                },
+              },
+            })
+          }
           className="flex items-center gap-x-2"
           size="sm"
         >

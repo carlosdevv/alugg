@@ -1,8 +1,8 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import { organizationSchema } from "@/lib/casl/models/organization";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -12,15 +12,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
     const { slug } = params;
-
-    if (!userId) {
-      return NextResponse.json(
-        { message: "Usuário não encontrado." },
-        { status: 404 }
-      );
-    }
 
     if (!slug) {
       return NextResponse.json(
@@ -94,7 +86,7 @@ export async function PATCH(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug } = params;
     const body = await req.json();
     const parsed = updateOrganizationSchema.safeParse(body);
@@ -168,7 +160,7 @@ export async function DELETE(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug } = params;
 
     if (!userId) {

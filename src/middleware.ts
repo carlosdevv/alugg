@@ -1,32 +1,43 @@
-import { appRoutes } from "@/lib/constants";
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { betterFetch } from "@better-fetch/fetch";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "./lib/auth";
+import { appRoutes } from "./lib/constants";
 
-const isPublicRoute = createRouteMatcher([
-  "/auth/sign-in(.*)",
-  "/auth/sign-up(.*)",
-  "/api/auth(.*)",
-]);
+type Session = typeof auth.$Infer.Session;
 
-export default clerkMiddleware((auth, request) => {
-  const { userId } = auth();
+const publicRoutes = ["/api/auth/reference", appRoutes.verifyEmail];
+const authRoutes = [appRoutes.signIn, appRoutes.signUp];
 
-  if (isPublicRoute(request) && userId) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = appRoutes.onboarding;
-    return NextResponse.redirect(redirectUrl);
+export default async function authMiddleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const isAuthRoute = authRoutes.includes(pathname);
+  const isPublicRoute = publicRoutes.includes(pathname);
+
+  const { data: session } = await betterFetch<Session>(
+    "/api/auth/get-session",
+    {
+      baseURL: request.nextUrl.origin,
+      headers: {
+        cookie: request.headers.get("cookie") || "", // Forward the cookies from the request
+      },
+    }
+  );
+
+  if (!session) {
+    if (isAuthRoute || isPublicRoute) {
+      return NextResponse.next();
+    }
+
+    return NextResponse.redirect(new URL(appRoutes.signIn, request.url));
   }
 
-  if (!isPublicRoute(request)) {
-    auth().protect();
+  if (isAuthRoute) {
+    return NextResponse.redirect(new URL(appRoutes.home, request.url));
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
 };

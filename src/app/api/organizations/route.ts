@@ -1,12 +1,12 @@
+import { getUserId } from "@/actions/user/get-user-id";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 // GET /api/organizations - Get all organizations for an user
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(
@@ -83,7 +83,7 @@ const createOrganizationSchema = z.object({
 // POST /api/organizations - Create a new organization
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(

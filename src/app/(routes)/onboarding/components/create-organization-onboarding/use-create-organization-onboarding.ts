@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const createOrganizationOnboardingFormSchema = z.object({
   name: z.string({ required_error: "Nome é obrigatório" }),
-  plan: z.enum(["free", "pro"]).optional(),
+  plan: z.enum(["free", "pro"]).default("free"),
   slug: z.string({ required_error: "Slug é obrigatório" }),
 });
 
@@ -22,12 +22,7 @@ export default function useCreateOrganizationOnboarding() {
     useCreateOrganizationService();
 
   async function onSubmit(data: CreateOrganizationOnboardingFormValues) {
-    const props = {
-      ...data,
-      plan: data.plan || "free",
-    };
-
-    await createOrganization(props);
+    await createOrganization(data);
   }
   return { form, onSubmit, isPending };
 }

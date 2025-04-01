@@ -9,19 +9,73 @@ datasource db {
   // directUrl = env("DIRECT_URL")
 }
 
-enum TokenType {
-  PASSWORD_RECOVER
-  EMAIL_VALIDATION
+enum Plan {
+  FREE
+  PRO
 }
 
-model Token {
-  id        String    @id @default(uuid())
-  type      TokenType
-  code      String?
-  createdAt DateTime  @default(now()) @map("created_at")
-  email     String?
+model User {
+  id                  String   @id
+  name                String
+  email               String   @unique
+  emailVerified       Boolean
+  image               String?
+  defaultOrganization String? // slug of the user's default organization
+  plan                Plan     @default(FREE)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
-  @@map("tokens")
+  sessions           Session[]
+  accounts           Account[]
+  invites            Invite[]
+  member_on          Member[]
+  owns_organizations Organization[]
+
+  @@index(defaultOrganization)
+  @@map("users")
 }
 
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
