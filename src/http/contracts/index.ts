@@ -21,8 +21,22 @@ import type {
 export async function getContractsService({
   slug,
   status,
+  page = 1,
+  limit = 10,
+  customerName,
 }: GetContractsServiceProps): Promise<GetContractsServiceResponse> {
-  const url = `api/organizations/${slug}/contracts?status=${status}`;
+  const params = new URLSearchParams();
+
+  if (status) {
+    params.append("status", status.join(","));
+  }
+  if (customerName) {
+    params.append("customerName", customerName);
+  }
+  params.append("page", page.toString());
+  params.append("limit", limit.toString());
+
+  const url = `api/organizations/${slug}/contracts?${params.toString()}`;
 
   const result = await api.get(url).json<GetContractsServiceResponse>();
 

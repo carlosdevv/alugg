@@ -2,8 +2,10 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useGetContractsService } from "@/http/contracts/use-contracts-service";
-import { useMemo } from "react";
+import type { ContractStatus } from "@prisma/client";
+import { useMemo, useState } from "react";
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 
@@ -14,15 +16,61 @@ type ContractsPageClientProps = {
 export default function ContractsPageClient({
   slug,
 }: ContractsPageClientProps) {
-  const { data: contracts, isLoading } = useGetContractsService({ slug });
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [customerName, setCustomerName] = useState("");
+  const [debouncedCustomerName] = useDebounce(customerName, 500);
+
+  const { data: contracts, isLoading } = useGetContractsService(
+    {
+      slug,
+      page,
+      limit: pageSize,
+      status:
+        selectedStatus.length > 0
+          ? (selectedStatus as ContractStatus[])
+          : undefined,
+      customerName: debouncedCustomerName || undefined,
+    },
+    {
+      enabled: !!slug,
+      queryKey: [
+        "getContracts",
+        slug,
+        page,
+        pageSize,
+        selectedStatus,
+        debouncedCustomerName,
+      ],
+      initialData: {
+        data: [],
+        count: {
+          total: 0,
+          open: 0,
+          collected: 0,
+          closed: 0,
+          cancelled: 0,
+        },
+        pagination: {
+          total: 0,
+          pages: 0,
+          page: 1,
+          limit: 10,
+        },
+      },
+    }
+  );
 
   const formattedContracts = useMemo(() => {
-    return contracts?.data.map((contract) => ({
-      ...contract,
-      customerName: contract.customer.name,
-      customerPhone: contract.customer.phone,
-      contractDocuments: contract.contractDocuments,
-    }));
+    return (
+      contracts?.data.map((contract) => ({
+        ...contract,
+        customerName: contract.customer.name,
+        customerPhone: contract.customer.phone,
+        contractDocuments: contract.contractDocuments,
+      })) ?? []
+    );
   }, [contracts]);
 
   if (isLoading) {
@@ -38,6 +86,36 @@ export default function ContractsPageClient({
       </div>
     );
   }
+
+  // Garantir que temos valores padrão seguros para a paginação
+  const paginationData = {
+    pageCount: contracts?.pagination?.pages ?? 0,
+    pageSize,
+    page,
+    onPageChange: (newPage: number) => {
+      setPage(newPage);
+    },
+    onPageSizeChange: (newPageSize: number) => {
+      setPageSize(newPageSize);
+      setPage(1); // Resetar para primeira página quando mudar o tamanho
+    },
+  };
+
+  const handleStatusChange = (newStatus: string[]) => {
+    setSelectedStatus(newStatus);
+    setPage(1); // Resetar para primeira página ao mudar o filtro
+  };
+
+  const handleCustomerNameChange = (name: string) => {
+    setCustomerName(name);
+    setPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setSelectedStatus([]);
+    setCustomerName("");
+    setPage(1);
+  };
 
   return (
     <>
@@ -62,7 +140,18 @@ export default function ContractsPageClient({
           <span>{contracts?.count.closed ?? 0}</span>
         </Badge>
       </div>
-      <DataTable columns={columns} data={formattedContracts ?? []} />
+      <DataTable
+        columns={columns}
+        data={formattedContracts}
+        pagination={paginationData}
+        toolbar={{
+          onStatusChange: handleStatusChange,
+          onResetFilters: handleResetFilters,
+          onCustomerNameChange: handleCustomerNameChange,
+          customerName,
+          isLoading,
+        }}
+      />
     </>
   );
 }

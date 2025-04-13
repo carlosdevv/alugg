@@ -10,13 +10,19 @@ import { z } from "zod";
 // GET /api/organizations/:slug/contracts - Get all contracts
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const userId = await getUserId();
-    const { slug } = params;
+    const { slug } = await params;
     const searchParams = req.nextUrl.searchParams;
     const statusParam = searchParams.get("status");
+    const customerName = searchParams.get("customerName");
+
+    // Parâmetros de paginação
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+    const skip = (page - 1) * limit;
 
     if (!userId) {
       return NextResponse.json(
@@ -38,6 +44,19 @@ export async function GET(
       organizationId: organization.id,
     };
 
+    // Adicionar filtro por nome do cliente
+    let customerFilter = {};
+    if (customerName) {
+      customerFilter = {
+        customer: {
+          name: {
+            contains: customerName,
+            mode: "insensitive" as const,
+          },
+        },
+      };
+    }
+
     let statusFilter = {};
     if (statusParam) {
       const statusList = statusParam.toUpperCase().split(",");
@@ -54,7 +73,7 @@ export async function GET(
       }
     }
 
-    const whereFilter = { ...baseFilter, ...statusFilter };
+    const whereFilter = { ...baseFilter, ...statusFilter, ...customerFilter };
 
     const [contracts, statusCounts] = await Promise.all([
       prisma.contract.findMany({
@@ -90,6 +109,8 @@ export async function GET(
         orderBy: {
           createdAt: "desc",
         },
+        skip,
+        take: limit,
       }),
       // Conta os contratos por status
       prisma.$transaction([
@@ -122,6 +143,11 @@ export async function GET(
         }),
       ]),
     ]);
+
+    // Adicionar contagem total de registros com o filtro
+    const totalItems = await prisma.contract.count({
+      where: whereFilter,
+    });
 
     const formattedContracts = contracts.map((contract) => {
       const pendingDebt = contract.payments.reduce((total, payment) => {
@@ -165,6 +191,12 @@ export async function GET(
       {
         data: formattedContracts,
         count,
+        pagination: {
+          total: totalItems,
+          pages: Math.ceil(totalItems / limit),
+          page,
+          limit,
+        },
       },
       { status: 200 }
     );

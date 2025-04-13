@@ -7,6 +7,9 @@ import type {
 export type GetContractsServiceProps = {
   slug: string;
   status?: ContractStatus[];
+  page?: number;
+  limit?: number;
+  customerName?: string;
 };
 
 export type GetContractsServiceResponse = {
@@ -35,6 +38,12 @@ export type GetContractsServiceResponse = {
     closed: number;
     cancelled: number;
     collected: number;
+  };
+  pagination: {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
   };
 };
 

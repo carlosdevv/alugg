@@ -50,7 +50,13 @@ export function useGetContractsService(
   >
 ) {
   return useQuery({
-    queryKey: ["getContracts", props.slug, props.status],
+    queryKey: [
+      "getContracts",
+      props.slug,
+      props.status,
+      props.page,
+      props.limit,
+    ],
     queryFn: async () => await getContractsService(props),
     ...options,
   });

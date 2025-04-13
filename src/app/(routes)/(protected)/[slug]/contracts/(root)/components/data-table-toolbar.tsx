@@ -22,6 +22,11 @@ import { useRouter } from "next/navigation";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+  onStatusChange?: (status: string[]) => void;
+  onResetFilters?: () => void;
+  onCustomerNameChange?: (name: string) => void;
+  customerName?: string;
+  isLoading?: boolean;
 }
 
 const statuses = [
@@ -42,36 +47,51 @@ const statuses = [
 
 export function DataTableToolbar<TData>({
   table,
+  onStatusChange,
+  onResetFilters,
+  onCustomerNameChange,
+  customerName,
+  isLoading,
 }: DataTableToolbarProps<TData>) {
   const router = useRouter();
   const isFiltered = table.getState().columnFilters.length > 0;
 
+  const handleResetFilters = () => {
+    table.resetColumnFilters();
+    onStatusChange?.([]);
+    onResetFilters?.();
+  };
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
-        <Input
-          placeholder="Filtrar por nome do cliente..."
-          value={
-            (table.getColumn("customerName")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("customerName")?.setFilterValue(event.target.value)
-          }
-          className="h-8 w-[150px] lg:w-[250px]"
-        />
+        <div className="relative w-[150px] lg:w-[250px]">
+          <Input
+            placeholder="Filtrar por nome do cliente..."
+            value={customerName}
+            onChange={(event) => onCustomerNameChange?.(event.target.value)}
+            className="h-8 pr-8"
+          />
+          {isLoading && (
+            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              <Icons.loader className="size-4 animate-spin" />
+            </div>
+          )}
+        </div>
         <div className="flex gap-x-2">
           {table.getColumn("status") && (
             <DataTableFacetedFilter
               column={table.getColumn("status")}
               title="Status"
               options={statuses}
+              onSelectionChange={onStatusChange}
             />
           )}
         </div>
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={handleResetFilters}
             className="h-8 px-2 lg:px-3"
           >
             Limpar
@@ -95,15 +115,28 @@ interface DataTableFacetedFilterProps<TData, TValue> {
     value: string;
     icon?: React.ComponentType<{ className?: string }>;
   }[];
+  onSelectionChange?: (values: string[]) => void;
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  onSelectionChange,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
+
+  const handleSelectionChange = (value: string) => {
+    if (selectedValues.has(value)) {
+      selectedValues.delete(value);
+    } else {
+      selectedValues.add(value);
+    }
+    const filterValues = Array.from(selectedValues);
+    column?.setFilterValue(filterValues.length ? filterValues : undefined);
+    onSelectionChange?.(filterValues);
+  };
 
   return (
     <Popover>
@@ -151,17 +184,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                 return (
                   <CommandItem
                     key={option.value}
-                    onSelect={() => {
-                      if (isSelected) {
-                        selectedValues.delete(option.value);
-                      } else {
-                        selectedValues.add(option.value);
-                      }
-                      const filterValues = Array.from(selectedValues);
-                      column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined
-                      );
-                    }}
+                    onSelect={() => handleSelectionChange(option.value)}
                   >
                     <div
                       className={cn(
@@ -188,7 +211,10 @@ export function DataTableFacetedFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => {
+                      column?.setFilterValue(undefined);
+                      onSelectionChange?.([]);
+                    }}
                     className="cursor-pointer justify-center text-center"
                   >
                     Limpar filtros
