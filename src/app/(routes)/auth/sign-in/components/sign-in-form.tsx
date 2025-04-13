@@ -12,12 +12,10 @@ import {
 } from "@/components/ui/form";
 import EmailInput from "@/components/ui/inputs/email-input";
 import PasswordInput from "@/components/ui/inputs/password-input";
-import { appRoutes } from "@/lib/constants";
-import Link from "next/link";
 import useSignInForm from "./use-sign-in-form";
 
 export default function SignInForm() {
-  const { form, onSubmit, isPending } = useSignInForm();
+  const { form, onSubmit, isPending, setModal } = useSignInForm();
 
   return (
     <div className="flex flex-col gap-5">
@@ -48,15 +46,16 @@ export default function SignInForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <FormLabel>Senha</FormLabel>
-                  <Link
-                    href={appRoutes.forgotPassword}
-                    passHref
-                    className="text-sm text-muted-foreground"
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={() => setModal("forgot-password")}
+                    className="text-sm w-min p-0 text-muted-foreground"
                   >
                     Esqueceu a senha?
-                  </Link>
+                  </Button>
                 </div>
                 <div className="relative">
                   <FormControl>

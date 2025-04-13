@@ -14,11 +14,17 @@ export default async function OnboardingLayout({
 }>) {
   const userId = await getUserId();
 
-  if (!userId) return redirect(appRoutes.signIn);
+  if (!userId) {
+    redirect(appRoutes.signIn);
+    return null;
+  }
 
   const user = await getUser(userId);
 
-  if (!user) return redirect(appRoutes.signIn);
+  if (!user) {
+    redirect(appRoutes.signIn);
+    return null;
+  }
 
   const defaultOrganization = await getDefaultOrganization(user);
 

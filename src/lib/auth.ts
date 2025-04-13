@@ -3,7 +3,6 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { openAPI } from "better-auth/plugins";
-import { Resend } from "resend";
 import prisma from "./prismadb";
 
 export const auth = betterAuth({
@@ -15,12 +14,9 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 6,
     requireEmailVerification: true,
-    sendResetPassword: async ({ user, url, token }) => {
-      const fromEmail = process.env.RESEND_EMAIL;
-      const resend = new Resend(process.env.RESEND_KEY);
-
-      await resend.emails.send({
-        from: `Alugg | Redefina sua senha <${fromEmail}>`,
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail({
+        label: "Redefina sua senha",
         to: user.email,
         subject: `Redefina sua senha | Alugg`,
         text: `Olá ${user.name}, clique no link abaixo para redefinir sua senha: ${url} \n\nEste link expira em 1 hora.`,

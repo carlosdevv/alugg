@@ -5,7 +5,11 @@ import { appRoutes } from "./lib/constants";
 
 type Session = typeof auth.$Infer.Session;
 
-const publicRoutes = ["/api/auth/reference", appRoutes.verifyEmail];
+const publicRoutes = [
+  "/api/auth/reference",
+  appRoutes.verifyEmail,
+  appRoutes.resetPassword,
+];
 const authRoutes = [appRoutes.signIn, appRoutes.signUp];
 
 export default async function authMiddleware(request: NextRequest) {

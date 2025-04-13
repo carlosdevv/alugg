@@ -1,9 +1,9 @@
 import { signInAction } from "@/actions/auth/sign-in";
-import { useAuth } from "@/hooks/use-auth";
 import { appRoutes } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -21,7 +21,8 @@ type SignInFormValues = z.infer<typeof signInFormSchema>;
 
 export default function useSignInForm() {
   const router = useRouter();
-  const { signIn } = useAuth();
+
+  const [, setModal] = useQueryState("modal");
 
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInFormSchema),
@@ -50,5 +51,5 @@ export default function useSignInForm() {
     await signInService(data);
   }
 
-  return { form, onSubmit, isPending };
+  return { form, onSubmit, isPending, setModal };
 }
