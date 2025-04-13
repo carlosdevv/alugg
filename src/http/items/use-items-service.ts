@@ -39,7 +39,7 @@ export function useGetItemsService(
   options?: UseQueryOptions<GetItemsServiceResponse, HTTPError<ErrorResponse>>
 ) {
   return useQuery({
-    queryKey: ["getItems", props.slug],
+    queryKey: ["getItems", props.slug, props.page, props.limit, props.itemName],
     queryFn: async () => await getItemsService(props),
     ...options,
   });

@@ -36,7 +36,13 @@ export function useGetCustomersService(
   >
 ) {
   return useQuery({
-    queryKey: ["getCustomers", props.slug],
+    queryKey: [
+      "getCustomers",
+      props.slug,
+      props.page,
+      props.limit,
+      props.customerName,
+    ],
     queryFn: async () => await getCustomersService(props),
     ...options,
   });

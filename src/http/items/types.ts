@@ -2,6 +2,9 @@ import type { ItemStatus } from "@prisma/client";
 
 export type GetItemServiceProps = {
   slug: string;
+  page?: number;
+  limit?: number;
+  itemName?: string;
 };
 
 export type GetItemByIdServiceProps = {
@@ -38,7 +41,20 @@ export type ItemProps = {
   color: string;
 };
 
-export type GetItemsServiceResponse = GetItemsApiResponse["items"];
+export type GetItemsServiceResponse = {
+  items: ItemProps[];
+  total: number;
+  counts: {
+    active: number;
+    inactive: number;
+  };
+  pagination: {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
+  };
+};
 
 export type UpdateItemByIdServiceProps = {
   id: string;

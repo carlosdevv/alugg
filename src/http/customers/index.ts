@@ -14,10 +14,21 @@ import type {
 
 export async function getCustomersService({
   slug,
+  page = 1,
+  limit = 10,
+  customerName,
 }: GetCustomersServiceProps): Promise<GetCustomersServiceResponse> {
-  const result = await api
-    .get(`api/organizations/${slug}/customers`)
-    .json<GetCustomersServiceResponse>();
+  const params = new URLSearchParams();
+
+  if (customerName) {
+    params.append("customerName", customerName);
+  }
+  params.append("page", page.toString());
+  params.append("limit", limit.toString());
+
+  const url = `api/organizations/${slug}/customers?${params.toString()}`;
+
+  const result = await api.get(url).json<GetCustomersServiceResponse>();
 
   return result;
 }
@@ -50,7 +61,9 @@ export async function deleteCustomerService(
   props: { slug: string },
   { customerId }: DeleteCustomerServiceBody
 ): Promise<void> {
-  await api.delete(`api/organizations/${props.slug}/customers/${customerId}`).json();
+  await api
+    .delete(`api/organizations/${props.slug}/customers/${customerId}`)
+    .json();
 }
 
 export async function updateCustomerService(

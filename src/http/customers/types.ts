@@ -20,11 +20,20 @@ export type CustomerProps = {
 
 export type GetCustomersServiceProps = {
   slug: string;
+  page?: number;
+  limit?: number;
+  customerName?: string;
 };
 
 export type GetCustomersServiceResponse = {
   data: CustomerProps[];
   total: number;
+  pagination: {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
+  };
 };
 
 export type CreateCustomerServiceBody = {

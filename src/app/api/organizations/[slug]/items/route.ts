@@ -12,6 +12,12 @@ export async function GET(
 ) {
   try {
     const userId = await getUserId();
+    const searchParams = req.nextUrl.searchParams;
+    const itemName = searchParams.get("itemName");
+
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+    const skip = (page - 1) * limit;
 
     if (!userId) {
       return NextResponse.json(
@@ -21,23 +27,74 @@ export async function GET(
     }
 
     const { slug } = params;
-
     const { organization } = await getUserMembership(slug);
 
-    const items = await prisma.item.findMany({
-      where: {
-        organizationId: organization.id,
-      },
-      include: {
-        category: {
-          select: {
-            name: true,
+    const baseFilter = {
+      organizationId: organization.id,
+    };
+
+    let nameFilter = {};
+    if (itemName) {
+      nameFilter = {
+        name: {
+          contains: itemName,
+          mode: "insensitive" as const,
+        },
+      };
+    }
+
+    const whereFilter = { ...baseFilter, ...nameFilter };
+
+    const [items, totalItems, statusCount] = await Promise.all([
+      prisma.item.findMany({
+        where: whereFilter,
+        include: {
+          category: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.item.count({
+        where: whereFilter,
+      }),
+      prisma.item.groupBy({
+        by: ["status"],
+        where: baseFilter,
+        _count: true,
+      }),
+    ]);
+
+    const counts = {
+      active: 0,
+      inactive: 0,
+    };
+
+    statusCount.forEach((status) => {
+      if (status.status === "ACTIVE") {
+        counts.active = status._count;
+      } else {
+        counts.inactive += status._count;
+      }
     });
 
-    return NextResponse.json({ items });
+    return NextResponse.json({
+      items,
+      total: totalItems,
+      counts,
+      pagination: {
+        total: totalItems,
+        pages: Math.ceil(totalItems / limit),
+        page,
+        limit,
+      },
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

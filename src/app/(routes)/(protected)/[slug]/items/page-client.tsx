@@ -1,8 +1,9 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useGetItemsService } from "@/http/items/use-items-service";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 
@@ -11,20 +12,57 @@ type ItemsPageClientProps = {
 };
 
 export default function ItemsPageClient({ slug }: ItemsPageClientProps) {
-  const { data, isLoading } = useGetItemsService({ slug });
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [itemName, setItemName] = useState("");
+  const [debouncedItemName] = useDebounce(itemName, 500);
 
-  const [active, setActive] = useState(0);
-
-  const formattedData = data ? data : [];
-
-  useEffect(() => {
-    if (data) {
-      const activeCounter = data.reduce((total, item) => {
-        return item.status === "ACTIVE" ? total + 1 : total;
-      }, 0);
-      setActive(activeCounter);
+  const { data, isLoading } = useGetItemsService(
+    {
+      slug,
+      page,
+      limit: pageSize,
+      itemName: debouncedItemName || undefined,
+    },
+    {
+      enabled: !!slug,
+      queryKey: ["getItems", slug, page, pageSize, debouncedItemName],
+      initialData: {
+        items: [],
+        total: 0,
+        counts: {
+          active: 0,
+          inactive: 0,
+        },
+        pagination: {
+          total: 0,
+          pages: 0,
+          page: 1,
+          limit: 10,
+        },
+      },
     }
-  }, [data]);
+  );
+
+  const formattedData = data?.items ?? [];
+
+  const handleItemNameChange = (name: string) => {
+    setItemName(name);
+    setPage(1);
+  };
+
+  const paginationData = {
+    pageCount: data?.pagination?.pages ?? 0,
+    pageSize,
+    page,
+    onPageChange: (newPage: number) => {
+      setPage(newPage);
+    },
+    onPageSizeChange: (newPageSize: number) => {
+      setPageSize(newPageSize);
+      setPage(1);
+    },
+  };
 
   if (isLoading) {
     return (
@@ -44,18 +82,27 @@ export default function ItemsPageClient({ slug }: ItemsPageClientProps) {
       <div className="flex flex-wrap gap-y-4 items-center space-x-6 text-xs mb-4">
         <div className="bg-gray-100 dark:bg-gray-800 dark:border dark:border-gray-700 rounded-md flex space-x-2 py-1 px-2">
           <span className="font-medium uppercase">Total</span>
-          <span className="font-light">{formattedData.length}</span>
+          <span className="font-light">{data?.total ?? 0}</span>
         </div>
         <div className="bg-emerald-100 dark:bg-emerald-900 dark:border dark:border-emerald-700 rounded-md flex space-x-2 py-1 px-2">
           <span className="font-medium uppercase">Itens ativos</span>
-          <span className="font-light">{active}</span>
+          <span className="font-light">{data?.counts.active ?? 0}</span>
         </div>
         <div className="bg-rose-100 dark:bg-rose-900 dark:border dark:border-rose-700 rounded-md flex space-x-2 py-1 px-2">
           <span className="font-medium uppercase">Itens inativos</span>
-          <span className="font-light">{formattedData.length - active} </span>
+          <span className="font-light">{data?.counts.inactive ?? 0}</span>
         </div>
       </div>
-      <DataTable columns={columns} data={formattedData} />
+      <DataTable
+        columns={columns}
+        data={formattedData}
+        pagination={paginationData}
+        toolbar={{
+          onItemNameChange: handleItemNameChange,
+          itemName,
+          isLoading,
+        }}
+      />
     </>
   );
 }

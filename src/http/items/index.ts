@@ -18,13 +18,22 @@ import {
 
 export async function getItemsService({
   slug,
+  page = 1,
+  limit = 10,
+  itemName,
 }: GetItemServiceProps): Promise<GetItemsServiceResponse> {
-  const url = `api/organizations/${slug}/items`;
+  const params = new URLSearchParams();
 
-  const response = await api
-    .get(url)
-    .json<{ items: GetItemsServiceResponse }>();
-  return response.items;
+  if (itemName) {
+    params.append("itemName", itemName);
+  }
+  params.append("page", page.toString());
+  params.append("limit", limit.toString());
+
+  const url = `api/organizations/${slug}/items?${params.toString()}`;
+
+  const response = await api.get(url).json<GetItemsServiceResponse>();
+  return response;
 }
 
 export async function getItemByIdService({
