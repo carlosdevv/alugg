@@ -2,9 +2,9 @@ import { useGetCategoriesService } from "@/http/category/use-categories-service"
 import { useCreateItemService } from "@/http/items/use-items-service";
 import { createClient } from "@/lib/supabase/client";
 import {
-  currencyToNumber,
-  itemsFileAcceptTypes,
-  UPLOAD_ITEMS_MAX_FILE_SIZE_MB,
+    currencyToNumber,
+    itemsFileAcceptTypes,
+    UPLOAD_ITEMS_MAX_FILE_SIZE_MB,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ItemStatus } from "@prisma/client";
@@ -39,7 +39,6 @@ type CreateItemFormValues = z.infer<typeof createItemFormSchema>;
 
 export default function useCreateItemForm() {
   const { slug } = useParams() as { slug: string };
-
   const router = useRouter();
 
   const form = useForm<CreateItemFormValues>({
@@ -76,9 +75,14 @@ export default function useCreateItemForm() {
     setImagePreview(null);
   }
 
-  const { data: categories } = useGetCategoriesService(
+  const { data: categories = [], isLoading: isLoadingCategories } = useGetCategoriesService(
     { slug },
-    { enabled: !!slug, queryKey: ["getCategories", slug] }
+    { 
+      enabled: !!slug,
+      queryKey: ["getCategories", slug],
+      initialData: [], // Fornece um valor inicial para evitar undefined
+      staleTime: 1000 * 60 * 5, // Cache por 5 minutos
+    }
   );
 
   const { mutateAsync: createItemService, isPending: isCreatingItem } =
@@ -162,6 +166,7 @@ export default function useCreateItemForm() {
     form,
     onSubmit,
     categories,
+    isLoadingCategories,
     setModal,
     getRootProps,
     getInputProps,

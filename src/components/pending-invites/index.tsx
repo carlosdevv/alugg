@@ -30,9 +30,9 @@ export function PendingInvites() {
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Tooltip>
-          <TooltipTrigger asChild>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
             <Button
               size="icon"
               variant="ghost"
@@ -41,13 +41,21 @@ export function PendingInvites() {
               <Icons.bell className="size-4" />
               <span className="sr-only">Convites pendentes</span>
             </Button>
-          </TooltipTrigger>
-          <TooltipContent>Ver convites pendentes</TooltipContent>
-        </Tooltip>
-      </PopoverTrigger>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Ver convites pendentes</TooltipContent>
+      </Tooltip>
 
       <PopoverContent className="space-y-2 w-60">
-        {isGettingInvites && <Icons.loader className="animate-spin size-4" />}
+        {isGettingInvites && (
+          <div className="flex items-center gap-x-2">
+            <span className="block text-sm font-medium">
+              Convites Pendentes
+            </span>
+            <Icons.loader className="animate-spin size-4" />
+          </div>
+        )}
+
         {!isGettingInvites && (
           <span className="block text-sm font-medium">
             Convites Pendentes ({invites?.length ?? 0})

@@ -3,15 +3,15 @@ import { PageWrapper } from "@/components/page-layout/page-wrapper";
 import UpdateItemPageClient from "./page-client";
 
 interface UpdateItemPageProps {
-  params: {
+  params: Promise<{
     slug: string;
     id: string;
-  };
+  }>;
 }
 
-export default function UpdateItemPage({
-  params: { id, slug },
-}: UpdateItemPageProps) {
+export default async function UpdateItemPage({ params }: UpdateItemPageProps) {
+  const { slug, id } = await params;
+
   return (
     <PageContent title="Editar Item" hasBackButton>
       <PageWrapper>

@@ -8,11 +8,11 @@ import { z } from "zod";
 // GET /api/organizations/:slug/categories – get all categories
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const userId = await getUserId();
-    const { slug } = params;
+    const { slug } = await params;
 
     if (!userId) {
       return NextResponse.json(

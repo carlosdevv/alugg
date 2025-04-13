@@ -13,15 +13,22 @@ type CategoriesPageClientProps = {
 export default function CategoriesPageClient({
   slug,
 }: CategoriesPageClientProps) {
-  const { data: categories, isLoading } = useGetCategoriesService({ slug });
+  const { data: categories = [], isLoading } = useGetCategoriesService(
+    { slug },
+    {
+      enabled: !!slug,
+      queryKey: ["getCategories", slug],
+      initialData: [],
+      staleTime: 1000 * 60 * 5,
+    }
+  );
 
-  const data =
-    categories?.map((category) => ({
-      id: category.id.toString(),
-      name: category.name,
-      totalItems: category.totalItems,
-      itemInactive: false,
-    })) ?? [];
+  const data = categories.map((category) => ({
+    id: category.id.toString(),
+    name: category.name,
+    totalItems: category.totalItems,
+    itemInactive: false,
+  }));
 
   return (
     <PageContent title="Categorias">
@@ -32,9 +39,7 @@ export default function CategoriesPageClient({
           ) : (
             <div className="bg-gray-100 dark:bg-zinc-900 rounded-md flex space-x-4 py-1 px-2">
               <span className="font-medium uppercase">Total</span>
-              <span className="font-light">
-                {categories == null ? 0 : categories.length}
-              </span>
+              <span className="font-light">{categories.length}</span>
             </div>
           )}
         </div>

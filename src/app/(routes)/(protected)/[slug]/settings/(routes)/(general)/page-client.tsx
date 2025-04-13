@@ -2,11 +2,11 @@
 
 import { useGetOrganizationService } from "@/http/organizations/use-organizations-service";
 import { useRouter } from "next/navigation";
+import ChangeOrgLogo from "./components/change-org-logo";
 import ChangeOrgSlugForm from "./components/change-org-slug-form";
 import DeleteOrg from "./components/delete-org";
 import { ToggleAppTheme } from "./components/toggle-app-theme";
 import UpdateOrgDataForm from "./components/update-org-data-form";
-import ChangeOrgLogo from "./components/change-org-logo";
 
 type SettingsPageClientProps = {
   slug: string;
@@ -14,8 +14,14 @@ type SettingsPageClientProps = {
 
 export default function SettingsPageClient({ slug }: SettingsPageClientProps) {
   const router = useRouter();
-  const { data: organization, isLoading } = useGetOrganizationService({ slug });
-
+  const { data: organization, isLoading } = useGetOrganizationService(
+    { slug },
+    {
+      enabled: !!slug,
+      queryKey: ["getOrganization", slug],
+      initialData: undefined,
+    }
+  );
   if (isLoading) return <div />;
 
   if (!organization) {

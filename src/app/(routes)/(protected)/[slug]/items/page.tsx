@@ -2,12 +2,12 @@ import { PageContent } from "@/components/page-layout";
 import { PageWrapper } from "@/components/page-layout/page-wrapper";
 import ItemsPageClient from "./page-client";
 
-export default async function CategoriesPage({
+export default async function ItemsPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const slug = params.slug;
+  const { slug } = await params;
 
   return (
     <PageContent title="Estoque">

@@ -92,23 +92,21 @@ export default function UpdateOrgDataForm({
                   <FormLabel>CNPJ</FormLabel>
                   <FormControl>
                     <Input
+                      maxLength={14}
                       placeholder="00.000.000/0001-00"
-                      {...field}
-                      defaultValue={
+                      value={
                         field.value && field.value.length === 14
                           ? parseToCnpj(field.value)
-                          : field.value
+                          : field.value || ""
                       }
-                      onChange={(resp) => {
-                        const value = resp.currentTarget.value;
+                      onChange={(e) => {
+                        const value = e.currentTarget.value;
                         const formatted = parseToNumber(value);
-                        field.onChange({
-                          target: { value: formatted.toString() },
-                        });
+                        field.onChange(formatted ? formatted.toString() : "");
                       }}
-                      onBlur={(resp) => {
-                        const value = resp.currentTarget.value;
-                        if (value.length === 14) {
+                      onBlur={(e) => {
+                        const value = e.currentTarget.value;
+                        if (value && value.length === 14) {
                           const formatted = parseToCnpj(value);
                           form.setValue("cnpj", formatted);
                         }

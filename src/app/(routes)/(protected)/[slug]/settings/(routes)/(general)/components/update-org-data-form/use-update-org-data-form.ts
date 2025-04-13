@@ -54,11 +54,20 @@ type UseUpdateOrgDataFormProps = {
 export default function useUpdateOrgDataForm({
   organization,
 }: UseUpdateOrgDataFormProps) {
-  const { ...organizationData } = organization;
   const form = useForm<UpdateOrgDataValues>({
     resolver: zodResolver(updateOrgDataFormSchema),
     defaultValues: {
-      ...organizationData,
+      name: organization.name || "",
+      fantasyName: organization.fantasyName || "",
+      socialName: organization.socialName || "",
+      cnpj: organization.cnpj?.toString() || "",
+      phone: organization.phone || "",
+      email: organization.email || "",
+      zipcode: organization.zipcode || "",
+      address: organization.address || "",
+      city: organization.city || "",
+      state: organization.state || "",
+      neighborhood: organization.neighborhood || "",
     },
   });
 
@@ -74,28 +83,27 @@ export default function useUpdateOrgDataForm({
       cep: zipcode,
     });
 
-    if (addressProps === null) {
+    if (!addressProps) {
       form.setValue("address", "");
       form.setValue("city", "");
       form.setValue("state", "");
       form.setValue("neighborhood", "");
+      setIsLoadingAddress(false);
+      return;
     }
 
-    if (addressProps) {
-      form.setValue("address", addressProps.logradouro);
-      form.setValue("city", addressProps.localidade);
-      form.setValue("state", addressProps.estado);
-      form.setValue("neighborhood", addressProps.bairro);
-      form.setValue("zipcode", addressProps.cep);
-    }
-
+    form.setValue("address", addressProps.logradouro || "");
+    form.setValue("city", addressProps.localidade || "");
+    form.setValue("state", addressProps.estado || "");
+    form.setValue("neighborhood", addressProps.bairro || "");
+    form.setValue("zipcode", addressProps.cep || "");
     setIsLoadingAddress(false);
   }
 
   async function onSubmit(data: UpdateOrgDataValues) {
     await updateOrganization({
-      cnpj: data.cnpj && parseToNumber(data.cnpj),
       ...data,
+      cnpj: data.cnpj ? parseToNumber(data.cnpj) : undefined,
     });
   }
 

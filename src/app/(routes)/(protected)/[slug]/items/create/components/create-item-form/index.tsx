@@ -37,6 +37,7 @@ export default function CreateItemForm() {
     form,
     onSubmit,
     categories,
+    isLoadingCategories,
     setModal,
     getRootProps,
     getInputProps,
@@ -82,19 +83,25 @@ export default function CreateItemForm() {
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
+                          disabled={isLoadingCategories}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecione uma categoria" />
+                              <SelectValue placeholder={
+                                isLoadingCategories 
+                                  ? "Carregando categorias..." 
+                                  : "Selecione uma categoria"
+                              } />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {categories?.length ? (
+                            {isLoadingCategories ? (
+                              <SelectItem disabled value="loading">
+                                Carregando categorias...
+                              </SelectItem>
+                            ) : categories?.length ? (
                               categories.map((category) => (
-                                <SelectItem
-                                  key={category.id}
-                                  value={category.id}
-                                >
+                                <SelectItem key={category.id} value={category.id}>
                                   {category.name}
                                 </SelectItem>
                               ))

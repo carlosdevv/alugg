@@ -3,13 +3,9 @@ import SettingsPageClient from "./page-client";
 export default async function SettingsPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const slug = params.slug;
+  const { slug } = await params;
 
-  return (
-    <>
-      <SettingsPageClient slug={slug} />
-    </>
-  );
+  return <SettingsPageClient slug={slug} />;
 }
