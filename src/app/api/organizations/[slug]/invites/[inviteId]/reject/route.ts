@@ -1,5 +1,5 @@
+import { getUserId } from "@/actions/user/get-user-id";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 // POST /api/organizations/:slug/invites/:inviteId/reject - Reject an invite
@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: { slug: string; inviteId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug, inviteId } = params;
 
     if (!userId) {

@@ -1,8 +1,8 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import { organizationSchema } from "@/lib/casl/models/organization";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ export async function PATCH(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug } = params;
     const body = await req.json();
     const parsed = transferOwnershipSchema.safeParse(body);

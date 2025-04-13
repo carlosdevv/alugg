@@ -1,7 +1,7 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(
@@ -67,7 +67,7 @@ export async function POST(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(
@@ -160,7 +160,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(

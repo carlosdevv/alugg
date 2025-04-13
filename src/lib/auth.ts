@@ -10,6 +10,30 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+        await sendEmail({
+          label: "Verifique seu novo endereço de e-mail",
+          to: newEmail,
+          subject: "Verifique seu novo endereço de e-mail | Alugg",
+          text: `Olá ${user.name}, clique no link abaixo para verificar seu novo endereço de e-mail: ${url} \n\nEste link expira em 1 hora.`,
+        });
+      },
+    },
+    additionalFields: {
+      defaultOrganization: {
+        type: "string",
+        required: false,
+      },
+      plan: {
+        type: "string",
+        required: false,
+        defaultValue: "FREE",
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 6,

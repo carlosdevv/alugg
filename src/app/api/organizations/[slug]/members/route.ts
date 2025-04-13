@@ -1,7 +1,7 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 // GET /api/organizations/:slug/members - Get all members of an organization
@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug } = params;
 
     if (!userId) {

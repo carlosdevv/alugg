@@ -1,7 +1,7 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { PaymentMethod } from "@prisma/client";
 import { compareDesc } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
@@ -23,7 +23,7 @@ export async function GET(
   { params }: { params: { slug: string; contractId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(
@@ -180,7 +180,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { slug: string; contractId: string } }
 ) {
-  const { userId } = auth();
+  const userId = await getUserId();
   const { slug, contractId } = params;
 
   if (!userId) {
@@ -279,13 +279,14 @@ const updateContractSchema = z
       });
     }
   });
+
 // PUT /api/organizations/:slug/contracts/:contractId - Update a contract
 export async function PUT(
   req: NextRequest,
   { params }: { params: { slug: string; contractId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug, contractId } = params;
 
     if (!userId) {

@@ -1,5 +1,5 @@
+import { getUserId } from "@/actions/user/get-user-id";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 // GET /api/organizations/:slug/invites/pending-invites - Get all pending invites
@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug } = params;
 
     if (!userId) {

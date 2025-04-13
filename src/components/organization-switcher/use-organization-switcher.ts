@@ -6,8 +6,9 @@ import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 
 export default function useOrganizationSwitcher() {
-  const { authClient } = useAuth();
-  const userId = authClient.useSession().data?.user.id;
+  const { useSession } = useAuth();
+  const session = useSession();
+  const userId = session?.data?.user?.id;
 
   const { data: organizations } = useGetOrganizationsService();
 
@@ -26,11 +27,13 @@ export default function useOrganizationSwitcher() {
   }, [currentSlug]);
 
   const currentOrganization = useMemo(() => {
-    const selectedOrganization = organizations?.find(
+    if (!organizations) return null;
+
+    const selectedOrganization = organizations.find(
       (organization) => organization.slug === slug
     );
 
-    if (slug && organizations && selectedOrganization) {
+    if (slug && selectedOrganization) {
       return {
         ...selectedOrganization,
       };
@@ -40,7 +43,7 @@ export default function useOrganizationSwitcher() {
   }, [organizations, slug]);
 
   const isOwner = useMemo(
-    () => currentOrganization?.ownerId === userId,
+    () => (userId ? currentOrganization?.ownerId === userId : false),
     [currentOrganization?.ownerId, userId]
   );
 

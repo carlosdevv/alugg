@@ -1,6 +1,6 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 // GET /api/organizations/:slug/items/:itemId/history
@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: { slug: string; itemId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug, itemId } = params;
 
     if (!userId) {

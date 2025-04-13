@@ -1,8 +1,8 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import { roleSchema } from "@/lib/casl/roles";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ export async function PUT(
   { params }: { params: { slug: string; memberId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug, memberId } = params;
 
     if (!userId) {
@@ -84,7 +84,7 @@ export async function DELETE(
   { params }: { params: { slug: string; memberId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug, memberId } = params;
 
     if (!userId) {
@@ -151,7 +151,7 @@ export async function GET(
   { params }: { params: { slug: string; memberId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug, memberId } = params;
 
     if (!userId) {

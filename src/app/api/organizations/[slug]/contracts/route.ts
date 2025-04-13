@@ -1,7 +1,7 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { PaymentMethod, type ContractStatus } from "@prisma/client";
 import { compareDesc } from "date-fns";
 import { NextResponse, type NextRequest } from "next/server";
@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug } = params;
     const searchParams = req.nextUrl.searchParams;
     const statusParam = searchParams.get("status");
@@ -246,7 +246,7 @@ export async function POST(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug } = params;
 
     if (!userId) {

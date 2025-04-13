@@ -1,7 +1,4 @@
 import { getDefaultOrganization } from "@/actions/get-default-organization";
-import { getUser } from "@/actions/get-user";
-import { getUserId } from "@/actions/user/get-user-id";
-import { useAuth } from "@/hooks/use-auth";
 import { auth } from "@/lib/auth";
 import { appRoutes } from "@/lib/constants";
 import { headers } from "next/headers";
@@ -12,21 +9,20 @@ export default async function OnboardingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userId = await getUserId();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
-    redirect(appRoutes.signIn);
-    return null;
-  }
+  if (!session) return redirect(appRoutes.signIn);
 
-  const user = await getUser(userId);
+  const user = session.user;
 
-  if (!user) {
-    redirect(appRoutes.signIn);
-    return null;
-  }
+  if (!user) return redirect(appRoutes.signIn);
 
-  const defaultOrganization = await getDefaultOrganization(user);
+  const defaultOrganization = await getDefaultOrganization({
+    id: user.id,
+    defaultOrganization: user.defaultOrganization,
+  });
 
   if (defaultOrganization) {
     return redirect(`/${defaultOrganization}`);

@@ -1,7 +1,7 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import { getUserPermissions } from "@/lib/casl/get-user-permissions";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { createCustomerSchema } from "../route";
 
@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { customerId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     const id = params.customerId;
 
@@ -55,7 +55,7 @@ export async function PATCH(
   }: { params: { slug: string; customerId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(
@@ -123,7 +123,7 @@ export async function DELETE(
   { params }: { params: { slug: string; customerId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
     const { slug, customerId } = params;
 
     if (!userId) {

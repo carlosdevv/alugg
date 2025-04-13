@@ -1,6 +1,7 @@
 "use client";
 
 import AuthLayout from "@/components/auth-layout";
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DubButton } from "@/components/ui/dub-button";
@@ -15,7 +16,6 @@ import {
 import PasswordInput from "@/components/ui/inputs/password-input";
 import { Suspense } from "react";
 import useResetPassword from "./use-reset-password";
-import { Icons } from "@/components/icons";
 
 export function ResetPasswordContent() {
   const { form, onSubmit, isPending, errorParam, redirectToLogin } =

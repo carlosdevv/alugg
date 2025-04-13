@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import useOrganizationSwitcher from "./use-organization-switcher";
 
 export function OrganizationSwitcher() {

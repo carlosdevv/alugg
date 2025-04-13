@@ -1,6 +1,6 @@
+import { useAuth } from "@/hooks/use-auth";
 import type { GetOrganizationResponse } from "@/http/organizations/types";
 import { useDeleteOrganizationService } from "@/http/organizations/use-organizations-service";
-import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -26,7 +26,9 @@ export default function useDeleteOrg({ organization }: UseDeleteOrgProps) {
     resolver: zodResolver(confirmDeleteOrgFormSchema),
   });
 
-  const { userId } = useAuth();
+  const { useSession } = useAuth();
+  const session = useSession();
+  const userId = session?.data?.user?.id;
 
   const isOwner = organization.ownerId === userId;
   const [showModal, setShowModal] = useState(false);

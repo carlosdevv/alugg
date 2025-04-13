@@ -1,6 +1,6 @@
 import { getUserMembership } from "@/actions/get-user-membership";
+import { getUserId } from "@/actions/user/get-user-id";
 import prisma from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs/server";
 import { addDays, parse, subDays } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -16,7 +16,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { userId } = auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(
@@ -131,8 +131,8 @@ export async function GET(
 
           // Verificar se há sobreposição com o período solicitado (já ajustado)
           const hasOverlap =
-            (contractWithdrawalDate <= adjustedReturnDate &&
-              contractReturnDate >= adjustedWithdrawalDate);
+            contractWithdrawalDate <= adjustedReturnDate &&
+            contractReturnDate >= adjustedWithdrawalDate;
 
           if (hasOverlap) {
             const rentedItem = contract.rentedItems.find(
@@ -163,8 +163,8 @@ export async function GET(
 
           // Verificar sobreposição
           const hasOverlap =
-            (contractWithdrawalDate <= adjustedReturnDate &&
-              contractReturnDate >= adjustedWithdrawalDate);
+            contractWithdrawalDate <= adjustedReturnDate &&
+            contractReturnDate >= adjustedWithdrawalDate;
 
           return (
             hasOverlap &&
