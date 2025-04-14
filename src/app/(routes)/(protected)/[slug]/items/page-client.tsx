@@ -15,6 +15,7 @@ export default function ItemsPageClient({ slug }: ItemsPageClientProps) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [itemName, setItemName] = useState("");
+  const [status, setStatus] = useState<string[]>([]);
   const [debouncedItemName] = useDebounce(itemName, 500);
 
   const { data, isLoading } = useGetItemsService(
@@ -23,10 +24,11 @@ export default function ItemsPageClient({ slug }: ItemsPageClientProps) {
       page,
       limit: pageSize,
       itemName: debouncedItemName || undefined,
+      status: status.length > 0 ? status : undefined,
     },
     {
       enabled: !!slug,
-      queryKey: ["getItems", slug, page, pageSize, debouncedItemName],
+      queryKey: ["getItems", slug, page, pageSize, debouncedItemName, status],
       initialData: {
         items: [],
         total: 0,
@@ -48,6 +50,17 @@ export default function ItemsPageClient({ slug }: ItemsPageClientProps) {
 
   const handleItemNameChange = (name: string) => {
     setItemName(name);
+    setPage(1);
+  };
+
+  const handleStatusChange = (newStatus: string[]) => {
+    setStatus(newStatus);
+    setPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setStatus([]);
+    setItemName("");
     setPage(1);
   };
 
@@ -101,6 +114,9 @@ export default function ItemsPageClient({ slug }: ItemsPageClientProps) {
           onItemNameChange: handleItemNameChange,
           itemName,
           isLoading,
+          onStatusChange: handleStatusChange,
+          onResetFilters: handleResetFilters,
+          status,
         }}
       />
     </>

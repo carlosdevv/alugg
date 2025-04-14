@@ -21,11 +21,15 @@ export async function getItemsService({
   page = 1,
   limit = 10,
   itemName,
+  status,
 }: GetItemServiceProps): Promise<GetItemsServiceResponse> {
   const params = new URLSearchParams();
 
   if (itemName) {
     params.append("itemName", itemName);
+  }
+  if (status?.length) {
+    status.forEach((s) => params.append("status", s));
   }
   params.append("page", page.toString());
   params.append("limit", limit.toString());

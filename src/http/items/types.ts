@@ -5,6 +5,7 @@ export type GetItemServiceProps = {
   page?: number;
   limit?: number;
   itemName?: string;
+  status?: string[];
 };
 
 export type GetItemByIdServiceProps = {

@@ -1,17 +1,7 @@
 "use client";
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  useReactTable,
-  type ColumnFiltersState,
-} from "@tanstack/react-table";
-
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -27,9 +17,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { appRoutes } from "@/lib/constants";
-import Link from "next/link";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+  type ColumnFiltersState,
+} from "@tanstack/react-table";
 import { useState } from "react";
+import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -45,6 +42,9 @@ interface DataTableProps<TData, TValue> {
     onItemNameChange?: (name: string) => void;
     itemName?: string;
     isLoading?: boolean;
+    onStatusChange?: (status: string[]) => void;
+    onResetFilters?: () => void;
+    status?: string[];
   };
 }
 
@@ -86,30 +86,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-y-4 justify-between items-center py-4">
-        <div className="relative w-[150px] lg:w-[250px]">
-          <Input
-            placeholder="🔎  Filtrar por Nome"
-            value={toolbar?.itemName}
-            onChange={(event) =>
-              toolbar?.onItemNameChange?.(event.target.value)
-            }
-            className="pr-8"
-          />
-          {toolbar?.isLoading && (
-            <div className="absolute right-2 top-1/2 -translate-y-1/2">
-              <Icons.loader className="size-4 animate-spin" />
-            </div>
-          )}
-        </div>
-        <Button size="sm" asChild>
-          <Link href={appRoutes.items.create}>
-            <Icons.circlePlus className="size-4 mr-2" />
-            Criar Item
-          </Link>
-        </Button>
-      </div>
+    <div className="flex flex-col space-y-4 mt-4">
+      <DataTableToolbar {...toolbar} />
       <div className="rounded-md border mb-2">
         <Table>
           <TableHeader>

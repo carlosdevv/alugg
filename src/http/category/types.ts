@@ -1,9 +1,12 @@
 export type GetCategoriesApiProps = {
-  categories: {
-    id: string;
-    name: string;
-    totalItems: number;
-  }[];
+  categories: CategoryModel[];
+  total: number;
+  pagination: {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
+  };
 };
 
 export type GetCategoryApiProps = {
@@ -16,9 +19,12 @@ export type GetCategoryApiProps = {
 
 export type GetCategoriesProps = {
   slug: string;
+  page?: number;
+  limit?: number;
+  categoryName?: string;
 };
 
-export type GetCategoriesResponse = GetCategoriesApiProps["categories"];
+export type GetCategoriesResponse = GetCategoriesApiProps;
 
 export type GetCategoryProps = {
   slug: string;

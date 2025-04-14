@@ -3,7 +3,6 @@ import type {
   CreateCategoryServiceBody,
   CreateCategoryServiceResponse,
   DeleteCategoryServiceBody,
-  GetCategoriesApiProps,
   GetCategoriesProps,
   GetCategoriesResponse,
   GetCategoryApiProps,
@@ -15,12 +14,22 @@ import type {
 
 export async function getCategoriesService({
   slug,
+  page = 1,
+  limit = 10,
+  categoryName,
 }: GetCategoriesProps): Promise<GetCategoriesResponse> {
-  const result = await api
-    .get(`api/organizations/${slug}/categories`)
-    .json<GetCategoriesApiProps>();
+  const params = new URLSearchParams();
 
-  return result.categories;
+  if (categoryName) {
+    params.append("categoryName", categoryName);
+  }
+  params.append("page", page.toString());
+  params.append("limit", limit.toString());
+
+  const url = `api/organizations/${slug}/categories?${params.toString()}`;
+
+  const result = await api.get(url).json<GetCategoriesResponse>();
+  return result;
 }
 
 export async function getCategoryService({

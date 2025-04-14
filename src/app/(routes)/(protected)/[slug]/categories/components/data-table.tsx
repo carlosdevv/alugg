@@ -5,14 +5,12 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   useReactTable,
   type ColumnFiltersState,
 } from "@tanstack/react-table";
 
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -28,53 +26,67 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useQueryState } from "nuqs";
 import { useState } from "react";
+import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pagination: {
+    pageCount: number;
+    pageSize: number;
+    page: number;
+    onPageChange: (page: number) => void;
+    onPageSizeChange: (pageSize: number) => void;
+  };
+  toolbar?: {
+    onCategoryNameChange?: (name: string) => void;
+    categoryName?: string;
+    isLoading?: boolean;
+    onResetFilters?: () => void;
+  };
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  pagination,
+  toolbar,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
-  const [, setModal] = useQueryState("modal");
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
-
+    manualPagination: true,
+    pageCount: pagination.pageCount,
     state: {
       columnFilters,
       rowSelection,
+      pagination: {
+        pageIndex: pagination.page - 1,
+        pageSize: pagination.pageSize,
+      },
+    },
+    onPaginationChange: (updater) => {
+      if (typeof updater === "function") {
+        const nextState = updater({
+          pageIndex: pagination.page - 1,
+          pageSize: pagination.pageSize,
+        });
+        pagination.onPageChange(nextState.pageIndex + 1);
+      }
     },
   });
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-y-4 justify-between items-center py-4">
-        <Input
-          placeholder="🔎  Filtrar por Nome"
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-60"
-        />
-        <Button size="sm" onClick={() => setModal("create-category")}>
-          <Icons.circlePlus className="size-4 mr-2" />
-          Criar Categoria
-        </Button>
-      </div>
+    <div className="flex flex-col space-y-4 mt-4">
+      <DataTableToolbar {...toolbar} />
       <div className="rounded-md border mb-2">
         <Table>
           <TableHeader>
@@ -129,13 +141,13 @@ export function DataTable<TData, TValue>({
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Items por página</p>
           <Select
-            value={`${table.getState().pagination.pageSize}`}
+            value={`${pagination.pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value));
+              pagination.onPageSizeChange(Number(value));
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue placeholder={pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
               {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -147,16 +159,15 @@ export function DataTable<TData, TValue>({
           </Select>
         </div>
         <div className="ml-auto flex w-[100px] items-center justify-center text-sm font-medium">
-          Página {table.getState().pagination.pageIndex + 1} de{" "}
-          {table.getPageCount()}
+          Página {pagination.page} de {pagination.pageCount}
         </div>
         <div className="flex items-center justify-end space-x-2">
           <Button
             variant="outline"
             size="sm"
             className="size-8 p-0"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => pagination.onPageChange(pagination.page - 1)}
+            disabled={pagination.page <= 1}
           >
             <span className="sr-only">Anterior</span>
             <Icons.chevronLeft className="size-4" />
@@ -165,8 +176,8 @@ export function DataTable<TData, TValue>({
             variant="outline"
             size="sm"
             className="size-8 p-0"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => pagination.onPageChange(pagination.page + 1)}
+            disabled={pagination.page >= pagination.pageCount}
           >
             <span className="sr-only">Próximo</span>
             <Icons.chevronRight className="size-4" />

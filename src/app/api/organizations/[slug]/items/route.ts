@@ -14,6 +14,7 @@ export async function GET(
     const userId = await getUserId();
     const searchParams = req.nextUrl.searchParams;
     const itemName = searchParams.get("itemName");
+    const status = searchParams.getAll("status");
 
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
@@ -43,7 +44,16 @@ export async function GET(
       };
     }
 
-    const whereFilter = { ...baseFilter, ...nameFilter };
+    let statusFilter = {};
+    if (status.length > 0) {
+      statusFilter = {
+        status: {
+          in: status,
+        },
+      };
+    }
+
+    const whereFilter = { ...baseFilter, ...nameFilter, ...statusFilter };
 
     const [items, totalItems, statusCount] = await Promise.all([
       prisma.item.findMany({

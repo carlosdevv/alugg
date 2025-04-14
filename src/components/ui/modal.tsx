@@ -3,6 +3,7 @@
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useRouter } from "next/navigation";
 import { ComponentProps, Dispatch, SetStateAction } from "react";
 import { Drawer } from "vaul";
@@ -92,7 +93,9 @@ export function Modal({
           id="modal-backdrop"
           className="animate-fade-in fixed inset-0 z-40 bg-gray-100 bg-opacity-50 backdrop-blur-md"
         />
-        <Dialog.Title />
+        <VisuallyHidden>
+          <Dialog.Title>Modal</Dialog.Title>
+        </VisuallyHidden>
         <Dialog.Content
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}

@@ -5,7 +5,7 @@ import prisma from "@/lib/prismadb";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
-// GET /api/organizations/:slug/categories – get all categories
+// GET /api/organizations/:slug/categories – get all categories
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -13,6 +13,12 @@ export async function GET(
   try {
     const userId = await getUserId();
     const { slug } = await params;
+    const searchParams = req.nextUrl.searchParams;
+    const categoryName = searchParams.get("categoryName");
+
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+    const skip = (page - 1) * limit;
 
     if (!userId) {
       return NextResponse.json(
@@ -30,22 +36,45 @@ export async function GET(
 
     const { organization } = await getUserMembership(slug);
 
-    const allCategories = await prisma.category.findMany({
-      select: {
-        id: true,
-        name: true,
-      },
-      where: {
-        organizationId: organization.id,
-      },
-    });
+    // Base filter
+    const baseFilter = {
+      organizationId: organization.id,
+    };
 
-    if (allCategories.length === 0) {
-      return NextResponse.json({ category: [] }, { status: 200 });
+    // Add name filter if provided
+    let nameFilter = {};
+    if (categoryName) {
+      nameFilter = {
+        name: {
+          contains: categoryName,
+          mode: "insensitive" as const,
+        },
+      };
     }
 
-    const categories = await Promise.all(
-      allCategories.map(async (category) => {
+    const whereFilter = { ...baseFilter, ...nameFilter };
+
+    const [categories, totalCategories] = await Promise.all([
+      prisma.category.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+        where: whereFilter,
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.category.count({
+        where: whereFilter,
+      }),
+    ]);
+
+    // Get item counts for each category
+    const categoriesWithCounts = await Promise.all(
+      categories.map(async (category) => {
         const itemCount = await prisma.item.count({
           where: {
             categoryId: category.id,
@@ -59,7 +88,16 @@ export async function GET(
       })
     );
 
-    return NextResponse.json({ categories }, { status: 200 });
+    return NextResponse.json({
+      categories: categoriesWithCounts,
+      total: totalCategories,
+      pagination: {
+        total: totalCategories,
+        pages: Math.ceil(totalCategories / limit),
+        page,
+        limit,
+      },
+    });
   } catch (error) {
     console.log("ERR:", error);
     return NextResponse.json(
