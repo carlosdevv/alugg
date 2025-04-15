@@ -54,6 +54,7 @@ export default function CreateCategoryModal({
                     placeholder="Nome da categoria"
                     className="bg-white dark:placeholder-gray-200 dark:border-zinc-700 dark:bg-neutral-900"
                     {...field}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />

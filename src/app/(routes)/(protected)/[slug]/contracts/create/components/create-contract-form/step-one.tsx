@@ -311,8 +311,8 @@ export function StepOne() {
                             <span className="text-sm">Carrengado...</span>
                           </div>
                         ) : (
-                          customers?.data.find((c) => c.id === field.value)
-                            ?.name ?? "Selecione Cliente"
+                          (customers?.data.find((c) => c.id === field.value)
+                            ?.name ?? "Selecione Cliente")
                         )}
                       </span>
                       <Icons.chevronsUpDown

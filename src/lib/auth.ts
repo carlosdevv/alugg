@@ -1,9 +1,14 @@
 import { sendEmail } from "@/actions/auth/send-email";
+import { stripe } from "@better-auth/stripe";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { openAPI } from "better-auth/plugins";
+import Stripe from "stripe";
 import prisma from "./prismadb";
+
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export const auth = betterAuth({
   appName: "Alugg",
@@ -63,5 +68,30 @@ export const auth = betterAuth({
     },
     expiresIn: 3600, // 1 hour
   },
-  plugins: [nextCookies(), openAPI()],
+  subscription: {
+    enabled: true,
+    plans: [
+      {
+        name: "premium",
+        priceId: "price_1RDz6QArAFan2Hw8kvHj8Wk5", // the price id from stripe
+        // annualDiscountPriceId: "price_1234567890", // (optional) the price id for annual billing with a discount
+        // limits: {
+        //   projects: 5,
+        //   storage: 10,
+        // },
+        freeTrial: {
+          days: 14,
+        },
+      },
+    ],
+  },
+  plugins: [
+    nextCookies(),
+    openAPI(),
+    stripe({
+      stripeClient,
+      stripeWebhookSecret,
+      createCustomerOnSignUp: true,
+    }),
+  ],
 });

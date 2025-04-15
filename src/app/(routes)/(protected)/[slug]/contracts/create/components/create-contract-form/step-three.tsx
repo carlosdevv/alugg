@@ -75,7 +75,7 @@ export function StepThree() {
     setTotalValue,
     nextContractCode,
   } = useCreateContractContext();
-  const { data: items } = useGetItemsService({ slug });
+  const { data: itemsResponse } = useGetItemsService({ slug });
   const [totalValueState, setTotalValueState] = useState(0);
 
   const formatBrazilianDate = (dateString: string) => {
@@ -230,34 +230,38 @@ export function StepThree() {
 
   // Inicializar os itens no formulário
   useEffect(() => {
-    if (items && selectedItems.size > 0) {
+    if (itemsResponse && selectedItems.size > 0) {
       const formItems = Array.from(selectedItems)
         .map(([itemId, quantity]) => {
-          const item = items.find((i) => i.id === itemId);
+          const item = itemsResponse.items.find((i) => i.id === itemId);
           if (!item) return null;
 
           const baseValue = item.rentPrice * quantity;
-          
+
           // Verificar se o item já existe no formulário para preservar configurações
-          const existingItem = form.getValues("items")?.find(
-            (formItem) => formItem.itemId === itemId
-          );
+          const existingItem = form
+            .getValues("items")
+            ?.find((formItem) => formItem.itemId === itemId);
 
           if (existingItem) {
             // Se a quantidade mudou, atualizar o valor base e final
             if (existingItem.quantity !== quantity) {
               const newBaseValue = item.rentPrice * quantity;
               let newFinalValue = newBaseValue;
-              
+
               // Recalcular desconto se existir
               if (existingItem.discount.value > 0) {
                 if (existingItem.discount.mode === "percent") {
-                  newFinalValue = newBaseValue * (1 - existingItem.discount.value / 100);
+                  newFinalValue =
+                    newBaseValue * (1 - existingItem.discount.value / 100);
                 } else {
-                  newFinalValue = Math.max(0, newBaseValue - existingItem.discount.value);
+                  newFinalValue = Math.max(
+                    0,
+                    newBaseValue - existingItem.discount.value
+                  );
                 }
               }
-              
+
               return {
                 ...existingItem,
                 quantity,
@@ -265,7 +269,7 @@ export function StepThree() {
                 finalValue: existingItem.isBonus ? 0 : newFinalValue,
               };
             }
-            
+
             // Se a quantidade não mudou, manter as configurações existentes
             return existingItem;
           }
@@ -297,20 +301,22 @@ export function StepThree() {
 
       // Atualizar apenas se houver mudanças nos itens
       const currentItems = form.getValues("items") || [];
-      const itemsChanged = 
-        formItems.length !== currentItems.length || 
+      const itemsChanged =
+        formItems.length !== currentItems.length ||
         formItems.some((item, index) => {
           const currentItem = currentItems[index];
-          return !currentItem || 
-                 item.itemId !== currentItem.itemId || 
-                 item.quantity !== currentItem.quantity;
+          return (
+            !currentItem ||
+            item.itemId !== currentItem.itemId ||
+            item.quantity !== currentItem.quantity
+          );
         });
 
       if (itemsChanged) {
         form.setValue("items", formItems);
       }
     }
-  }, [items, selectedItems, form]);
+  }, [itemsResponse, selectedItems, form]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.45fr] gap-4">
@@ -359,15 +365,9 @@ export function StepThree() {
           <CardContent className="flex flex-col gap-y-2">
             <header className="grid grid-cols-2 sm:grid-cols-[1.5fr_80px_50px_50px_1fr_1.4fr] text-xs text-muted-foreground mt-4 gap-x-4">
               <span className="col-span-1 truncate">Nome</span>
-              <span className="hidden sm:block text-center">
-                Código
-              </span>
-              <span className="col-span-1 text-center">
-                Qtd
-              </span>
-              <span className="hidden sm:block text-center">
-                Bônus
-              </span>
+              <span className="hidden sm:block text-center">Código</span>
+              <span className="col-span-1 text-center">Qtd</span>
+              <span className="hidden sm:block text-center">Bônus</span>
               <div className="hidden sm:flex items-center gap-x-1 justify-center">
                 <span>Desconto</span>
                 <TooltipProvider>
@@ -390,7 +390,9 @@ export function StepThree() {
             {/* body */}
             <div className="h-full max-h-80 overflow-y-auto space-y-4">
               {form.watch("items")?.map((formItem, index) => {
-                const item = items?.find((i) => i.id === formItem.itemId);
+                const item = itemsResponse?.items.find(
+                  (i) => i.id === formItem.itemId
+                );
                 if (!item) return null;
 
                 return (
@@ -398,7 +400,10 @@ export function StepThree() {
                     key={formItem.itemId}
                     className="grid grid-cols-2 sm:grid-cols-[1.5fr_80px_50px_50px_1fr_1.4fr] items-center gap-x-4 gap-y-2 py-2 border-b border-border"
                   >
-                    <span className="col-span-1 font-medium text-xs truncate max-w-full" title={item.name}>
+                    <span
+                      className="col-span-1 font-medium text-xs truncate max-w-full"
+                      title={item.name}
+                    >
                       {item.name}
                     </span>
                     <span className="hidden sm:block font-medium text-xs text-center">
@@ -690,7 +695,9 @@ export function StepThree() {
               <h3 className="text-sm font-medium">Itens Contratados</h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {form.watch("items")?.map((formItem, index) => {
-                  const item = items?.find((i) => i.id === formItem.itemId);
+                  const item = itemsResponse?.items.find(
+                    (i) => i.id === formItem.itemId
+                  );
                   if (!item) return null;
 
                   return (

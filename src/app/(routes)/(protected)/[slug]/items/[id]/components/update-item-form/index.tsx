@@ -35,14 +35,14 @@ import useUpdateItemForm from "./use-update-item-form";
 
 type UpdateItemFormProps = {
   itemProps: ItemProps;
-  categories?: GetCategoriesResponse;
+  categoriesResponse?: GetCategoriesResponse;
   id: string;
   slug: string;
 };
 
 export default function UpdateItemForm({
   itemProps: item,
-  categories,
+  categoriesResponse,
   id,
   slug,
 }: UpdateItemFormProps) {
@@ -102,8 +102,8 @@ export default function UpdateItemForm({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categories?.length ? (
-                            categories.map((category) => (
+                          {categoriesResponse?.categories.length ? (
+                            categoriesResponse?.categories.map((category) => (
                               <SelectItem key={category.id} value={category.id}>
                                 {category.name}
                               </SelectItem>

@@ -29,7 +29,7 @@ export default function UpdateItemPageClient({
       {item && !isLoading && !isCategoriesLoading && (
         <UpdateItemForm
           itemProps={item}
-          categories={categories}
+          categoriesResponse={categories}
           id={id}
           slug={slug}
         />

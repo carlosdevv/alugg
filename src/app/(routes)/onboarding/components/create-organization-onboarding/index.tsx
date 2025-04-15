@@ -26,7 +26,7 @@ export default function CreateOrganizationOnboarding() {
               <div className="border-b flex flex-col px-4 py-4 md:px-6">
                 <h4 className="font-medium">Criar nova organização</h4>
                 <p className="text-sm text-muted-foreground">
-                  A organização representa sua empresa no Allug
+                  A organização representa sua empresa no Alugg
                 </p>
               </div>
 

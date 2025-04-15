@@ -2,15 +2,15 @@ import { useGetCategoriesService } from "@/http/category/use-categories-service"
 import { useCreateItemService } from "@/http/items/use-items-service";
 import { createClient } from "@/lib/supabase/client";
 import {
-    currencyToNumber,
-    itemsFileAcceptTypes,
-    UPLOAD_ITEMS_MAX_FILE_SIZE_MB,
+  currencyToNumber,
+  itemsFileAcceptTypes,
+  UPLOAD_ITEMS_MAX_FILE_SIZE_MB,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ItemStatus } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -75,14 +75,19 @@ export default function useCreateItemForm() {
     setImagePreview(null);
   }
 
-  const { data: categories = [], isLoading: isLoadingCategories } = useGetCategoriesService(
-    { slug },
-    { 
-      enabled: !!slug,
-      queryKey: ["getCategories", slug],
-      initialData: [], // Fornece um valor inicial para evitar undefined
-      staleTime: 1000 * 60 * 5, // Cache por 5 minutos
-    }
+  const { data: categoriesData, isLoading: isLoadingCategories } =
+    useGetCategoriesService(
+      { slug },
+      {
+        enabled: !!slug,
+        queryKey: ["getCategories", slug],
+        staleTime: 1000 * 60 * 5, // Cache por 5 minutos
+      }
+    );
+
+  const categories = useMemo(
+    () => categoriesData?.categories || [],
+    [categoriesData]
   );
 
   const { mutateAsync: createItemService, isPending: isCreatingItem } =
@@ -144,8 +149,8 @@ export default function useCreateItemForm() {
     const status = data.itemInRepair
       ? ItemStatus.IN_REPAIR
       : data.itemInactive
-      ? ItemStatus.INACTIVE
-      : ItemStatus.ACTIVE;
+        ? ItemStatus.INACTIVE
+        : ItemStatus.ACTIVE;
 
     await createItemService({
       description: data.description,

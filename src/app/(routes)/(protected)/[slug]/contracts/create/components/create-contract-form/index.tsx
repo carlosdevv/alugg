@@ -47,14 +47,14 @@ export default function CreateContractForm() {
   // Obter valores do formulário para validação
   const formValues = form.watch();
   const { customerId, eventDate, withdrawalDate, returnDate } = formValues;
-  
+
   // Verificar se pode avançar da step 1
-  const canAdvanceFromStepOne = 
+  const canAdvanceFromStepOne =
     !!customerId && !!eventDate && !!withdrawalDate && !!returnDate;
-  
+
   // Determinar se o botão "Avançar" deve estar desabilitado
-  const isNextButtonDisabled = 
-    isCreatingContract || 
+  const isNextButtonDisabled =
+    isCreatingContract ||
     (currentStep === 1 && !canAdvanceFromStepOne) ||
     currentStep > steps.length;
 

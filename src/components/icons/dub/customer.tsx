@@ -9,20 +9,45 @@ export function CustomerIcon({
   useEffect(() => {
     if (!ref.current) return;
 
-    const circles = ref.current.querySelectorAll("circle");
+    const heads = ref.current.querySelectorAll("circle");
 
     if (hovered) {
-      circles.forEach((circle, index) => {
-        circle.animate([{ opacity: 0 }, { opacity: 1 }], {
-          duration: 600,
-          delay: index * 150, // Sequência de animação entre os círculos
+      // Animação da primeira cabeça (leve movimento circular)
+      heads[0].animate(
+        [
+          { transform: "translate(0, 0)" },
+          { transform: "translate(1px, -1px)" },
+          { transform: "translate(0, -2px)" },
+          { transform: "translate(-1px, -1px)" },
+          { transform: "translate(0, 0)" },
+        ],
+        {
+          duration: 1500,
           iterations: Infinity,
-          direction: "alternate", // Vai e volta no efeito de fade
-        });
-      });
+          easing: "ease-in-out",
+        }
+      );
+
+      // Animação da segunda cabeça (movimento levemente diferente)
+      heads[1].animate(
+        [
+          { transform: "translate(0, 0)" },
+          { transform: "translate(-1px, -1px)" },
+          { transform: "translate(-1px, 1px)" },
+          { transform: "translate(1px, 1px)" },
+          { transform: "translate(0, 0)" },
+        ],
+        {
+          duration: 1800,
+          iterations: Infinity,
+          easing: "ease-in-out",
+          delay: 200, // Pequeno atraso para dessincronizar do primeiro
+        }
+      );
     } else {
-      circles.forEach((circle) =>
-        circle.getAnimations().forEach((anim) => anim.cancel())
+      // Cancela todas as animações quando não estiver em hover
+      heads.forEach((head) =>
+        head.getAnimations().forEach((anim) => anim.cancel())
       );
     }
   }, [hovered]);
@@ -35,22 +60,19 @@ export function CustomerIcon({
       xmlns="http://www.w3.org/2000/svg"
       ref={ref}
       {...rest}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {/* Cliente central */}
-        <circle cx="12" cy="12" r="3" />
-        {/* Clientes ao redor */}
-        <circle cx="6" cy="12" r="2" />
-        <circle cx="18" cy="12" r="2" />
-        <circle cx="12" cy="6" r="2" />
-        <circle cx="12" cy="18" r="2" />
-      </g>
+      {/* Primeiro usuário (frente) */}
+      <circle cx="9" cy="7" r="4" />
+      <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+
+      {/* Segundo usuário (atrás) */}
+      <circle cx="16" cy="11" r="4" />
+      <path d="M21 21v-2a4 4 0 0 0-4-4h-4" />
     </svg>
   );
 }

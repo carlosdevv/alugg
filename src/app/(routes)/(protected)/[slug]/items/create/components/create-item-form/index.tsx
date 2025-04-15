@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { formatToCurrency } from "@/lib/utils";
+import { formatToCurrency, handleCurrencyInputChange } from "@/lib/utils";
 import Image from "next/image";
 import useCreateItemForm from "./use-create-item-form";
 
@@ -67,7 +67,11 @@ export default function CreateItemForm() {
                     <FormItem>
                       <FormLabel>Nome *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nome do Item" {...field} />
+                        <Input
+                          placeholder="Nome do Item"
+                          {...field}
+                          value={field.value || ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -87,11 +91,13 @@ export default function CreateItemForm() {
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder={
-                                isLoadingCategories 
-                                  ? "Carregando categorias..." 
-                                  : "Selecione uma categoria"
-                              } />
+                              <SelectValue
+                                placeholder={
+                                  isLoadingCategories
+                                    ? "Carregando categorias..."
+                                    : "Selecione uma categoria"
+                                }
+                              />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -101,7 +107,10 @@ export default function CreateItemForm() {
                               </SelectItem>
                             ) : categories?.length ? (
                               categories.map((category) => (
-                                <SelectItem key={category.id} value={category.id}>
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.id}
+                                >
                                   {category.name}
                                 </SelectItem>
                               ))
@@ -133,7 +142,11 @@ export default function CreateItemForm() {
                     <FormItem>
                       <FormLabel>Quantidade *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Informe a quantidade" {...field} />
+                        <Input
+                          placeholder="Informe a quantidade"
+                          {...field}
+                          value={field.value || ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -149,12 +162,10 @@ export default function CreateItemForm() {
                         <Input
                           placeholder="Informe o valor"
                           {...field}
+                          value={field.value || ""}
                           onChange={(e) => {
-                            const formattedValue = formatToCurrency(
-                              e.currentTarget.value
-                            );
-                            field.onChange({
-                              target: { value: formattedValue },
+                            handleCurrencyInputChange(e, (value) => {
+                              field.onChange(formatToCurrency(value));
                             });
                           }}
                         />
@@ -173,12 +184,10 @@ export default function CreateItemForm() {
                         <Input
                           placeholder="Informe o valor"
                           {...field}
+                          value={field.value || ""}
                           onChange={(e) => {
-                            const formattedValue = formatToCurrency(
-                              e.currentTarget.value
-                            );
-                            field.onChange({
-                              target: { value: formattedValue },
+                            handleCurrencyInputChange(e, (value) => {
+                              field.onChange(formatToCurrency(value));
                             });
                           }}
                         />
@@ -203,7 +212,11 @@ export default function CreateItemForm() {
                     <FormItem>
                       <FormLabel>Tamanho</FormLabel>
                       <FormControl>
-                        <Input placeholder="Tamanho do Item" {...field} />
+                        <Input
+                          placeholder="Tamanho do Item"
+                          {...field}
+                          value={field.value || ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -216,7 +229,11 @@ export default function CreateItemForm() {
                     <FormItem>
                       <FormLabel>Cor</FormLabel>
                       <FormControl>
-                        <Input placeholder="Cor do Item" {...field} />
+                        <Input
+                          placeholder="Cor do Item"
+                          {...field}
+                          value={field.value || ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -233,6 +250,7 @@ export default function CreateItemForm() {
                           placeholder="Descrição do Item"
                           className="min-h-32"
                           {...field}
+                          value={field.value || ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -258,6 +276,7 @@ export default function CreateItemForm() {
                         <Input
                           placeholder="Código do Item"
                           {...field}
+                          value={field.value || ""}
                           onBlur={async () => {
                             form.clearErrors("code");
                             if (field.value) {

@@ -8,8 +8,8 @@ import {
   FileIcon,
   GearIcon,
   HomeIcon,
+  InventoryItemsIcon,
   LayersIcon,
-  ListIcon,
   PeopleIcon,
 } from "@/components/icons/dub";
 import {
@@ -67,7 +67,7 @@ export function NavMain() {
       items: [
         {
           name: "Items",
-          icon: ListIcon,
+          icon: InventoryItemsIcon,
           href: `/${slug}/items`,
         },
         {
