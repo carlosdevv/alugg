@@ -2,6 +2,7 @@
 
 import {
   ApertureIcon,
+  ArrowRightIcon,
   AtSignIcon,
   BellIcon,
   CalendarDaysIcon,
@@ -60,6 +61,7 @@ import { ComponentType, SVGProps } from "react";
 export type IconType = LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;
 
 export const Icons = {
+  arrowRight: ArrowRightIcon,
   list: List,
   package: Package,
   home: Home,

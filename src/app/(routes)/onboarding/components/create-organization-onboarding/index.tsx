@@ -11,6 +11,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { appRoutes } from "@/lib/constants";
+import Link from "next/link";
 import slugify from "slugify";
 import useCreateOrganizationOnboarding from "./use-create-organization-onboarding";
 
@@ -117,18 +126,52 @@ export default function CreateOrganizationOnboarding() {
                   render={({ field }) => (
                     <FormItem className="px-4 pb-4 md:px-6 md:grid md:grid-cols-[8rem_1fr] w-full justify-between">
                       <FormLabel className="text-sm break-all text-muted-foreground block mb-2 md:mb-0">
-                        Plano
+                        Planos
                       </FormLabel>
-                      <div>
+                      <div className="flex items-center gap-x-4">
                         <FormControl>
-                          <Input
-                            placeholder="Gratuíto - R$0/mês"
-                            readOnly
-                            {...field}
-                          />
+                          <Select
+                            defaultValue="free"
+                            onValueChange={field.onChange}
+                            value={field.value || "free"}
+                          >
+                            <SelectTrigger className="w-full text-left">
+                              <SelectValue>
+                                {field.value === "free"
+                                  ? "Plano Gratuito"
+                                  : "Plano Pro"}
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="free" className="py-2">
+                                <div>
+                                  <div>Plano Gratuito</div>
+                                  <p className="text-muted-foreground mt-1 text-xs font-normal">
+                                    Explore todas as funcionalidades sem
+                                    compromisso.
+                                  </p>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="pro" className="py-2">
+                                <div>
+                                  <div>Plano Pro</div>
+                                  <p className="text-muted-foreground mt-1 text-xs font-normal">
+                                    Tudo o que você precisa, sem limites.
+                                  </p>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
+                        <div className="flex">
+                          <Button type="button" asChild className="w-fit">
+                            <Link href={appRoutes.plans}>
+                              Visualizar planos
+                            </Link>
+                          </Button>
+                        </div>
+                        <FormMessage className="mt-1" />
                       </div>
-                      <FormMessage className="mt-1 md:col-start-2 md:col-end-3" />
                     </FormItem>
                   )}
                 />

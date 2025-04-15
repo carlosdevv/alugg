@@ -9,6 +9,8 @@ const publicRoutes = [
   "/api/auth/reference",
   appRoutes.verifyEmail,
   appRoutes.resetPassword,
+  appRoutes.plans,
+  appRoutes.landing,
 ];
 const authRoutes = [appRoutes.signIn, appRoutes.signUp];
 
@@ -36,7 +38,7 @@ export default async function authMiddleware(request: NextRequest) {
   }
 
   if (isAuthRoute) {
-    return NextResponse.redirect(new URL(appRoutes.home, request.url));
+    return NextResponse.redirect(new URL(appRoutes.onboarding, request.url));
   }
 
   return NextResponse.next();

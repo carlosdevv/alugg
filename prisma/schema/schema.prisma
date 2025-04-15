@@ -21,6 +21,7 @@ model User {
   emailVerified       Boolean
   image               String?
   defaultOrganization String? // slug of the user's default organization
+  stripeCustomerId    String?
   plan                Plan     @default(FREE)
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
@@ -78,4 +79,19 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Subscription {
+  id                   String    @id
+  plan                 String
+  referenceId          String
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  status               String?
+  periodStart          DateTime?
+  periodEnd            DateTime?
+  cancelAtPeriodEnd    Boolean?
+  seats                Int?
+
+  @@map("subscription")
 }

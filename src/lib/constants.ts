@@ -1,11 +1,16 @@
 export const appRoutes = {
-  home: "/",
+  // Public routes
+  plans: "/plans",
+  landing: "/",
+
+  // Auth routes
   signIn: "/auth/sign-in",
   signUp: "/auth/sign-up",
   verifyEmail: "/auth/verify-email",
   resetPassword: "/auth/reset-password",
+
+  // Private routes
   onboarding: "/onboarding",
-  createOrganization: "/create-organization",
   categories: {
     root: "categories",
     create: "categories/create",

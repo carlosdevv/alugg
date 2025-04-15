@@ -68,30 +68,34 @@ export const auth = betterAuth({
     },
     expiresIn: 3600, // 1 hour
   },
-  subscription: {
-    enabled: true,
-    plans: [
-      {
-        name: "premium",
-        priceId: "price_1RDz6QArAFan2Hw8kvHj8Wk5", // the price id from stripe
-        // annualDiscountPriceId: "price_1234567890", // (optional) the price id for annual billing with a discount
-        // limits: {
-        //   projects: 5,
-        //   storage: 10,
-        // },
-        freeTrial: {
-          days: 14,
-        },
-      },
-    ],
-  },
   plugins: [
-    nextCookies(),
-    openAPI(),
     stripe({
       stripeClient,
       stripeWebhookSecret,
       createCustomerOnSignUp: true,
+      subscription: {
+        enabled: true,
+        plans: [
+          {
+            name: "Free",
+            priceId: "price_1REDjnArAFan2Hw8yDQwuf0B", // the price id from stripe
+          },
+          {
+            name: "Pro",
+            priceId: "price_1RDz6QArAFan2Hw8kvHj8Wk5", // the price id from stripe
+            annualDiscountPriceId: "price_1REDnzArAFan2Hw8KQxDDFK3", // (optional) the price id for annual billing with a discount
+            // limits: {
+            //   projects: 5,
+            //   storage: 10,
+            // },
+            freeTrial: {
+              days: 14,
+            },
+          },
+        ],
+      },
     }),
+    openAPI(),
+    nextCookies(), // must be the last plugin
   ],
 });
