@@ -2,6 +2,14 @@ export const appRoutes = {
   // Public routes
   plans: "/plans",
   landing: "/",
+  solutions: "/solutions",
+  resources: "/resources",
+  help: "/help",
+  docs: "/docs",
+  aboutUs: "/about-us",
+  contact: "/contact",
+  privacyPolicy: "/privacy-policy",
+  termsOfService: "/terms-of-service",
 
   // Auth routes
   signIn: "/auth/sign-in",

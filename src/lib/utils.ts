@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import ms from "ms";
 import slugify from "slugify";
 import { twMerge } from "tailwind-merge";
 
@@ -152,4 +153,68 @@ export const formatToCurrency = (value: string | number): string => {
     currency: "BRL",
     maximumFractionDigits: 2,
   }).format(numValue);
+};
+
+export function nFormatter(
+  num?: number,
+  opts: { digits?: number; full?: boolean } = {
+    digits: 1,
+  }
+) {
+  if (!num) return "0";
+  if (opts.full) {
+    return Intl.NumberFormat("pt-BR").format(num);
+  }
+
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+
+  if (num < 1) {
+    return num.toFixed(opts.digits).replace(rx, "$1");
+  }
+
+  const lookup = [
+    { value: 1, symbol: "" },
+    { value: 1e3, symbol: "K" },
+    { value: 1e6, symbol: "M" },
+    { value: 1e9, symbol: "G" },
+    { value: 1e12, symbol: "T" },
+    { value: 1e15, symbol: "P" },
+    { value: 1e18, symbol: "E" },
+  ];
+  var item = lookup
+    .slice()
+    .reverse()
+    .find(function (item) {
+      return num >= item.value;
+    });
+  return item
+    ? (num / item.value).toFixed(opts.digits).replace(rx, "$1") + item.symbol
+    : "0";
+}
+
+export const timeAgo = (
+  timestamp: Date | null,
+  {
+    withAgo,
+  }: {
+    withAgo?: boolean;
+  } = {}
+): string => {
+  if (!timestamp) return "Never";
+  const diff = Date.now() - new Date(timestamp).getTime();
+  if (diff < 1000) {
+    // less than 1 second
+    return "Just now";
+  } else if (diff > 82800000) {
+    // more than 23 hours – similar to how Twitter displays timestamps
+    return new Date(timestamp).toLocaleDateString("pt-BR", {
+      month: "short",
+      day: "numeric",
+      year:
+        new Date(timestamp).getFullYear() !== new Date().getFullYear()
+          ? "numeric"
+          : undefined,
+    });
+  }
+  return `${ms(diff)}${withAgo ? " ago" : ""}`;
 };
