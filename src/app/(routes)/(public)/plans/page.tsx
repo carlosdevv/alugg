@@ -4,7 +4,7 @@ import PlansPageClient from "./page-client";
 
 export default function PlansPage() {
   return (
-    <div className="mx-auto flex min-h-screen max-w-[1120px] flex-col">
+    <div className="mx-auto flex min-h-screen w-full max-w-[1120px] flex-col">
       <Nav />
       <PlansPageClient />
       <Footer />

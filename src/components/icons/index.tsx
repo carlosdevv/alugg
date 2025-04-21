@@ -1,7 +1,7 @@
 "use client";
 
+import LogoIcon from "@/assets/logo-icon.svg";
 import {
-  ApertureIcon,
   ArrowRightIcon,
   AtSignIcon,
   BadgeHelpIcon,
@@ -105,7 +105,7 @@ export const Icons = {
   clock: Clock1Icon,
   checkCircle: CheckCircle2Icon,
   chevronsUpDown: ChevronsUpDownIcon,
-  logo: ApertureIcon,
+  logo: LogoIcon,
   image: ImageIcon,
   chevronLeft: ChevronLeftIcon,
   chevronRight: ChevronRightIcon,

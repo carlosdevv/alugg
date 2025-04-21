@@ -1,0 +1,21 @@
+<svg width="120" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bar { fill: #1A1A1A; }
+      .text { 
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        fill: #1A1A1A;
+      }
+    </style>
+  </defs>
+
+  <!-- Três barras: curta, alta, curta -->
+   <rect x="2" y="8" width="8" height="16" rx="2" fill="black"/>
+  <rect x="12" y="4" width="8" height="24" rx="2" fill="black"/>
+  <rect x="22" y="8" width="8" height="16" rx="2" fill="black"/>
+
+  <text class="text" x="36" y="24">Alugg</text>
+</svg>

@@ -8,6 +8,7 @@ import { appRoutes } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { LayoutGroup } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useId, type PropsWithChildren, type SVGProps } from "react";
@@ -65,10 +66,13 @@ export default function Nav() {
                 {/* Logo */}
                 <div className="flex flex-1 items-center justify-start">
                   <Link href="/" className="flex items-center space-x-2">
-                    <div className="h-8 w-8 rounded-md bg-blue-600 flex items-center justify-center text-white">
-                      A
-                    </div>
-                    <span className="font-bold">Alugg</span>
+                    <Image
+                      src="/logo.svg"
+                      alt="Alugg"
+                      width={120}
+                      height={32}
+                      className="w-auto h-8"
+                    />
                   </Link>
                 </div>
 
