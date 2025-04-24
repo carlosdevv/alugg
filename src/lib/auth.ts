@@ -88,9 +88,9 @@ export const auth = betterAuth({
             //   projects: 5,
             //   storage: 10,
             // },
-            freeTrial: {
-              days: 14,
-            },
+            // freeTrial: {
+            //   days: 14,
+            // },
           },
         ],
       },

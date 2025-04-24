@@ -65,7 +65,7 @@ export default function Nav() {
               <div className="flex h-14 items-center justify-between">
                 {/* Logo */}
                 <div className="flex flex-1 items-center justify-start">
-                  <Link href="/" className="flex items-center space-x-2">
+                  <Link href="/" className="flex items-center">
                     <Image
                       src="/logo.svg"
                       alt="Alugg"
@@ -73,6 +73,9 @@ export default function Nav() {
                       height={32}
                       className="w-auto h-8"
                     />
+                    <div className="bg-neutral-900 tracking-wider text-white text-[8px] font-light px-2 py-1 rounded-full">
+                      BETA
+                    </div>
                   </Link>
                 </div>
 

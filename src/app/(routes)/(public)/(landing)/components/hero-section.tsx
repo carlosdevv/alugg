@@ -1,6 +1,12 @@
+"use client";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
+import { DubButton } from "@/components/ui/dub-button";
+import { appRoutes } from "@/lib/constants";
+import { useRouter } from "next/navigation";
 
 const HeroSection = () => {
+  const router = useRouter();
+
   return (
     <section className="relative overflow-hidden pt-24 md:pt-32">
       <div className="pointer-events-none absolute inset-0">
@@ -26,13 +32,12 @@ const HeroSection = () => {
             complicações.
           </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="/cadastro"
-              className="w-full sm:w-auto rounded-full bg-foreground px-8 py-3 text-background font-medium hover:bg-foreground/90"
-            >
-              Comece agora
-            </a>
+          <div className="flex justify-center mt-10">
+            <DubButton
+              onClick={() => router.push(appRoutes.signUp)}
+              className="w-auto"
+              text="Inscreva-se gratuitamente"
+            />
           </div>
 
           {/* Simulador interativo: visão de item no inventário */}

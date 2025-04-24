@@ -1,16 +1,26 @@
 import { appRoutes } from "@/lib/constants";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white py-12">
+    <footer className="py-12">
       <div className="mx-auto max-w-[1120px] px-4">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-2 lg:col-span-1">
-            <div className="flex items-center space-x-2">
-              {/* <Image src="/logo.svg" alt="Alugg logo" width={32} height={32} /> */}
-              <div>logo</div>
-              <span className="text-xl font-bold">Alugg</span>
+            <div className="flex flex-1 items-center justify-start">
+              <Link href="/" className="flex items-center">
+                <Image
+                  src="/logo.svg"
+                  alt="Alugg"
+                  width={120}
+                  height={32}
+                  className="w-auto h-8"
+                />
+                <div className="bg-neutral-900 tracking-wider text-white text-[8px] font-light px-2 py-1 rounded-full">
+                  BETA
+                </div>
+              </Link>
             </div>
           </div>
 
